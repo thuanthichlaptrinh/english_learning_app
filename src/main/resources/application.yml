@@ -14,7 +14,7 @@ spring:
     jpa:
         hibernate:
             ddl-auto: update
-        show-sql: false # Tắt hiển thị SQL
+        show-sql: false
         properties:
             hibernate:
                 dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -22,7 +22,6 @@ spring:
                 use_sql_comments: true
         open-in-view: false
 
-    # Redis Configuration
     data:
         redis:
             host: localhost
@@ -30,11 +29,10 @@ spring:
             password:
             timeout: 60000
 
-    # Cache Configuration
     cache:
         type: redis
         redis:
-            time-to-live: 3600000 # 1 hour in milliseconds
+            time-to-live: 3600000 # 1h
 
     mail:
         host: smtp.gmail.com
@@ -61,14 +59,14 @@ springdoc:
 
 # JWT Configuration
 jwt:
-    secret-key: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
-    expiration: 86400000 # 24 hours in milliseconds
+    secret-key: Y2FyZC13b3Jkcy1zZWNyZXQta2V5LWZvci1qd3QtdG9rZW4tZ2VuZXJhdGlvbg==
+    expiration: 86400000 # 24h
     refresh-token:
-        expiration: 604800000 # 7 days in milliseconds
+        expiration: 604800000 # 7d
 
 activation:
-    expired-time: 86400000 # 24 hours in milliseconds
-    resend-interval: 300000 # 5 minutes in milliseconds
+    expired-time: 86400000 # 24h
+    resend-interval: 300000 # 5m
 
 logging:
     level:

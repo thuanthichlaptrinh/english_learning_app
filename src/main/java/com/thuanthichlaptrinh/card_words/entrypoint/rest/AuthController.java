@@ -1,10 +1,14 @@
 package com.thuanthichlaptrinh.card_words.entrypoint.rest;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.thuanthichlaptrinh.card_words.core.usecase.AuthenticationService;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.AuthenticationRequest;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.RegisterRequest;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.ApiResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.AuthenticationResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.RegisterResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,16 +24,20 @@ public class AuthController {
 
     private final AuthenticationService authenticationService;
 
-    @PostMapping("/register")
-    @Operation(summary = "Đăng ký tài khoản mới", description = "Tạo tài khoản mới với email và tên. Mật khẩu sẽ được tự động tạo và gửi về email.")
-    public ApiResponse<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
+    @PostMapping("/signup")
+    @Operation(summary = "Đăng ký tài khoản", description = "Tạo tài khoản mới với email và tên. Mật khẩu sẽ được tự động tạo và gửi về email.")
+    public ResponseEntity<ApiResponse<RegisterResponse>> register(@Valid @RequestBody RegisterRequest request) {
         RegisterResponse response = authenticationService.register(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success("Đăng ký thành công", response));
+    }
 
-        return ApiResponse.<RegisterResponse>builder()
-                .status("201")
-                .message("Đăng ký thành công")
-                .data(response)
-                .build();
+    @PostMapping("/signin")
+    @Operation(summary = "Đăng nhập", description = "Đăng nhập bằng email và mật khẩu.")
+    public ResponseEntity<ApiResponse<AuthenticationResponse>> login(
+            @Valid @RequestBody AuthenticationRequest request) {
+        AuthenticationResponse response = authenticationService.login(request);
+        return ResponseEntity.ok(ApiResponse.success("Đăng nhập thành công", response));
     }
 
 }

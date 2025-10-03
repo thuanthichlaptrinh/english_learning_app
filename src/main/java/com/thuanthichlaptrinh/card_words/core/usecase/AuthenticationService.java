@@ -2,11 +2,16 @@ package com.thuanthichlaptrinh.card_words.core.usecase;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,11 +21,14 @@ import com.thuanthichlaptrinh.card_words.common.exceptions.ErrorException;
 import com.thuanthichlaptrinh.card_words.common.utils.PasswordGenerator;
 import com.thuanthichlaptrinh.card_words.configuration.jwt.JwtService;
 import com.thuanthichlaptrinh.card_words.core.domain.Role;
+import com.thuanthichlaptrinh.card_words.core.domain.Token;
 import com.thuanthichlaptrinh.card_words.core.domain.User;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.RoleRepository;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.TokenRepository;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.UserRepository;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.AuthenticationRequest;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.RegisterRequest;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.AuthenticationResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.RegisterResponse;
 
 import jakarta.transaction.Transactional;
@@ -33,6 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final TokenRepository tokenRepository;
@@ -87,7 +96,39 @@ public class AuthenticationService {
         return RegisterResponse.builder()
                 .email(user.getEmail())
                 .name(user.getName())
+                .avatar(user.getAvatar())
                 .message("Đăng ký thành công! Mật khẩu đã được gửi về email của bạn.")
+                .build();
+    }
+
+    @Transactional
+    public AuthenticationResponse login(final AuthenticationRequest request) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+
+        var user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new ErrorException("Email không tồn tại"));
+
+        if (Boolean.TRUE.equals(user.getBanned())) {
+            throw new ErrorException("Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.");
+        }
+
+        var accessToken = jwtService.generateToken(Map.of(
+                "authorities", authentication.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .toList(),
+                "userId", user.getId().toString(),
+                "name", user.getName()),
+                user);
+
+        var refreshToken = jwtService.generateRefreshToken(user);
+
+        revokeAllUserTokens(user.getId().toString());
+        saveUserToken(user, accessToken, refreshToken);
+
+        return AuthenticationResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 
@@ -163,6 +204,29 @@ public class AuthenticationService {
         emailService.sendActivationEmail(user.getEmail(), user.getName(), newActivationKey);
 
         return "Email kích hoạt đã được gửi lại. Vui lòng kiểm tra hộp thư.";
+    }
+
+    private void saveUserToken(User user, String accessToken, String refreshToken) {
+        var token = Token.builder()
+                .user(user)
+                .token(accessToken)
+                .refreshToken(refreshToken)
+                .expired(false)
+                .revoked(false)
+                .build();
+        tokenRepository.save(token);
+    }
+
+    public void revokeAllUserTokens(String userId) {
+        var validUserTokens = tokenRepository.findAllByUserId(UUID.fromString(userId));
+        if (validUserTokens.isEmpty())
+            return;
+        validUserTokens.forEach(
+                token -> {
+                    token.setExpired(true);
+                    token.setRevoked(true);
+                });
+        tokenRepository.saveAll(validUserTokens);
     }
 
 }

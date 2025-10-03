@@ -78,7 +78,15 @@ public class JwtService {
     }
 
     private Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(jwtProperties.getSecretKey());
-        return Keys.hmacShaKeyFor(keyBytes);
+        String secretKey = jwtProperties.getSecretKey();
+        if (secretKey == null || secretKey.isEmpty()) {
+            throw new IllegalArgumentException("JWT secret key cannot be null or empty");
+        }
+        try {
+            byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+            return Keys.hmacShaKeyFor(keyBytes);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid JWT secret key format: " + e.getMessage());
+        }
     }
 }

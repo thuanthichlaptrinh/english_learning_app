@@ -7,11 +7,9 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class RegisterResponse {
-    private String email;
-    private String name;
-    private String message;
-    private String avatar;
+@NoArgsConstructor
+public class AuthenticationResponse {
+    private String accessToken;
+    private String refreshToken;
 }
