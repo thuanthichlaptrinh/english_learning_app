@@ -15,7 +15,8 @@ import java.util.Set;
 @Table(name = "roles", indexes = {
         @Index(name = "idx_role_name", columnList = "name", unique = true)
 })
-public class Role extends BaseEntity {
+public class Role extends BaseLongEntity {
+
     @Column(nullable = false, unique = true, length = 50)
     private String name;
 
@@ -25,4 +26,18 @@ public class Role extends BaseEntity {
     @Builder.Default
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
     private Set<User> users = new HashSet<>();
+
+    @Override
+    public String toString() {
+        return "Role{"
+                + "id="
+                + getId()
+                + ", name='"
+                + name
+                + '\''
+                + ", description='"
+                + description
+                + '\''
+                + '}';
+    }
 }

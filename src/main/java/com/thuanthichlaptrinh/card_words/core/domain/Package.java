@@ -17,7 +17,8 @@ import java.util.Set;
         @Index(name = "idx_package_topic_id", columnList = "topic_id"),
         @Index(name = "idx_package_version", columnList = "version")
 })
-public class Package extends BaseEntity {
+public class Package extends BaseLongEntity {
+
     @Column(nullable = false, length = 100)
     private String name;
 

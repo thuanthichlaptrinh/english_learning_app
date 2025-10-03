@@ -5,18 +5,16 @@ spring:
     application:
         name: card-words
 
-    # PostgreSQL Configuration
     datasource:
         url: jdbc:postgresql://localhost:5432/card_words
         username: postgres
         password: 123456
         driver-class-name: org.postgresql.Driver
 
-    # JPA Configuration
     jpa:
         hibernate:
             ddl-auto: update
-        show-sql: true
+        show-sql: false # Tắt hiển thị SQL
         properties:
             hibernate:
                 dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -38,14 +36,49 @@ spring:
         redis:
             time-to-live: 3600000 # 1 hour in milliseconds
 
+    mail:
+        host: smtp.gmail.com
+        port: 587
+        username: thuanthichlaptrinh@gmail.com
+        password: jcdfsqryziswpjfw
+        properties:
+            mail:
+                smtp:
+                    auth: true
+                    starttls:
+                        enable: true
+                    ssl:
+                        trust: smtp.gmail.com
+                    connectiontimeout: 5000
+                    timeout: 3000
+                    writetimeout: 5000
+
 springdoc:
     api-docs:
         enabled: true
     swagger-ui:
         enabled: true
 
-# Logging
+# JWT Configuration
+jwt:
+    secret-key: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+    expiration: 86400000 # 24 hours in milliseconds
+    refresh-token:
+        expiration: 604800000 # 7 days in milliseconds
+
+activation:
+    expired-time: 86400000 # 24 hours in milliseconds
+    resend-interval: 300000 # 5 minutes in milliseconds
+
 logging:
     level:
-        org.hibernate.SQL: DEBUG
-        org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+        org:
+            springframework:
+                security: trace
+        com:
+            thuanthichlaptrinh: error
+
+http:
+    request-logging-filter:
+        enabled: true
+        include-payload: true

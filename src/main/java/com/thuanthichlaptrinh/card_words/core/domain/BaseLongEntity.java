@@ -13,10 +13,15 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @MappedSuperclass
-public abstract class BaseEntity implements Serializable {
+public abstract class BaseLongEntity implements Serializable {
 
     @Serial
-    private static final long serialVersionUID = -6200598865028967314L;
+    private static final long serialVersionUID = -6200598865028967315L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

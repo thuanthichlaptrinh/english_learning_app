@@ -14,7 +14,8 @@ import lombok.*;
         @Index(name = "idx_token_token", columnList = "token"),
         @Index(name = "idx_token_refresh_token", columnList = "refresh_token")
 })
-public class Token extends BaseEntity {
+public class Token extends BaseUUIDEntity {
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

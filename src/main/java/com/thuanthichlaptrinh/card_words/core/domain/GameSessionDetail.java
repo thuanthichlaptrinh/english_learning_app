@@ -14,7 +14,8 @@ import lombok.*;
         @Index(name = "idx_gsd_vocab_id", columnList = "vocab_id"),
         @Index(name = "idx_gsd_is_correct", columnList = "is_correct")
 })
-public class GameSessionDetail extends BaseEntity {
+public class GameSessionDetail extends BaseLongEntity {
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "session_id", nullable = false)
     private GameSession session;

@@ -5,6 +5,9 @@ import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
+
+import org.hibernate.annotations.GenericGenerator;
 
 @Getter
 @Setter
@@ -18,6 +21,12 @@ import java.util.Set;
         @Index(name = "idx_vocab_word_type", columnList = "word_type")
 })
 public class Vocab extends BaseEntity {
+    @Id
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "id", updatable = false, nullable = false, columnDefinition = "uuid")
+    private UUID id;
+
     @Column(nullable = false, unique = true, length = 100)
     private String word;
 

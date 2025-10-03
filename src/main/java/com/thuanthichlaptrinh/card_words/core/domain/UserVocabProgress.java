@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.UUID;
+
+import org.hibernate.annotations.GenericGenerator;
 
 @Getter
 @Setter
@@ -19,6 +22,12 @@ import java.time.LocalDate;
         @Index(name = "idx_uvp_user_vocab", columnList = "user_id,vocab_id", unique = true)
 })
 public class UserVocabProgress extends BaseEntity {
+    @Id
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "id", updatable = false, nullable = false, columnDefinition = "uuid")
+    private UUID id;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

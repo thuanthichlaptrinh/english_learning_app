@@ -15,7 +15,8 @@ import java.util.Set;
 @Table(name = "games", indexes = {
         @Index(name = "idx_game_name", columnList = "name")
 })
-public class Game extends BaseEntity {
+public class Game extends BaseLongEntity {
+
     @Column(nullable = false, unique = true, length = 100)
     private String name;
 

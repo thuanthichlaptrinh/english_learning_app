@@ -15,7 +15,8 @@ import lombok.*;
         @Index(name = "idx_notif_type", columnList = "type"),
         @Index(name = "idx_notif_created_at", columnList = "created_at")
 })
-public class Notification extends BaseEntity {
+public class Notification extends BaseLongEntity {
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

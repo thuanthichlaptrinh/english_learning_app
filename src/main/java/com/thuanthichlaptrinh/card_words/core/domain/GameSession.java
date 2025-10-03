@@ -20,7 +20,8 @@ import java.util.Set;
         @Index(name = "idx_gs_started_at", columnList = "started_at"),
         @Index(name = "idx_gs_score", columnList = "score")
 })
-public class GameSession extends BaseEntity {
+public class GameSession extends BaseLongEntity {
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
