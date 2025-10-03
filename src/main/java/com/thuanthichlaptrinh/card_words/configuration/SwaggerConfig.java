@@ -1,7 +1,6 @@
 package com.thuanthichlaptrinh.card_words.configuration;
 
 import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
@@ -18,10 +17,8 @@ public class SwaggerConfig {
                 .info(new Info()
                         .title("Card Words API")
                         .version("1.0.0")
-                        .description("API Documentation cho ứng dụng Card Words - Học từ vựng thông minh")
-                        .contact(new Contact()
-                                .name("Thuan Thich Lap Trinh")
-                                .url("https://thuanthichlaptrinh.com")))
+                        .description(
+                                "API Documentation cho ứng dụng Card Words - Học từ vựng Tiếng Anh bằng trò chơi ghép thẻ"))
                 .servers(List.of(
                         new Server()
                                 .url("http://localhost:8080")
@@ -30,4 +27,5 @@ public class SwaggerConfig {
                                 .url("https://api.cardwords.com")
                                 .description("Production Server")));
     }
+
 }

@@ -24,4 +24,5 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findByActivationKey(String activationKey);
 
     boolean existsByEmail(String email);
+
 }

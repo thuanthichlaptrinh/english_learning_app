@@ -17,8 +17,7 @@ import org.hibernate.annotations.GenericGenerator;
 @Entity
 @Table(name = "vocab", indexes = {
         @Index(name = "idx_vocab_word", columnList = "word"),
-        @Index(name = "idx_vocab_cefr", columnList = "cefr"),
-        @Index(name = "idx_vocab_word_type", columnList = "word_type")
+        @Index(name = "idx_vocab_cefr", columnList = "cefr")
 })
 public class Vocab extends BaseEntity {
     @Id
@@ -38,9 +37,6 @@ public class Vocab extends BaseEntity {
 
     @Column(length = 1000)
     private String interpret;
-
-    @Column(name = "word_type", length = 50)
-    private String wordType;
 
     @Column(name = "example_sentence", length = 1000)
     private String exampleSentence;
