@@ -250,4 +250,106 @@ public class EmailService {
                         """,
                 name);
     }
+
+    /**
+     * Gửi email với mật khẩu mới khi quên mật khẩu
+     */
+    public void sendNewPasswordEmail(String toEmail, String name, String newPassword) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(fromEmail);
+            helper.setTo(toEmail);
+            helper.setSubject("🔐 Mật khẩu mới cho tài khoản Card Words");
+
+            String htmlContent = buildNewPasswordEmailContent(name, toEmail, newPassword);
+            helper.setText(htmlContent, true);
+
+            mailSender.send(message);
+            log.info("Đã gửi email mật khẩu mới đến: {}", toEmail);
+
+        } catch (Exception e) {
+            log.error("Lỗi khi gửi email mật khẩu mới đến {}: {}", toEmail, e.getMessage());
+            log.error("THÔNG TIN MẬT KHẨU MỚI (Do lỗi email):");
+            log.error("Email: {}", toEmail);
+            log.error("Mật khẩu mới: {}", newPassword);
+            throw new RuntimeException("Không thể gửi email mật khẩu mới", e);
+        }
+    }
+
+    /**
+     * Tạo nội dung HTML cho email mật khẩu mới
+     */
+    private String buildNewPasswordEmailContent(String name, String email, String newPassword) {
+        return String.format(
+                """
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <title>Mật khẩu mới - Card Words</title>
+                            <style>
+                                body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
+                                .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+                                .header { background: linear-gradient(135deg, #667eea 0%%, #764ba2 100%%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+                                .header h1 { margin: 0; font-size: 28px; }
+                                .content { padding: 30px; }
+                                .password-box { background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center; }
+                                .password { font-size: 24px; font-weight: bold; color: #495057; font-family: 'Courier New', monospace; letter-spacing: 2px; }
+                                .warning { background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px; padding: 15px; margin: 20px 0; color: #856404; }
+                                .footer { background: #f8f9fa; padding: 20px; text-align: center; color: #6c757d; border-radius: 0 0 10px 10px; }
+                                .button { display: inline-block; padding: 12px 24px; background: #007bff; color: white; text-decoration: none; border-radius: 6px; margin: 10px 5px; }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="container">
+                                <div class="header">
+                                    <h1>🔐 Mật khẩu mới</h1>
+                                    <p>Card Words - Ứng dụng học từ vựng Tiếng Anh bằng trò chơi ghép thẻ</p>
+                                </div>
+                                <div class="content">
+                                    <h2>Xin chào %s!</h2>
+
+                                    <p>Bạn đã yêu cầu đặt lại mật khẩu cho tài khoản <strong>%s</strong>.</p>
+
+                                    <div class="password-box">
+                                        <p><strong>Mật khẩu mới của bạn là:</strong></p>
+                                        <div class="password">%s</div>
+                                    </div>
+
+                                    <div class="warning">
+                                        <strong>⚠️ Lưu ý quan trọng:</strong>
+                                        <ul style="margin: 10px 0; padding-left: 20px;">
+                                            <li>Vui lòng đăng nhập và đổi mật khẩu ngay lập tức</li>
+                                            <li>Không chia sẻ mật khẩu này với bất kỳ ai</li>
+                                            <li>Mật khẩu này được tạo tự động và dễ nhớ</li>
+                                        </ul>
+                                    </div>
+
+                                    <div style="text-align: center; margin: 30px 0;">
+                                        <a href="http://localhost:3000/login" class="button">Đăng nhập ngay</a>
+                                    </div>
+
+                                    <p><strong>Thông tin đăng nhập:</strong></p>
+                                    <ul>
+                                        <li><strong>Email:</strong> %s</li>
+                                        <li><strong>Mật khẩu:</strong> %s</li>
+                                    </ul>
+
+                                    <p>Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng liên hệ với chúng tôi ngay lập tức.</p>
+
+                                    <p>Chúc bạn có những trải nghiệm học tập tuyệt vời!</p>
+                                </div>
+                                <div class="footer">
+                                    <p>© 2025 Card Words</p>
+                                    <p>Email này được gửi tự động, vui lòng không trả lời</p>
+                                </div>
+                            </div>
+                        </body>
+                        </html>
+                        """,
+                name, email, newPassword, email, newPassword);
+    }
 }

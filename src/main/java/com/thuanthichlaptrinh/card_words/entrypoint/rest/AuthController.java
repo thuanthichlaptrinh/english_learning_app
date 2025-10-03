@@ -6,9 +6,12 @@ import org.springframework.web.bind.annotation.*;
 
 import com.thuanthichlaptrinh.card_words.core.usecase.AuthenticationService;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.AuthenticationRequest;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.ForgotPasswordRequest;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.RefreshTokenRequest;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.RegisterRequest;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.ApiResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.AuthenticationResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.ForgotPasswordResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.RegisterResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,6 +49,22 @@ public class AuthController {
     public ResponseEntity<ApiResponse<Void>> logout() {
         authenticationService.logout();
         return ResponseEntity.ok(ApiResponse.success("Đăng xuất thành công", null));
+    }
+
+    @PostMapping("/forgot-password")
+    @Operation(summary = "Quên mật khẩu", description = "Xử lý quên mật khẩu - tạo mật khẩu mới và gửi về email.")
+    public ResponseEntity<ApiResponse<ForgotPasswordResponse>> forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequest request) {
+        ForgotPasswordResponse response = authenticationService.forgotPassword(request);
+        return ResponseEntity.ok(ApiResponse.success("Đã gửi mật khẩu mới về email của bạn", response));
+    }
+
+    @PostMapping("/refresh-token")
+    @Operation(summary = "Làm mới token", description = "Làm mới token truy cập bằng refresh token.")
+    public ResponseEntity<ApiResponse<AuthenticationResponse>> refreshToken(
+            @Valid @RequestBody RefreshTokenRequest request) {
+        AuthenticationResponse response = authenticationService.refreshToken(request);
+        return ResponseEntity.ok(ApiResponse.success("Làm mới token thành công", response));
     }
 
 }

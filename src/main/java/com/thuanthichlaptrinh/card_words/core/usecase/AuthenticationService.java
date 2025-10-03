@@ -28,8 +28,11 @@ import com.thuanthichlaptrinh.card_words.dataprovider.repository.RoleRepository;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.TokenRepository;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.UserRepository;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.AuthenticationRequest;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.ForgotPasswordRequest;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.RefreshTokenRequest;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.RegisterRequest;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.AuthenticationResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.ForgotPasswordResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.RegisterResponse;
 
 import jakarta.transaction.Transactional;
@@ -246,6 +249,101 @@ public class AuthenticationService {
                     token.setRevoked(true);
                 });
         tokenRepository.saveAll(validUserTokens);
+    }
+
+    /**
+     * Xử lý quên mật khẩu - tạo mật khẩu mới và gửi về email
+     */
+    @Transactional
+    public ForgotPasswordResponse forgotPassword(final ForgotPasswordRequest request) {
+        log.info("Xử lý quên mật khẩu cho email: {}", request.getEmail());
+
+        if (!EMAIL_PATTERN.matcher(request.getEmail()).matches()) {
+            throw new ErrorException("Email không hợp lệ");
+        }
+
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new ErrorException("Email không tồn tại trong hệ thống"));
+
+        if (Boolean.TRUE.equals(user.getBanned())) {
+            throw new ErrorException("Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.");
+        }
+
+        // Tạo mật khẩu mới
+        String newPassword = PasswordGenerator.generatePassword();
+
+        // Cập nhật mật khẩu mới
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        // Thu hồi tất cả token hiện tại
+        revokeAllUserTokens(user.getId().toString());
+
+        // Gửi email với mật khẩu mới
+        try {
+            emailService.sendNewPasswordEmail(user.getEmail(), user.getName(), newPassword);
+            log.info("Đã gửi mật khẩu mới về email: {}", user.getEmail());
+        } catch (Exception e) {
+            log.error("Lỗi khi gửi email mật khẩu mới: {}", e.getMessage());
+            throw new ErrorException("Có lỗi xảy ra khi gửi email. Vui lòng thử lại sau.");
+        }
+
+        return ForgotPasswordResponse.builder()
+                .email(user.getEmail())
+                .message("Mật khẩu mới đã được gửi về email của bạn. Vui lòng kiểm tra hộp thư.")
+                .build();
+    }
+
+    /**
+     * Làm mới access token bằng refresh token
+     */
+    @Transactional
+    public AuthenticationResponse refreshToken(final RefreshTokenRequest request) {
+        log.info("Làm mới token với refresh token");
+
+        // Tìm token trong database
+        Token storedToken = tokenRepository.findByRefreshToken(request.getRefreshToken())
+                .orElseThrow(() -> new ErrorException("Refresh token không hợp lệ"));
+
+        // Kiểm tra token đã bị thu hồi hoặc hết hạn chưa
+        if (storedToken.getExpired() || storedToken.getRevoked()) {
+            throw new ErrorException("Refresh token đã hết hạn hoặc bị thu hồi");
+        }
+
+        // Lấy user từ token
+        User user = storedToken.getUser();
+
+        // Kiểm tra refresh token có hợp lệ không
+        if (!jwtService.isTokenValid(request.getRefreshToken(), user)) {
+            throw new ErrorException("Refresh token không hợp lệ");
+        }
+
+        // Tạo access token mới
+        var newAccessToken = jwtService.generateToken(Map.of(
+                "authorities", user.getAuthorities().stream()
+                        .map(authority -> authority.getAuthority())
+                        .toList(),
+                "userId", user.getId().toString(),
+                "name", user.getName()),
+                user);
+
+        // Tạo refresh token mới
+        var newRefreshToken = jwtService.generateRefreshToken(user);
+
+        // Thu hồi token cũ
+        storedToken.setExpired(true);
+        storedToken.setRevoked(true);
+        tokenRepository.save(storedToken);
+
+        // Lưu token mới
+        saveUserToken(user, newAccessToken, newRefreshToken);
+
+        log.info("Đã làm mới token thành công cho user: {}", user.getEmail());
+
+        return AuthenticationResponse.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(newRefreshToken)
+                .build();
     }
 
 }
