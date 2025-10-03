@@ -7,6 +7,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.thuanthichlaptrinh.card_words.common.enums.CEFRLevel;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
@@ -38,6 +41,17 @@ public class User extends BaseUUIDEntity implements UserDetails {
 
     @Column(length = 255)
     private String avatar;
+
+    @Column(length = 10)
+    private String gender;
+
+    @Column(name = "date_of_birth")
+    private LocalDate dateOfBirth;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 5)
+    @Builder.Default
+    private CEFRLevel currentLevel = CEFRLevel.A1;
 
     @Builder.Default
     @Column(nullable = false)

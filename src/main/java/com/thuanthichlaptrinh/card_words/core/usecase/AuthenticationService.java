@@ -34,6 +34,7 @@ import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.RegisterRequest;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.AuthenticationResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.ForgotPasswordResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.RegisterResponse;
+import com.thuanthichlaptrinh.card_words.common.enums.CEFRLevel;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -62,8 +63,6 @@ public class AuthenticationService {
 
     @Transactional
     public RegisterResponse register(final RegisterRequest request) {
-        log.info("Đăng ký tài khoản mới: {}", request.getEmail());
-
         if (!EMAIL_PATTERN.matcher(request.getEmail()).matches()) {
             throw new ErrorException("Email không hợp lệ");
         }
@@ -84,6 +83,10 @@ public class AuthenticationService {
                 .name(request.getName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(generatedPassword))
+                .avatar(request.getAvatar())
+                .gender(request.getGender() != null ? request.getGender() : null)
+                .dateOfBirth(request.getDateOfBirth())
+                .currentLevel(request.getCurrentLevel() != null ? request.getCurrentLevel() : CEFRLevel.A1)
                 .activated(true)
                 .roles(roles)
                 .status("ACTIVE")
@@ -101,6 +104,9 @@ public class AuthenticationService {
                 .email(user.getEmail())
                 .name(user.getName())
                 .avatar(user.getAvatar())
+                .gender(user.getGender() != null ? user.getGender() : null)
+                .dateOfBirth(user.getDateOfBirth())
+                .currentLevel(user.getCurrentLevel())
                 .message("Đăng ký thành công! Mật khẩu đã được gửi về email của bạn.")
                 .build();
     }

@@ -2,8 +2,6 @@ package com.thuanthichlaptrinh.card_words.entrypoint.dto.request;
 
 import java.time.LocalDate;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -17,16 +15,10 @@ import com.thuanthichlaptrinh.card_words.common.enums.CEFRLevel;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegisterRequest {
+public class UpdateUserRequest {
 
-    @NotBlank(message = "Tên không được để trống")
     @Size(min = 2, max = 100, message = "Tên phải từ 2-100 ký tự")
     private String name;
-
-    @NotBlank(message = "Email không được để trống")
-    @Email(message = "Email không hợp lệ")
-    @Size(max = 100, message = "Email tối đa 100 ký tự")
-    private String email;
 
     private String avatar;
 
@@ -37,5 +29,4 @@ public class RegisterRequest {
     private LocalDate dateOfBirth;
 
     private CEFRLevel currentLevel;
-
 }

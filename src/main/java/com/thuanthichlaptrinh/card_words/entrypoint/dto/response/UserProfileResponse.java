@@ -13,12 +13,11 @@ import com.thuanthichlaptrinh.card_words.common.enums.CEFRLevel;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegisterResponse {
+public class UserProfileResponse {
     private String email;
     private String name;
     private String avatar;
     private String gender;
     private LocalDate dateOfBirth;
     private CEFRLevel currentLevel;
-    private String message;
 }

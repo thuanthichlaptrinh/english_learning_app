@@ -19,13 +19,11 @@ import com.thuanthichlaptrinh.card_words.dataprovider.repository.UserRepository;
 @Configuration
 public class ApplicationConfig {
     private final UserRepository userRepository;
-    private final GlobalExceptionHandler globalExceptionHandler;
 
     public ApplicationConfig(
             UserRepository userRepository,
             GlobalExceptionHandler globalExceptionHandler) {
         this.userRepository = userRepository;
-        this.globalExceptionHandler = globalExceptionHandler;
     }
 
     @Bean
