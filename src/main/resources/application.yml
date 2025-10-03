@@ -74,7 +74,7 @@ logging:
             springframework:
                 security: trace
         com:
-            thuanthichlaptrinh: error
+            thuanthichlaptrinh: debug
 
 http:
     request-logging-filter:

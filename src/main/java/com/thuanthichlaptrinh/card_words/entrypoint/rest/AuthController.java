@@ -12,6 +12,7 @@ import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.AuthenticationR
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.RegisterResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,13 @@ public class AuthController {
             @Valid @RequestBody AuthenticationRequest request) {
         AuthenticationResponse response = authenticationService.login(request);
         return ResponseEntity.ok(ApiResponse.success("Đăng nhập thành công", response));
+    }
+
+    @PostMapping("/signout")
+    @Operation(summary = "Đăng xuất", description = "Đăng xuất khỏi hệ thống.", security = @SecurityRequirement(name = "Bearer Authentication"))
+    public ResponseEntity<ApiResponse<Void>> logout() {
+        authenticationService.logout();
+        return ResponseEntity.ok(ApiResponse.success("Đăng xuất thành công", null));
     }
 
 }
