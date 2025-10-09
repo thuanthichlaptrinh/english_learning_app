@@ -31,3 +31,14 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Environment Variables ###
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+### Sensitive Configuration Files ###
+application-secrets.yml
+application-local.yml
