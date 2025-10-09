@@ -68,6 +68,12 @@ activation:
     expired-time: 86400000 # 24h
     resend-interval: 300000 # 5m
 
+google:
+    oauth2:
+        client-id: 157814544933-v1gn4l8k6jkvn20j45ps885s28slsg66.apps.googleusercontent.com
+        client-secret: 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
+        redirect-uri: http://localhost:8080/api/v1/auth/google/callback
+
 logging:
     level:
         org:

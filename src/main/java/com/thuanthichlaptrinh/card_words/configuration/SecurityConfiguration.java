@@ -31,6 +31,9 @@ public class SecurityConfiguration {
             "/login/oauth2/**",
             "/api/v1/auth/signin",
             "/api/v1/auth/signup",
+            "/api/v1/auth/google",
+            "/api/v1/auth/forgot-password",
+            "/api/v1/auth/refresh-token",
             "/favicon.ico",
             "/static/**",
             "/css/**",
@@ -48,7 +51,10 @@ public class SecurityConfiguration {
             "/swagger-ui.html",
             "/swagger-ui.html/**",
             "/swagger-ui/index.html/**",
-            "/api-test.html"
+            "/api-test.html",
+            "/google-test.html",
+            "https://accounts.google.com/signin/oauth2/**",
+            "https://developers.google.com/oauthplayground/**"
     };
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;

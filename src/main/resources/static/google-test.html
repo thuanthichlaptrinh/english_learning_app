@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Google OAuth2 Test</title>
+        <script src="https://apis.google.com/js/platform.js" async defer></script>
+        <meta
+            name="google-signin-client_id"
+            content="157814544933-v1gn4l8k6jkvn20j45ps885s28slsg66.apps.googleusercontent.com"
+        />
+    </head>
+    <body>
+        <h2>Google OAuth2 Test</h2>
+
+        <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+
+        <div id="result" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc; display: none">
+            <h3>ID Token:</h3>
+            <textarea id="idToken" rows="10" cols="100" readonly></textarea>
+            <br /><br />
+            <button onclick="copyToken()">Copy Token</button>
+            <button onclick="signOut()">Sign Out</button>
+        </div>
+
+        <script>
+            function onSignIn(googleUser) {
+                const profile = googleUser.getBasicProfile();
+                const idToken = googleUser.getAuthResponse().id_token;
+
+                console.log('ID Token: ' + idToken);
+                console.log('Name: ' + profile.getName());
+                console.log('Email: ' + profile.getEmail());
+
+                document.getElementById('idToken').value = idToken;
+                document.getElementById('result').style.display = 'block';
+            }
+
+            function copyToken() {
+                const tokenElement = document.getElementById('idToken');
+                tokenElement.select();
+                document.execCommand('copy');
+                alert('Token copied to clipboard!');
+            }
+
+            function signOut() {
+                const auth2 = gapi.auth2.getAuthInstance();
+                auth2.signOut().then(function () {
+                    console.log('User signed out.');
+                    document.getElementById('result').style.display = 'none';
+                });
+            }
+        </script>
+
+        <script>
+            gapi.load('auth2', function () {
+                gapi.auth2.init({
+                    client_id: '157814544933-v1gn4l8k6jkvn20j45ps885s28slsg66.apps.googleusercontent.com',
+                });
+            });
+        </script>
+    </body>
+</html>

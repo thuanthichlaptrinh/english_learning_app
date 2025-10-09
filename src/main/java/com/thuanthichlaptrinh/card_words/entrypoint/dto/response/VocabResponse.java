@@ -23,6 +23,7 @@ public class VocabResponse {
     private String cefr;
     private String img;
     private String audio;
+    private String credit;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

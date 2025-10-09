@@ -50,6 +50,9 @@ public class Vocab extends BaseEntity {
     @Column(length = 500)
     private String audio;
 
+    @Column(length = 255)
+    private String credit;
+
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "vocab_types", joinColumns = @JoinColumn(name = "vocab_id"), inverseJoinColumns = @JoinColumn(name = "type_id"), indexes = {

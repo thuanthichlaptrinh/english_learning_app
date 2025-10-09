@@ -42,7 +42,10 @@ public class CreateVocabRequest {
     @Size(max = 500, message = "URL audio tối đa 500 ký tự")
     private String audio;
 
-    private Set<Long> typeIds;
-    private Set<Long> topicIds;
+    @Size(max = 255, message = "Ghi công tối đa 255 ký tự")
+    private String credit;
+
+    private Set<String> types;
+    private Set<String> topics;
 
 }

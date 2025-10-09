@@ -5,13 +5,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.thuanthichlaptrinh.card_words.core.usecase.AuthenticationService;
+import com.thuanthichlaptrinh.card_words.core.usecase.GoogleOAuth2Service;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.AuthenticationRequest;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.ForgotPasswordRequest;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.GoogleAuthRequest;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.RefreshTokenRequest;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.RegisterRequest;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.ApiResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.AuthenticationResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.ForgotPasswordResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.GoogleAuthResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.RegisterResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 public class AuthController {
 
     private final AuthenticationService authenticationService;
+    private final GoogleOAuth2Service googleOAuth2Service;
 
     @PostMapping("/signup")
     @Operation(summary = "Đăng ký tài khoản", description = "Tạo tài khoản mới với email và tên. Mật khẩu sẽ được tự động tạo và gửi về email.")
@@ -65,6 +69,14 @@ public class AuthController {
             @Valid @RequestBody RefreshTokenRequest request) {
         AuthenticationResponse response = authenticationService.refreshToken(request);
         return ResponseEntity.ok(ApiResponse.success("Làm mới token thành công", response));
+    }
+
+    @PostMapping("/google")
+    @Operation(summary = "Đăng nhập bằng Google", description = "Xác thực và đăng nhập bằng Google OAuth2 ID Token.")
+    public ResponseEntity<ApiResponse<GoogleAuthResponse>> loginWithGoogle(
+            @Valid @RequestBody GoogleAuthRequest request) {
+        GoogleAuthResponse response = googleOAuth2Service.authenticateWithGoogle(request.getIdToken());
+        return ResponseEntity.ok(ApiResponse.success("Đăng nhập Google thành công", response));
     }
 
 }

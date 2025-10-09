@@ -41,23 +41,38 @@ public class VocabService {
             throw new ErrorException("Từ vựng '" + request.getWord() + "' đã tồn tại");
         }
 
-        // Load types từ database nếu có typeIds
+        // Load hoặc tạo types từ tên
         Set<Type> types = new HashSet<>();
-        if (request.getTypeIds() != null && !request.getTypeIds().isEmpty()) {
-            types = new HashSet<>(typeRepository.findAllById(request.getTypeIds()));
-            // Kiểm tra xem tất cả typeIds có tồn tại không
-            if (types.size() != request.getTypeIds().size()) {
-                throw new ErrorException("Một hoặc nhiều Type ID không tồn tại");
+        if (request.getTypes() != null && !request.getTypes().isEmpty()) {
+            for (String typeName : request.getTypes()) {
+                String normalizedName = typeName.trim().toLowerCase();
+                Type type = typeRepository.findByNameIgnoreCase(normalizedName)
+                        .orElseGet(() -> {
+                            log.info("Tạo Type mới: {}", normalizedName);
+                            Type newType = Type.builder()
+                                    .name(normalizedName)
+                                    .build();
+                            return typeRepository.save(newType);
+                        });
+                types.add(type);
             }
         }
 
-        // Load topics từ database nếu có topicIds
+        // Load hoặc tạo topics từ tên
         Set<Topic> topics = new HashSet<>();
-        if (request.getTopicIds() != null && !request.getTopicIds().isEmpty()) {
-            topics = new HashSet<>(topicRepository.findAllById(request.getTopicIds()));
-            // Kiểm tra xem tất cả topicIds có tồn tại không
-            if (topics.size() != request.getTopicIds().size()) {
-                throw new ErrorException("Một hoặc nhiều Topic ID không tồn tại");
+        if (request.getTopics() != null && !request.getTopics().isEmpty()) {
+            for (String topicName : request.getTopics()) {
+                String normalizedName = topicName.trim().toLowerCase();
+                Topic topic = topicRepository.findByNameIgnoreCase(normalizedName)
+                        .orElseGet(() -> {
+                            log.info("Tạo Topic mới: {}", normalizedName);
+                            Topic newTopic = Topic.builder()
+                                    .name(normalizedName)
+                                    .description("Auto-generated from vocab creation")
+                                    .build();
+                            return topicRepository.save(newTopic);
+                        });
+                topics.add(topic);
             }
         }
 
@@ -70,6 +85,7 @@ public class VocabService {
                 .cefr(request.getCefr() != null ? request.getCefr().toUpperCase() : "A1")
                 .img(request.getImg())
                 .audio(request.getAudio())
+                .credit(request.getCredit())
                 .types(types)
                 .topics(topics)
                 .build();
@@ -157,6 +173,7 @@ public class VocabService {
                 .cefr(vocab.getCefr())
                 .img(vocab.getImg())
                 .audio(vocab.getAudio())
+                .credit(vocab.getCredit())
                 .createdAt(vocab.getCreatedAt())
                 .updatedAt(vocab.getUpdatedAt())
                 .types(typeInfos)

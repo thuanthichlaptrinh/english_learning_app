@@ -12,6 +12,8 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
 
     Optional<Topic> findByName(String name);
 
+    Optional<Topic> findByNameIgnoreCase(String name);
+
     boolean existsByName(String name);
 
 }

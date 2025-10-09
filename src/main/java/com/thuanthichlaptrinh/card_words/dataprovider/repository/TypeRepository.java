@@ -12,6 +12,8 @@ public interface TypeRepository extends JpaRepository<Type, Long> {
 
     Optional<Type> findByName(String name);
 
+    Optional<Type> findByNameIgnoreCase(String name);
+
     boolean existsByName(String name);
 
 }
