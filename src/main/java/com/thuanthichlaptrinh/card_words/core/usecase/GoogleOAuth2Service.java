@@ -38,7 +38,7 @@ public class GoogleOAuth2Service {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
 
-    @Value("${google.oauth2.client-id}")
+    @Value("${google.oauth2.client-id:your-google-client-id}")
     private String googleClientId;
 
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
