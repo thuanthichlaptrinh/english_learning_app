@@ -1,14 +1,14 @@
 server:
-    port: 8080
+    port: ${SERVER_PORT}
 
 spring:
     application:
         name: card-words
 
     datasource:
-        url: jdbc:postgresql://localhost:5432/card_words
-        username: postgres
-        password: 123456
+        url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+        username: ${POSTGRES_USER}
+        password: ${POSTGRES_PASSWORD}
         driver-class-name: org.postgresql.Driver
 
     jpa:
@@ -24,21 +24,21 @@ spring:
 
     data:
         redis:
-            host: localhost
-            port: 6379
-            password:
+            host: ${REDIS_HOST}
+            port: ${REDIS_PORT}
+            password: ${REDIS_PASSWORD}
             timeout: 60000
 
     cache:
         type: redis
         redis:
-            time-to-live: 3600000 # 1h
+            time-to-live: 3600000
 
     mail:
-        host: smtp.gmail.com
-        port: 587
-        username: thuanthichlaptrinh@gmail.com
-        password: jcdfsqryziswpjfw
+        host: ${MAIL_HOST}
+        port: ${MAIL_PORT}
+        username: ${MAIL_USERNAME}
+        password: ${MAIL_PASSWORD}
         properties:
             mail:
                 smtp:
@@ -59,20 +59,20 @@ springdoc:
 
 # JWT Configuration
 jwt:
-    secret-key: Y2FyZC13b3Jkcy1zZWNyZXQta2V5LWZvci1qd3QtdG9rZW4tZ2VuZXJhdGlvbg==
-    expiration: 86400000 # 24h
+    secret-key: ${JWT_SECRET}
+    expiration: ${JWT_EXPIRATION_TIME}
     refresh-token:
-        expiration: 604800000 # 7d
+        expiration: ${JWT_REFRESH_TOKEN_EXPIRATION}
 
 activation:
-    expired-time: 86400000 # 24h
-    resend-interval: 300000 # 5m
+    expired-time: ${ACTIVATION_EXPIRED_TIME}
+    resend-interval: ${ACTIVATION_RESEND_INTERVAL}
 
 google:
     oauth2:
-        client-id: ${GOOGLE_OAUTH_CLIENT_ID:your-google-client-id}
-        client-secret: ${GOOGLE_OAUTH_CLIENT_SECRET:your-google-client-secret}
-        redirect-uri: ${GOOGLE_OAUTH_REDIRECT_URI:http://localhost:8080/api/v1/auth/google/callback}
+        client-id: ${GOOGLE_OAUTH_CLIENT_ID}
+        client-secret: ${GOOGLE_OAUTH_CLIENT_SECRET}
+        redirect-uri: ${GOOGLE_OAUTH_REDIRECT_URI}
 
 logging:
     level:
