@@ -26,7 +26,6 @@ public class TypeService {
     public TypeResponse createType(CreateTypeRequest request) {
         log.info("Tạo loại từ mới: {}", request.getName());
 
-        // Kiểm tra trùng tên
         if (typeRepository.existsByName(request.getName())) {
             throw new ErrorException("Loại từ đã tồn tại: " + request.getName());
         }
@@ -79,4 +78,5 @@ public class TypeService {
         typeRepository.deleteById(id);
         log.info("Đã xóa loại từ thành công: {}", id);
     }
+
 }

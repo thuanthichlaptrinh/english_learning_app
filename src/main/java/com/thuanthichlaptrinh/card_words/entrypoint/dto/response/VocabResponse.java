@@ -48,4 +48,5 @@ public class VocabResponse {
         private Long id;
         private String name;
     }
+
 }

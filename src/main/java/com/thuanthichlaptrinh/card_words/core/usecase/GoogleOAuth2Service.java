@@ -134,10 +134,10 @@ public class GoogleOAuth2Service {
                 .email(email)
                 .name(fullName != null && !fullName.isEmpty() ? fullName : "Google User")
                 .avatar(avatar)
-                .password(passwordEncoder.encode("google-oauth2-" + System.currentTimeMillis())) // Random password
-                .activated(true) // Google users are automatically activated
+                .password(passwordEncoder.encode("google-oauth2-" + System.currentTimeMillis()))
+                .activated(true)
                 .banned(false)
-                .currentLevel(CEFRLevel.A1) // Mặc định level A1
+                .currentLevel(CEFRLevel.A1)
                 .roles(Set.of(userRole))
                 .build();
 

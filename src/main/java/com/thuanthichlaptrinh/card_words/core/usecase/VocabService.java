@@ -180,4 +180,5 @@ public class VocabService {
                 .topics(topicInfos)
                 .build();
     }
+
 }

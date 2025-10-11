@@ -26,7 +26,6 @@ public class TopicService {
     public TopicResponse createTopic(CreateTopicRequest request) {
         log.info("Tạo chủ đề mới: {}", request.getName());
 
-        // Kiểm tra trùng tên
         if (topicRepository.existsByName(request.getName())) {
             throw new ErrorException("Chủ đề đã tồn tại: " + request.getName());
         }
@@ -83,4 +82,5 @@ public class TopicService {
         topicRepository.deleteById(id);
         log.info("Đã xóa chủ đề thành công: {}", id);
     }
+
 }

@@ -36,4 +36,11 @@ public interface VocabRepository extends JpaRepository<Vocab, UUID> {
 
     @Query("SELECT v FROM Vocab v LEFT JOIN FETCH v.types LEFT JOIN FETCH v.topics")
     Page<Vocab> findAllWithTypesAndTopics(Pageable pageable);
+
+    @Query("SELECT DISTINCT v FROM Vocab v JOIN v.topics t WHERE LOWER(t.name) = LOWER(:topicName)")
+    List<Vocab> findByTopicNameIgnoreCase(@Param("topicName") String topicName);
+
+    @Query("SELECT DISTINCT v FROM Vocab v JOIN v.topics t WHERE LOWER(t.name) = LOWER(:topicName) AND v.cefr = :cefr")
+    List<Vocab> findByTopicNameAndCefr(@Param("topicName") String topicName, @Param("cefr") String cefr);
+
 }
