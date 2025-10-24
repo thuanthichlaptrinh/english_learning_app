@@ -2,8 +2,6 @@
 
 ## Tổng quan
 
-Backend của bạn đã hoàn chỉnh với API Google OAuth2! **KHÔNG CẦN** thêm API nào nữa.
-
 ## Luồng hoạt động
 
 ```
@@ -131,18 +129,18 @@ curl -X POST http://localhost:8080/api/v1/auth/google \
 
 ### Backend ✓
 
--   ✅ API `/api/v1/auth/google` sẵn sàng
--   ✅ Verify ID Token tự động
--   ✅ Tạo user mới hoặc login user cũ
--   ✅ Trả về JWT tokens (access + refresh)
--   ✅ Xử lý avatar, email, tên từ Google
--   ✅ Tự động active user (không cần verify email)
+-   API `/api/v1/auth/google` sẵn sàng
+-   Verify ID Token tự động
+-   Tạo user mới hoặc login user cũ
+-   Trả về JWT tokens (access + refresh)
+-   Xử lý avatar, email, tên từ Google
+-   Tự động active user (không cần verify email)
 
 ### Frontend cần làm:
 
-1. ✅ Tích hợp Google Sign-In button
-2. ✅ Lấy ID Token từ Google
-3. ✅ Gửi ID Token đến API `/api/v1/auth/google`
-4. ✅ Lưu accessToken và refreshToken
-5. ✅ Redirect user sau khi login thành công
-6. ✅ Sử dụng accessToken cho các API calls tiếp theo
+1. Tích hợp Google Sign-In button
+2. Lấy ID Token từ Google
+3. Gửi ID Token đến API `/api/v1/auth/google`
+4. Lưu accessToken và refreshToken
+5. Redirect user sau khi login thành công
+6. Sử dụng accessToken cho các API calls tiếp theo

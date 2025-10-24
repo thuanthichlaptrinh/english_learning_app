@@ -19,7 +19,7 @@ public class QuickQuizAnswerRequest {
     private Integer questionNumber;
 
     @NotNull(message = "Câu trả lời không được để trống")
-    private Boolean userAnswer;
+    private Integer selectedOptionIndex; // 0, 1, hoặc 2
 
     @NotNull(message = "Thời gian trả lời không được để trống")
     private Integer timeTaken;

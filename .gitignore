@@ -34,7 +34,9 @@ build/
 
 ### Environment Variables ###
 .env
+.env.docker
 .env.local
+.env.example
 .env.development.local
 .env.test.local
 .env.production.local
@@ -42,3 +44,7 @@ build/
 ### Sensitive Configuration Files ###
 application-secrets.yml
 application-local.yml
+
+### Firebase ###
+firebase-service-account.json
+src/main/resources/firebase-service-account.json

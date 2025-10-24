@@ -13,7 +13,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserVocabProgressResponse {
-
     private UUID id;
     private VocabInfo vocab;
     private String status;

@@ -45,4 +45,20 @@ public interface UserVocabProgressRepository extends JpaRepository<UserVocabProg
     // Count total wrong attempts by user
     @Query("SELECT SUM(uvp.timesWrong) FROM UserVocabProgress uvp WHERE uvp.user.id = :userId")
     Long countTotalWrongAttempts(@Param("userId") UUID userId);
+
+    // Admin methods
+    @Query("SELECT uvp FROM UserVocabProgress uvp LEFT JOIN FETCH uvp.vocab WHERE uvp.user.id = :userId")
+    org.springframework.data.domain.Page<UserVocabProgress> findByUserId(@Param("userId") UUID userId,
+            org.springframework.data.domain.Pageable pageable);
+
+    @Query("SELECT uvp FROM UserVocabProgress uvp WHERE uvp.vocab.id = :vocabId")
+    List<UserVocabProgress> findByVocabId(@Param("vocabId") UUID vocabId);
+
+    @Query("SELECT SUM(uvp.timesCorrect) FROM UserVocabProgress uvp")
+    Long sumAllTimesCorrect();
+
+    @Query("SELECT SUM(uvp.timesWrong) FROM UserVocabProgress uvp")
+    Long sumAllTimesWrong();
+
+    void deleteByUserId(UUID userId);
 }

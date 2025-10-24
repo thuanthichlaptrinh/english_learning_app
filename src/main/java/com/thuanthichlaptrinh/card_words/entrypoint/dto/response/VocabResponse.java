@@ -26,8 +26,6 @@ public class VocabResponse {
     private String credit;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
-    // Simplified nested objects
     private Set<TypeInfo> types;
     private Set<TopicInfo> topics;
 

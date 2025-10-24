@@ -15,8 +15,8 @@ public class QuickQuizQuestionResponse {
     private java.util.UUID vocabId;
     private String word;
     private String transcription;
-    private String displayedMeaning;
-    private Boolean isCorrectPair;
+    private java.util.List<String> options; // 3 đáp án
+    private Integer correctAnswerIndex; // Hidden from response, used internally
     private Integer timeLimit;
     private String cefr;
     private String img;

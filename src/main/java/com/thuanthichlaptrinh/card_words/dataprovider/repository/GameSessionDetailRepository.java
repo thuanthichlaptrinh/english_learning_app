@@ -19,4 +19,7 @@ public interface GameSessionDetailRepository extends JpaRepository<GameSessionDe
             @Param("vocabId") UUID vocabId);
 
     long countBySessionIdAndIsCorrect(Long sessionId, Boolean isCorrect);
+
+    // Admin method
+    List<GameSessionDetail> findBySessionId(Long sessionId);
 }

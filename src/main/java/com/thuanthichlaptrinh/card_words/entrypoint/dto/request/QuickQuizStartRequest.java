@@ -13,8 +13,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class QuickQuizStartRequest {
 
-    private String topicName;
-
     @Min(value = 5, message = "Số câu hỏi tối thiểu là 5")
     @Max(value = 50, message = "Số câu hỏi tối đa là 50")
     @Builder.Default

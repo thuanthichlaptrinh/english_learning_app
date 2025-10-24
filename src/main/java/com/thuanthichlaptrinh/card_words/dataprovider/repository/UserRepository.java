@@ -25,4 +25,15 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     boolean existsByEmail(String email);
 
+    // Admin methods
+    org.springframework.data.domain.Page<User> findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase(
+            String name, String email, org.springframework.data.domain.Pageable pageable);
+
+    long countByActivated(boolean activated);
+
+    long countByBanned(boolean banned);
+
+    @Query("SELECT COUNT(u) FROM User u JOIN u.roles r WHERE r.name = :roleName")
+    long countByRoles_Name(@Param("roleName") String roleName);
+
 }

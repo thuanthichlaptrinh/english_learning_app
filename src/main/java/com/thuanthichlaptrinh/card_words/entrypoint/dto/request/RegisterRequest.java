@@ -28,8 +28,6 @@ public class RegisterRequest {
     @Size(max = 100, message = "Email tối đa 100 ký tự")
     private String email;
 
-    private String avatar;
-
     @Size(max = 10, message = "Giới tính tối đa 10 ký tự")
     private String gender;
 

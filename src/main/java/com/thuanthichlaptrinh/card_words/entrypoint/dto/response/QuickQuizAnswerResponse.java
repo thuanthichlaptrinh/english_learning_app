@@ -13,7 +13,7 @@ public class QuickQuizAnswerResponse {
     private Long sessionId;
     private Integer questionNumber;
     private Boolean isCorrect;
-    private Boolean correctAnswer;
+    private Integer correctAnswerIndex; // Index of correct answer (0, 1, hoặc 2)
     private Integer currentScore;
     private Integer currentStreak;
     private Integer comboBonus;

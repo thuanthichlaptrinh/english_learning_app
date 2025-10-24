@@ -25,4 +25,35 @@ public interface GameSessionRepository extends JpaRepository<GameSession, Long> 
 
     @Query("SELECT gs FROM GameSession gs WHERE gs.finishedAt IS NOT NULL ORDER BY gs.score DESC")
     Page<GameSession> findGlobalLeaderboard(Pageable pageable);
+
+    List<GameSession> findByUserIdAndGameIdOrderByCreatedAtDesc(UUID userId, Long gameId);
+
+    List<GameSession> findByUserIdAndGameId(UUID userId, Long gameId);
+
+    // Admin methods
+    Page<GameSession> findByGameId(Long gameId, Pageable pageable);
+
+    long countByGameId(Long gameId);
+
+    long countByGameIdAndFinishedAtIsNotNull(Long gameId);
+
+    long countByFinishedAtIsNotNull();
+
+    @Query("SELECT AVG(gs.score) FROM GameSession gs WHERE gs.game.id = :gameId AND gs.finishedAt IS NOT NULL")
+    Double findAverageScoreByGameId(@Param("gameId") Long gameId);
+
+    @Query("SELECT MAX(gs.score) FROM GameSession gs WHERE gs.game.id = :gameId AND gs.finishedAt IS NOT NULL")
+    Integer findHighestScoreByGameId(@Param("gameId") Long gameId);
+
+    @Query("SELECT MIN(gs.score) FROM GameSession gs WHERE gs.game.id = :gameId AND gs.finishedAt IS NOT NULL")
+    Integer findLowestScoreByGameId(@Param("gameId") Long gameId);
+
+    @Query("SELECT AVG(gs.accuracy) FROM GameSession gs WHERE gs.game.id = :gameId AND gs.finishedAt IS NOT NULL")
+    Double findAverageAccuracyByGameId(@Param("gameId") Long gameId);
+
+    @Query("SELECT AVG(gs.score) FROM GameSession gs WHERE gs.finishedAt IS NOT NULL")
+    Double findOverallAverageScore();
+
+    @Query("SELECT MAX(gs.score) FROM GameSession gs WHERE gs.finishedAt IS NOT NULL")
+    Integer findOverallHighestScore();
 }

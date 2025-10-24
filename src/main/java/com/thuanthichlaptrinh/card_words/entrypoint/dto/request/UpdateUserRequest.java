@@ -20,8 +20,6 @@ public class UpdateUserRequest {
     @Size(min = 2, max = 100, message = "Tên phải từ 2-100 ký tự")
     private String name;
 
-    private String avatar;
-
     @Size(max = 10, message = "Giới tính tối đa 10 ký tự")
     private String gender;
 
