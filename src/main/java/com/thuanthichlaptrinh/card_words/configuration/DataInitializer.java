@@ -1,5 +1,6 @@
 package com.thuanthichlaptrinh.card_words.configuration;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,7 +25,7 @@ public class DataInitializer {
     @PostConstruct
     public void initData() {
         initRoles();
-        // initAdminAccounts();
+        initAdminAccounts();
     }
 
     private void initRoles() {
@@ -32,11 +33,10 @@ public class DataInitializer {
         createRoleIfNotExists("ROLE_USER", "Người dùng");
     }
 
-    // private void initAdminAccounts() {
-    // createAdminIfNotExists("admin1@cardwords.com", "Quản trị viên 1");
-    // createAdminIfNotExists("admin2@cardwords.com", "Quản trị viên 2");
-    // createAdminIfNotExists("admin3@cardwords.com", "Quản trị viên 3");
-    // }
+    private void initAdminAccounts() {
+        createAdminIfNotExists("admin1@cardwords.com", "Quản trị viên 1", "Nam", LocalDate.of(1990, 1, 1));
+        createAdminIfNotExists("admin2@cardwords.com", "Quản trị viên 2", "Nam", LocalDate.of(1992, 2, 2));
+    }
 
     private void createRoleIfNotExists(String roleName, String description) {
         roleRepository.findByName(roleName).ifPresentOrElse(
@@ -52,13 +52,12 @@ public class DataInitializer {
                 });
     }
 
-    private void createAdminIfNotExists(String email, String name) {
+    private void createAdminIfNotExists(String email, String name, String gender, LocalDate dateOfBirth) {
         userRepository.findByEmail(email).ifPresentOrElse(
                 user -> {
                     // Admin account already exists
                 },
                 () -> {
-                    // Get ADMIN and USER roles
                     Role adminRole = roleRepository.findByName("ROLE_ADMIN")
                             .orElseThrow(() -> new RuntimeException("ROLE_ADMIN not found"));
                     Role userRole = roleRepository.findByName("ROLE_USER")
@@ -68,18 +67,19 @@ public class DataInitializer {
                     roles.add(adminRole);
                     roles.add(userRole);
 
-                    // Create admin user with default password "Admin@123"
                     User adminUser = User.builder()
                             .email(email)
                             .name(name)
+                            .gender(gender)
+                            .dateOfBirth(dateOfBirth)
                             .password(passwordEncoder.encode("Admin@123"))
                             .activated(true)
                             .banned(false)
+                            .status("ACTIVE")
                             .roles(roles)
                             .build();
 
                     userRepository.save(adminUser);
-                    System.out.println("Đã tạo admin account: " + email + " (mật khẩu: Admin@123)");
                 });
     }
 }
