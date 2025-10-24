@@ -1,5 +1,6 @@
 package com.thuanthichlaptrinh.card_words.entrypoint.dto.response;
 
+import com.thuanthichlaptrinh.card_words.common.enums.VocabStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,7 +26,7 @@ public class ReviewResultResponse {
     private Double efFactor;
     private Integer intervalDays;
     private LocalDate nextReviewDate;
-    private String status;
+    private VocabStatus status;
 
     // Review session info
     private Integer remainingDueCards;

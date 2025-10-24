@@ -1,5 +1,6 @@
 package com.thuanthichlaptrinh.card_words.entrypoint.dto.response;
 
+import com.thuanthichlaptrinh.card_words.common.enums.VocabStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,5 +33,5 @@ public class FlashcardResponse {
     private Integer repetition;
     private Double efFactor;
     private Integer intervalDays;
-    private String status;
+    private VocabStatus status;
 }

@@ -1,5 +1,6 @@
 package com.thuanthichlaptrinh.card_words.entrypoint.dto.response;
 
+import com.thuanthichlaptrinh.card_words.common.enums.VocabStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +16,7 @@ import java.util.UUID;
 public class UserVocabProgressResponse {
     private UUID id;
     private VocabInfo vocab;
-    private String status;
+    private VocabStatus status;
     private LocalDate lastReviewed;
     private Integer timesCorrect;
     private Integer timesWrong;

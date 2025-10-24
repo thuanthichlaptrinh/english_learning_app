@@ -1,5 +1,6 @@
 package com.thuanthichlaptrinh.card_words.core.usecase.user;
 
+import com.thuanthichlaptrinh.card_words.common.enums.VocabStatus;
 import com.thuanthichlaptrinh.card_words.common.exceptions.ErrorException;
 import com.thuanthichlaptrinh.card_words.common.exceptions.Exceptions;
 import com.thuanthichlaptrinh.card_words.core.domain.User;
@@ -75,7 +76,7 @@ public class FlashcardReviewService {
                     UserVocabProgress newProgress = UserVocabProgress.builder()
                             .user(user)
                             .vocab(vocab)
-                            .status("NEW")
+                            .status(VocabStatus.KNOWN) // Flashcard review → KNOWN
                             .efFactor(2.5)
                             .intervalDays(1)
                             .repetition(0)
@@ -109,7 +110,7 @@ public class FlashcardReviewService {
                     return UserVocabProgress.builder()
                             .user(user)
                             .vocab(vocab)
-                            .status("NEW")
+                            .status(VocabStatus.KNOWN) // Flashcard review là ôn tập → mặc định KNOWN
                             .efFactor(2.5)
                             .intervalDays(1)
                             .repetition(0)
@@ -180,24 +181,24 @@ public class FlashcardReviewService {
             // If quality is less than 3, start over
             newRepetition = 0;
             newInterval = 1;
-            progress.setStatus("LEARNING");
+            progress.setStatus(VocabStatus.UNKNOWN); // Chưa thuộc
         } else {
             newRepetition = progress.getRepetition() + 1;
 
             if (newRepetition == 1) {
                 newInterval = 1;
-                progress.setStatus("LEARNING");
+                progress.setStatus(VocabStatus.KNOWN); // Đã thuộc
             } else if (newRepetition == 2) {
                 newInterval = 6;
-                progress.setStatus("LEARNING");
+                progress.setStatus(VocabStatus.KNOWN);
             } else {
                 newInterval = (int) Math.round(progress.getIntervalDays() * newEF);
 
                 // Mark as MASTERED if interval is greater than 21 days
                 if (newInterval > 21) {
-                    progress.setStatus("MASTERED");
+                    progress.setStatus(VocabStatus.MASTERED);
                 } else {
-                    progress.setStatus("LEARNING");
+                    progress.setStatus(VocabStatus.KNOWN);
                 }
             }
         }

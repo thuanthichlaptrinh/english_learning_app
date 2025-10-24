@@ -1,5 +1,6 @@
 package com.thuanthichlaptrinh.card_words.core.usecase.user;
 
+import com.thuanthichlaptrinh.card_words.common.enums.VocabStatus;
 import com.thuanthichlaptrinh.card_words.core.domain.UserVocabProgress;
 import com.thuanthichlaptrinh.card_words.core.mapper.UserVocabProgressMapper;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.UserVocabProgressRepository;
@@ -76,9 +77,12 @@ public class UserVocabProgressService {
         Double overallAccuracy = totalAttempts > 0 ? (totalCorrect * 100.0 / totalAttempts) : 0.0;
 
         Long totalLearned = userVocabProgressRepository.countLearnedVocabs(userId);
-        Long mastered = userVocabProgressRepository.countByUserIdAndStatus(userId, "MASTERED");
-        Long learning = userVocabProgressRepository.countByUserIdAndStatus(userId, "LEARNING");
-        Long vocabsNew = userVocabProgressRepository.countByUserIdAndStatus(userId, "NEW");
+        Long mastered = userVocabProgressRepository.countByUserIdAndStatus(userId, VocabStatus.MASTERED);
+        // learning = KNOWN + UNKNOWN (chưa đạt MASTERED)
+        Long known = userVocabProgressRepository.countByUserIdAndStatus(userId, VocabStatus.KNOWN);
+        Long unknown = userVocabProgressRepository.countByUserIdAndStatus(userId, VocabStatus.UNKNOWN);
+        Long learning = known + unknown;
+        Long vocabsNew = userVocabProgressRepository.countByUserIdAndStatus(userId, VocabStatus.NEW);
 
         List<UserVocabProgress> dueVocabs = userVocabProgressRepository.findDueForReview(userId, LocalDate.now());
 
