@@ -62,9 +62,9 @@ public class QuickQuizService {
         // Shuffle for randomness
         Collections.shuffle(vocabs);
 
-        // Need totalQuestions * 3 vocabs (1 for question + 2 for wrong options)
+        // Need totalQuestions * 4 vocabs (1 for question + 3 for wrong options)
         return vocabs.stream()
-                .limit(request.getTotalQuestions() * 3)
+                .limit(request.getTotalQuestions() * 4)
                 .collect(Collectors.toList());
     }
 
@@ -80,9 +80,9 @@ public class QuickQuizService {
         // Get random vocabularies based on filters
         List<Vocab> vocabs = getRandomVocabs(request);
 
-        if (vocabs.size() < request.getTotalQuestions() * 3) {
+        if (vocabs.size() < request.getTotalQuestions() * 4) {
             throw new ErrorException("Not enough vocabularies. Found: " + vocabs.size()
-                    + ", Required: " + (request.getTotalQuestions() * 3));
+                    + ", Required: " + (request.getTotalQuestions() * 4));
         }
 
         // Create game session
@@ -106,15 +106,17 @@ public class QuickQuizService {
         List<QuestionData> allQuestions = new ArrayList<>();
 
         for (int i = 0; i < request.getTotalQuestions(); i++) {
-            Vocab correctVocab = vocabs.get(i * 3); // Main vocab
-            Vocab wrongVocab1 = vocabs.get(i * 3 + 1); // Wrong option 1
-            Vocab wrongVocab2 = vocabs.get(i * 3 + 2); // Wrong option 2
+            Vocab correctVocab = vocabs.get(i * 4); // Main vocab
+            Vocab wrongVocab1 = vocabs.get(i * 4 + 1); // Wrong option 1
+            Vocab wrongVocab2 = vocabs.get(i * 4 + 2); // Wrong option 2
+            Vocab wrongVocab3 = vocabs.get(i * 4 + 3); // Wrong option 3
 
-            // Create 3 options
+            // Create 4 options
             List<String> options = new ArrayList<>();
             options.add(correctVocab.getMeaningVi()); // Correct answer
             options.add(wrongVocab1.getMeaningVi()); // Wrong answer 1
             options.add(wrongVocab2.getMeaningVi()); // Wrong answer 2
+            options.add(wrongVocab3.getMeaningVi()); // Wrong answer 3
 
             // Shuffle options to randomize position
             Collections.shuffle(options);
