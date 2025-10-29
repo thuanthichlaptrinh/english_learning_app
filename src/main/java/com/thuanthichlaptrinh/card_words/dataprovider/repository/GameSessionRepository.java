@@ -58,4 +58,8 @@ public interface GameSessionRepository extends JpaRepository<GameSession, Long> 
 
     @Query("SELECT MAX(gs.score) FROM GameSession gs WHERE gs.finishedAt IS NOT NULL")
     Integer findOverallHighestScore();
+
+    // User high scores
+    @Query("SELECT MAX(gs.score) FROM GameSession gs WHERE gs.user.id = :userId AND gs.game.id = :gameId AND gs.finishedAt IS NOT NULL")
+    Integer findHighestScoreByUserAndGame(@Param("userId") UUID userId, @Param("gameId") Long gameId);
 }
