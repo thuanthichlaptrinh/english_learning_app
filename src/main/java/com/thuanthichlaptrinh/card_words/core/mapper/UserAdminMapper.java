@@ -10,7 +10,7 @@ import org.mapstruct.factory.Mappers;
 
 import com.thuanthichlaptrinh.card_words.core.domain.Role;
 import com.thuanthichlaptrinh.card_words.core.domain.User;
-import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.UserAdminResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.user.UserAdminResponse;
 
 @Mapper(componentModel = "spring")
 public interface UserAdminMapper {

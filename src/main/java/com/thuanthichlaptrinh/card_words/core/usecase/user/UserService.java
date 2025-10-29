@@ -9,8 +9,8 @@ import com.thuanthichlaptrinh.card_words.common.exceptions.ErrorException;
 import com.thuanthichlaptrinh.card_words.core.domain.User;
 import com.thuanthichlaptrinh.card_words.core.usecase.admin.FirebaseStorageService;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.UserRepository;
-import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.UpdateUserRequest;
-import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.UserProfileResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.user.UpdateUserRequest;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.user.UserProfileResponse;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

@@ -17,8 +17,8 @@ import com.thuanthichlaptrinh.card_words.dataprovider.repository.UserRepository;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.UserVocabProgressRepository;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.DifficultWordResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.OverallProgressStatsResponse;
-import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.UserVocabProgressAdminResponse;
-import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.VocabLearningStatsResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.user.UserVocabProgressAdminResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.vocab.VocabLearningStatsResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

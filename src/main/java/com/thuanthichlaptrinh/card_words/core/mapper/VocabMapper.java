@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 import com.thuanthichlaptrinh.card_words.core.domain.Vocab;
-import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.VocabMediaUrlResponse;
-import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.VocabResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.vocab.VocabMediaUrlResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.vocab.VocabResponse;
 
 @Component
 public class VocabMapper {

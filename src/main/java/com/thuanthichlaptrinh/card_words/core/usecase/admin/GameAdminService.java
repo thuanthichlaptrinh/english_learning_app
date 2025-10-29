@@ -17,12 +17,12 @@ import com.thuanthichlaptrinh.card_words.core.mapper.GameAdminMapper;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.GameRepository;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.GameSessionRepository;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.GameSessionDetailRepository;
-import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.GameAdminResponse;
-import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.GameSessionDetailResponse;
-import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.GameSessionResponse;
-import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.GameStatisticsResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.OverallGameStatisticsResponse;
-import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.QuestionDetail;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.game.GameAdminResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.game.GameSessionDetailResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.game.GameSessionResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.game.GameStatisticsResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.game.QuestionDetail;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -17,12 +17,12 @@ import com.thuanthichlaptrinh.card_words.core.mapper.VocabMapper;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.TypeRepository;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.TopicRepository;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.VocabRepository;
-import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.VocabMediaUrlResponse;
-import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.BulkCreateVocabRequest;
-import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateVocabRequest;
-import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.UpdateVocabRequest;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.vocab.BulkCreateVocabRequest;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.vocab.CreateVocabRequest;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.vocab.UpdateVocabRequest;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.BulkImportResponse;
-import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.VocabResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.vocab.VocabMediaUrlResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.vocab.VocabResponse;
 
 import java.util.ArrayList;
 import java.util.List;

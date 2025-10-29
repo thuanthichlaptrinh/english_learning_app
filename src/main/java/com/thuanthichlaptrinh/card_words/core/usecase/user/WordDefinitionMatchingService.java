@@ -13,12 +13,12 @@ import com.thuanthichlaptrinh.card_words.dataprovider.repository.GameSessionRepo
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.UserRepository;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.UserVocabProgressRepository;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.VocabRepository;
-import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.WordDefinitionMatchingAnswerRequest;
-import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.WordDefinitionMatchingStartRequest;
-import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.WordDefinitionMatchingResultResponse;
-import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.WordDefinitionMatchingSessionResponse;
-import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.SessionData;
-import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.VocabResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.vocab.VocabResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.game.WordDefinitionMatchingAnswerRequest;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.game.WordDefinitionMatchingStartRequest;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.game.SessionData;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.game.WordDefinitionMatchingResultResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.game.WordDefinitionMatchingSessionResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

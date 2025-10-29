@@ -3,7 +3,7 @@ package com.thuanthichlaptrinh.card_words.core.mapper;
 import org.springframework.stereotype.Component;
 
 import com.thuanthichlaptrinh.card_words.core.domain.UserVocabProgress;
-import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.UserVocabProgressAdminResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.user.UserVocabProgressAdminResponse;
 
 @Component
 public class VocabProgressAdminMapper {

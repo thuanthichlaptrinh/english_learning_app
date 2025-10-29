@@ -20,6 +20,8 @@ public interface GameSessionRepository extends JpaRepository<GameSession, Long> 
 
     List<GameSession> findByGameIdAndUserIdOrderByStartedAtDesc(Long gameId, UUID userId);
 
+    Page<GameSession> findByGameIdAndUserIdOrderByStartedAtDesc(Long gameId, UUID userId, Pageable pageable);
+
     @Query("SELECT gs FROM GameSession gs WHERE gs.game.id = :gameId ORDER BY gs.score DESC, gs.accuracy DESC")
     Page<GameSession> findTopScoresByGame(@Param("gameId") Long gameId, Pageable pageable);
 

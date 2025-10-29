@@ -5,8 +5,8 @@ import org.springframework.stereotype.Component;
 import com.thuanthichlaptrinh.card_words.core.domain.Game;
 import com.thuanthichlaptrinh.card_words.core.domain.GameSession;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.GameSessionRepository;
-import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.GameAdminResponse;
-import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.GameSessionResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.game.GameAdminResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.game.GameSessionResponse;
 
 import lombok.RequiredArgsConstructor;
 

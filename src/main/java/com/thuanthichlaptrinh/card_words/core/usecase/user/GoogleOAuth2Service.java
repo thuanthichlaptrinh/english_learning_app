@@ -23,7 +23,7 @@ import com.thuanthichlaptrinh.card_words.core.domain.Role;
 import com.thuanthichlaptrinh.card_words.core.domain.User;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.RoleRepository;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.UserRepository;
-import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.GoogleAuthResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.auth.GoogleAuthResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

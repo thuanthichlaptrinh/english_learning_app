@@ -4,8 +4,9 @@ import com.thuanthichlaptrinh.card_words.common.enums.VocabStatus;
 import com.thuanthichlaptrinh.card_words.core.domain.UserVocabProgress;
 import com.thuanthichlaptrinh.card_words.core.mapper.UserVocabProgressMapper;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.UserVocabProgressRepository;
-import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.UserVocabProgressResponse;
-import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.UserVocabStatsResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.user.UserVocabProgressResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.user.UserVocabStatsResponse;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

@@ -15,9 +15,9 @@ import com.thuanthichlaptrinh.card_words.core.domain.User;
 import com.thuanthichlaptrinh.card_words.core.mapper.UserAdminMapper;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.RoleRepository;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.UserRepository;
-import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.UpdateRolesRequest;
-import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.UserAdminResponse;
-import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.UserStatisticsResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.user.UpdateRolesRequest;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.user.UserAdminResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.user.UserStatisticsResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
