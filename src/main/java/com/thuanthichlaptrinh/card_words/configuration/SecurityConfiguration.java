@@ -26,7 +26,6 @@ import lombok.RequiredArgsConstructor;
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration {
-
     private static final String[] WHITE_LIST_URL = {
             "/login/oauth2/**",
             "/api/v1/auth/signin",
@@ -73,7 +72,8 @@ public class SecurityConfiguration {
                             configuration.setAllowedHeaders(List.of("*"));
                             return configuration;
                         }))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exceptionHandling -> exceptionHandling

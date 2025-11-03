@@ -1,5 +1,6 @@
 package com.thuanthichlaptrinh.card_words.core.domain;
 
+import com.thuanthichlaptrinh.card_words.common.enums.VocabStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -36,8 +37,9 @@ public class UserVocabProgress extends BaseEntity {
     @JoinColumn(name = "vocab_id", nullable = false)
     private Vocab vocab;
 
+    @Enumerated(EnumType.STRING)
     @Column(length = 50)
-    private String status;
+    private VocabStatus status;
 
     @Column(name = "last_reviewed")
     private LocalDate lastReviewed;

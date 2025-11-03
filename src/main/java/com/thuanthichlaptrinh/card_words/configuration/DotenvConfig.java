@@ -9,9 +9,6 @@ import org.springframework.core.env.MapPropertySource;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Loads environment variables from .env file into Spring Environment
- */
 public class DotenvConfig implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
     @Override
@@ -25,12 +22,10 @@ public class DotenvConfig implements ApplicationContextInitializer<ConfigurableA
             ConfigurableEnvironment environment = applicationContext.getEnvironment();
             Map<String, Object> dotenvMap = new HashMap<>();
 
-            // Load all dotenv entries into a map
             dotenv.entries().forEach(entry -> {
                 dotenvMap.put(entry.getKey(), entry.getValue());
             });
 
-            // Add to Spring Environment with highest priority
             environment.getPropertySources()
                     .addFirst(new MapPropertySource("dotenvProperties", dotenvMap));
 

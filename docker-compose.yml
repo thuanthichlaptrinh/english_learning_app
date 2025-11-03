@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+    # PostgreSQL Database
+    postgres:
+        image: postgres:16-alpine
+        container_name: card-words-postgres
+        env_file:
+            - .env.docker
+        ports:
+            - '5432:5432'
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+            - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+        networks:
+            - card-words-network
+        healthcheck:
+            test: ['CMD-SHELL', 'pg_isready -U postgres']
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+    # Redis Cache
+    redis:
+        image: redis:7-alpine
+        container_name: card-words-redis
+        ports:
+            - '6379:6379'
+        volumes:
+            - redis_data:/data
+        networks:
+            - card-words-network
+        healthcheck:
+            test: ['CMD', 'redis-cli', 'ping']
+            interval: 10s
+            timeout: 3s
+            retries: 5
+        command: redis-server --appendonly yes
+
+    # Spring Boot Application
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: card-words-app
+        env_file:
+            - .env.docker
+        ports:
+            - '8080:8080'
+        depends_on:
+            postgres:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+        networks:
+            - card-words-network
+        restart: unless-stopped
+
+volumes:
+    postgres_data:
+        driver: local
+    redis_data:
+        driver: local
+
+networks:
+    card-words-network:
+        driver: bridge

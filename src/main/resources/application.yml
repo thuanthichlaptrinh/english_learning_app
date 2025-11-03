@@ -1,4 +1,5 @@
 server:
+    address: 0.0.0.0
     port: ${SERVER_PORT}
 
 spring:
@@ -73,6 +74,12 @@ google:
         client-id: ${GOOGLE_OAUTH_CLIENT_ID}
         client-secret: ${GOOGLE_OAUTH_CLIENT_SECRET}
         redirect-uri: ${GOOGLE_OAUTH_REDIRECT_URI}
+
+# Firebase Configuration
+firebase:
+    storage:
+        bucket-name: ${FIREBASE_STORAGE_BUCKET}
+        service-account-path: ${FIREBASE_SERVICE_ACCOUNT_PATH:classpath}
 
 logging:
     level:
