@@ -27,19 +27,17 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class QuickQuizService {
-
     private final GameRepository gameRepository;
     private final GameSessionRepository gameSessionRepository;
     private final GameSessionDetailRepository gameSessionDetailRepository;
     private final VocabRepository vocabRepository;
     private final UserVocabProgressRepository userVocabProgressRepository;
+    private final StreakService streakService;
 
-    // Cache cho questions và timestamps
     private final Map<Long, List<QuestionData>> sessionQuestionsCache = new ConcurrentHashMap<>();
     private final Map<Long, Map<Integer, LocalDateTime>> questionStartTimes = new ConcurrentHashMap<>();
     private final Map<Long, Integer> sessionTimeLimits = new ConcurrentHashMap<>();
 
-    // Cache để track user game sessions cho rate limiting
     private final Map<UUID, List<LocalDateTime>> userGameStarts = new ConcurrentHashMap<>();
 
     private static final String GAME_NAME = "Quick Reflex Quiz";
@@ -48,7 +46,7 @@ public class QuickQuizService {
     private static final int SPEED_BONUS_THRESHOLD = 1500; // 1.5 seconds
     private static final int MIN_ANSWER_TIME = 100; // Minimum 100ms - chống gian lận
     private static final int MAX_GAMES_PER_5_MIN = 10; // Rate limit
-    private static final int TIME_TOLERANCE_MS = 500; // Cho phép chênh lệch 500ms
+    private static final int TIME_TOLERANCE_MS = 3000; // Cho phép chênh lệch 3000ms (3 giây) để tránh network latency
 
     private List<Vocab> getRandomVocabs(QuickQuizStartRequest request) {
         List<Vocab> vocabs;
@@ -140,6 +138,55 @@ public class QuickQuizService {
 
         // 10. Build and return response
         return buildAnswerResponse(request, session, currentQuestionData, answerResult, nextQuestion);
+    }
+
+    // Skip question (timeout or user chooses to skip)
+    @Transactional
+    public QuickQuizAnswerResponse skipQuestion(QuickQuizAnswerRequest request, UUID userId) {
+        log.info("Skipping question for session: {}, question: {}", request.getSessionId(),
+                request.getQuestionNumber());
+
+        // 1. Validate and load session
+        GameSession session = validateAndLoadSession(request.getSessionId(), userId);
+
+        // 2. Get cached questions and validate
+        List<QuestionData> cachedQuestions = getCachedQuestions(request.getSessionId());
+        validateQuestionNumber(request.getQuestionNumber(), cachedQuestions.size());
+
+        // 3. Check duplicate answer
+        checkDuplicateAnswer(session, cachedQuestions, request.getQuestionNumber());
+
+        // 4. Get current question data
+        QuestionData currentQuestionData = cachedQuestions.get(request.getQuestionNumber() - 1);
+
+        // 5. Process as wrong answer (timeout/skip = wrong)
+        AnswerResult answerResult = processSkippedAnswer(session, currentQuestionData, request.getTimeTaken());
+
+        // 6. Update spaced repetition progress (mark as wrong)
+        updateVocabProgress(userId, currentQuestionData.getMainVocab().getId(), false);
+
+        // 7. Prepare next question or finish game
+        QuickQuizQuestionResponse nextQuestion = prepareNextQuestionOrFinish(
+                request, session, cachedQuestions, answerResult.getDetails());
+
+        // 8. Save session
+        gameSessionRepository.save(session);
+
+        // 9. Build and return response for skipped question
+        return QuickQuizAnswerResponse.builder()
+                .sessionId(session.getId())
+                .questionNumber(request.getQuestionNumber())
+                .isCorrect(false)
+                .correctAnswerIndex(currentQuestionData.getCorrectAnswerIndex())
+                .currentScore(session.getScore())
+                .currentStreak(0)
+                .comboBonus(0)
+                .explanation("⏱ Hết giờ! Đáp án đúng: " +
+                        currentQuestionData.getOptionVocabs().get(currentQuestionData.getCorrectAnswerIndex())
+                                .getMeaningVi())
+                .hasNextQuestion(nextQuestion != null)
+                .nextQuestion(nextQuestion)
+                .build();
     }
 
     @Transactional(readOnly = true)
@@ -425,13 +472,22 @@ public class QuickQuizService {
             LocalDateTime startTime = sessionTimes.get(request.getQuestionNumber());
             long actualTimeTaken = Duration.between(startTime, LocalDateTime.now()).toMillis();
 
-            if (Math.abs(actualTimeTaken - request.getTimeTaken()) > TIME_TOLERANCE_MS) {
-                log.warn("Time mismatch detected. Client: {}ms, Server: {}ms",
-                        request.getTimeTaken(), actualTimeTaken);
+            // Cho phép client báo cáo thời gian nhỏ hơn server (do network delay)
+            // Nhưng không cho phép quá nhanh (< MIN_ANSWER_TIME) hoặc quá lâu (> timeLimit
+            // + tolerance)
+            if (actualTimeTaken > timeLimit + TIME_TOLERANCE_MS) {
+                log.warn("Time exceeded. Client: {}ms, Server: {}ms, Limit: {}ms",
+                        request.getTimeTaken(), actualTimeTaken, timeLimit);
                 throw new ErrorException(
-                        "Time mismatch. Possible manipulation detected. " +
-                                "Client reported: " + request.getTimeTaken() + "ms, " +
-                                "Server measured: " + actualTimeTaken + "ms");
+                        "Time exceeded. Server measured: " + actualTimeTaken + "ms, " +
+                                "Limit: " + timeLimit + "ms");
+            }
+
+            // Warning nếu chênh lệch quá lớn nhưng không throw error
+            if (Math.abs(actualTimeTaken - request.getTimeTaken()) > TIME_TOLERANCE_MS) {
+                log.warn("Large time mismatch (acceptable). Client: {}ms, Server: {}ms, Diff: {}ms",
+                        request.getTimeTaken(), actualTimeTaken,
+                        Math.abs(actualTimeTaken - request.getTimeTaken()));
             }
         }
     }
@@ -484,6 +540,32 @@ public class QuickQuizService {
         return new AnswerResult(isUserCorrect, pointsEarned, currentStreak, details);
     }
 
+    // Process skipped answer (timeout or user skip)
+    private AnswerResult processSkippedAnswer(GameSession session, QuestionData questionData, Integer timeTaken) {
+        Vocab currentVocab = questionData.getMainVocab();
+        List<GameSessionDetail> details = new ArrayList<>(session.getDetails());
+
+        // Skipped = wrong answer, no points, reset streak
+        int pointsEarned = 0;
+        int currentStreak = 0;
+
+        // Save answer detail as wrong
+        GameSessionDetail detail = GameSessionDetail.builder()
+                .session(session)
+                .vocab(currentVocab)
+                .isCorrect(false) // Skipped = wrong
+                .timeTaken(timeTaken != null ? timeTaken : 0)
+                .build();
+
+        details.add(detail);
+        gameSessionDetailRepository.save(detail);
+
+        // No score update for skipped questions
+        log.info("Question skipped. Session: {}, Vocab: {}", session.getId(), currentVocab.getWord());
+
+        return new AnswerResult(false, pointsEarned, currentStreak, details);
+    }
+
     // 9. Prepare next question or finish game
     private QuickQuizQuestionResponse prepareNextQuestionOrFinish(
             QuickQuizAnswerRequest request,
@@ -526,6 +608,10 @@ public class QuickQuizService {
     // 11. Finish game and cleanup caches
     private void finishGameAndCleanup(GameSession session, List<GameSessionDetail> details) {
         finishGame(session, details);
+
+        // Record streak AFTER finishing game (outside main transaction)
+        recordStreakActivitySafely(session.getUser());
+
         sessionQuestionsCache.remove(session.getId());
         questionStartTimes.remove(session.getId());
         sessionTimeLimits.remove(session.getId());
@@ -668,6 +754,16 @@ public class QuickQuizService {
                 session.getScore(), String.format("%.1f", accuracy), duration);
     }
 
+    // Record streak in separate method to avoid transaction issues
+    private void recordStreakActivitySafely(User user) {
+        try {
+            streakService.recordActivity(user);
+            log.info("Streak activity recorded for user: {}", user.getId());
+        } catch (Exception e) {
+            log.error("Failed to record streak activity: {}", e.getMessage(), e);
+        }
+    }
+
     // Update user vocabulary progress (Spaced Repetition)
     private void updateVocabProgress(UUID userId, UUID vocabId, boolean isCorrect) {
         User user = new User();
@@ -681,12 +777,17 @@ public class QuickQuizService {
                 .orElse(UserVocabProgress.builder()
                         .user(user)
                         .vocab(vocab)
+                        .status(com.thuanthichlaptrinh.card_words.common.enums.VocabStatus.NEW) // Set NEW for first
+                                                                                                // time
                         .timesCorrect(0)
                         .timesWrong(0)
                         .efFactor(2.5)
                         .intervalDays(1)
                         .repetition(0)
                         .build());
+
+        // Save current status for logging
+        com.thuanthichlaptrinh.card_words.common.enums.VocabStatus oldStatus = progress.getStatus();
 
         if (isCorrect) {
             progress.setTimesCorrect(progress.getTimesCorrect() + 1);
@@ -706,7 +807,29 @@ public class QuickQuizService {
             progress.setIntervalDays(1);
         }
 
+        // Calculate and update status using VocabStatusCalculator
+        com.thuanthichlaptrinh.card_words.common.enums.VocabStatus newStatus = com.thuanthichlaptrinh.card_words.common.utils.VocabStatusCalculator
+                .calculateStatus(
+                        oldStatus,
+                        progress.getTimesCorrect(),
+                        progress.getTimesWrong());
+        progress.setStatus(newStatus);
+
+        // Update review dates
+        progress.setLastReviewed(java.time.LocalDate.now());
+        if (progress.getIntervalDays() != null && progress.getIntervalDays() > 0) {
+            progress.setNextReviewDate(java.time.LocalDate.now().plusDays(progress.getIntervalDays()));
+        }
+
         userVocabProgressRepository.save(progress);
+
+        // Log status change
+        if (oldStatus != newStatus) {
+            log.info("Quick Quiz - Vocab status updated: userId={}, vocabId={}, {} -> {}, accuracy={}",
+                    userId, vocabId, oldStatus, newStatus,
+                    com.thuanthichlaptrinh.card_words.common.utils.VocabStatusCalculator.formatAccuracy(
+                            progress.getTimesCorrect(), progress.getTimesWrong()));
+        }
     }
 
     // Build explanation for answer

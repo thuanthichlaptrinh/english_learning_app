@@ -71,6 +71,18 @@ public class QuickQuizController {
                 return ResponseEntity.ok(ApiResponse.success(message, response));
         }
 
+        @PostMapping("/skip")
+        @Operation(summary = "Bỏ qua câu hỏi (timeout)", description = "Bỏ qua câu hỏi hiện tại khi hết thời gian hoặc không biết đáp án. Câu hỏi sẽ được tính là SAI và mất combo.", security = @SecurityRequirement(name = "Bearer Authentication"))
+        public ResponseEntity<ApiResponse<QuickQuizAnswerResponse>> skipQuestion(
+                        @Valid @RequestBody QuickQuizAnswerRequest request,
+                        Authentication authentication) {
+
+                UUID userId = getUserIdFromAuth(authentication);
+                QuickQuizAnswerResponse response = quickQuizService.skipQuestion(request, userId);
+
+                return ResponseEntity.ok(ApiResponse.success("⏭ Đã bỏ qua câu hỏi (timeout)", response));
+        }
+
         @GetMapping("/session/{sessionId}")
         @Operation(summary = "Xem kết quả game", description = "Lấy thông tin chi tiết và kết quả của phiên chơi.", security = @SecurityRequirement(name = "Bearer Authentication"))
         public ResponseEntity<ApiResponse<QuickQuizSessionResponse>> getSessionResults(
@@ -87,7 +99,7 @@ public class QuickQuizController {
         @Operation(summary = "Hướng dẫn chơi", description = "Xem hướng dẫn và luật chơi của Quick Reflex Quiz")
         public ResponseEntity<ApiResponse<QuickQuizInstructionResponse>> getInstructions() {
                 QuickQuizInstructionResponse instructions = QuickQuizInstructionResponse.builder()
-                                .gameName("Quick Reflex Quiz - Trắc nghiệm phản xạ nhanh")
+                                .gameName("Quick Quiz - Trắc nghiệm phản xạ nhanh")
                                 .description("Game Multiple Choice: Kiểm tra phản xạ và độ nhạy từ vựng của bạn!")
                                 .howToPlay("1. Xem từ vựng (tiếng Anh)\n"
                                                 + "2. Chọn 1 trong 3 nghĩa tiếng Việt đúng nhất\n"

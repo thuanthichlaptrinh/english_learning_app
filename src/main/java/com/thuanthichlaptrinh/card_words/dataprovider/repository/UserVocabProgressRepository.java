@@ -180,31 +180,33 @@ public interface UserVocabProgressRepository extends JpaRepository<UserVocabProg
             "ORDER BY uvp.createdAt ASC")
     List<UserVocabProgress> findNewVocabsByUser(@Param("userId") UUID userId);
 
+    // Get vocabularies learned today based on createdAt
     @Query("SELECT uvp FROM UserVocabProgress uvp " +
-            "LEFT JOIN FETCH uvp.vocab v " +
-            "LEFT JOIN v.topics t " +
-            "WHERE uvp.user.id = :userId " +
-            "AND LOWER(t.name) = LOWER(:topicName) " +
-            "AND uvp.status = 'NEW' " +
-            "ORDER BY uvp.createdAt ASC")
-    List<UserVocabProgress> findNewVocabsByUserAndTopic(@Param("userId") UUID userId,
-            @Param("topicName") String topicName);
+           "LEFT JOIN FETCH uvp.vocab v " +
+           "WHERE uvp.user.id = :userId " +
+           "AND CAST(uvp.createdAt AS date) = :date " +
+           "ORDER BY uvp.createdAt DESC")
+    List<UserVocabProgress> findLearnedVocabsByDate(
+            @Param("userId") UUID userId,
+            @Param("date") LocalDate date);
 
-    // Non-paged queries for LEARNING vocabs (based on STATUS only)
+    // Get learning vocabs (KNOWN or UNKNOWN) - non-paged
     @Query("SELECT uvp FROM UserVocabProgress uvp " +
-            "LEFT JOIN FETCH uvp.vocab v " +
-            "LEFT JOIN v.topics t " +
-            "WHERE uvp.user.id = :userId " +
-            "AND LOWER(t.name) = LOWER(:topicName) " +
-            "AND (uvp.status = 'KNOWN' OR uvp.status = 'UNKNOWN') " +
-            "ORDER BY uvp.updatedAt DESC")
-    List<UserVocabProgress> findLearningVocabsByTopic(@Param("userId") UUID userId,
-            @Param("topicName") String topicName);
-
-    @Query("SELECT uvp FROM UserVocabProgress uvp " +
-            "LEFT JOIN FETCH uvp.vocab v " +
-            "WHERE uvp.user.id = :userId " +
-            "AND (uvp.status = 'KNOWN' OR uvp.status = 'UNKNOWN') " +
-            "ORDER BY uvp.updatedAt DESC")
+           "LEFT JOIN FETCH uvp.vocab v " +
+           "WHERE uvp.user.id = :userId " +
+           "AND (uvp.status = 'KNOWN' OR uvp.status = 'UNKNOWN') " +
+           "ORDER BY uvp.updatedAt DESC")
     List<UserVocabProgress> findLearningVocabs(@Param("userId") UUID userId);
+
+    // Get learning vocabs by topic (KNOWN or UNKNOWN) - non-paged
+    @Query("SELECT uvp FROM UserVocabProgress uvp " +
+           "LEFT JOIN FETCH uvp.vocab v " +
+           "LEFT JOIN v.topics t " +
+           "WHERE uvp.user.id = :userId " +
+           "AND LOWER(t.name) = LOWER(:topicName) " +
+           "AND (uvp.status = 'KNOWN' OR uvp.status = 'UNKNOWN') " +
+           "ORDER BY uvp.updatedAt DESC")
+    List<UserVocabProgress> findLearningVocabsByTopic(
+            @Param("userId") UUID userId,
+            @Param("topicName") String topicName);
 }

@@ -35,6 +35,7 @@ public class LearnVocabService {
 
     private final UserVocabProgressRepository userVocabProgressRepository;
     private final VocabRepository vocabRepository;
+    private final StreakService streakService;
 
     /**
      * Lấy danh sách từ vựng cần ôn tập với phân trang
@@ -245,6 +246,14 @@ public class LearnVocabService {
 
         // Save
         progress = userVocabProgressRepository.save(progress);
+        // Record streak activity
+        try {
+            streakService.recordActivity(user);
+            log.info("Streak activity recorded for user: {}", user.getId());
+        } catch (Exception e) {
+            log.error("Failed to record streak activity: {}", e.getMessage());
+        }
+
 
         String message = generateMessage(request.getIsCorrect(), progress.getStatus());
 

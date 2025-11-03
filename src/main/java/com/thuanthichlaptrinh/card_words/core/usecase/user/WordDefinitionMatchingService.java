@@ -47,9 +47,10 @@ public class WordDefinitionMatchingService {
     private final VocabRepository vocabRepository;
     private final UserRepository userRepository;
     private final UserVocabProgressRepository userVocabProgressRepository;
+    private final StreakService streakService;
 
     private final Cache<Long, SessionData> sessionCache = Caffeine.newBuilder()
-            .expireAfterWrite(30, TimeUnit.MINUTES)
+            .expireAfterWrite(2, TimeUnit.HOURS) // Tăng lên 2 giờ
             .maximumSize(10000)
             .build();
 
@@ -193,6 +194,9 @@ public class WordDefinitionMatchingService {
 
         sessionCache.invalidate(request.getSessionId());
 
+        // Record streak activity AFTER transaction completes
+        recordStreakActivitySafely(session.getUser());
+
         log.info("Word-Definition Matching completed: sessionId={}, score={}, accuracy={}%",
                 session.getId(), totalScore, String.format("%.2f", accuracy));
 
@@ -262,23 +266,56 @@ public class WordDefinitionMatchingService {
                 .findByUserIdAndVocabId(user.getId(), vocab.getId());
 
         UserVocabProgress progress;
+        com.thuanthichlaptrinh.card_words.common.enums.VocabStatus oldStatus;
+
         if (progressOpt.isPresent()) {
+            // Record đã tồn tại
             progress = progressOpt.get();
+            oldStatus = progress.getStatus();
+
             if (isCorrect) {
                 progress.setTimesCorrect(progress.getTimesCorrect() + 1);
             } else {
                 progress.setTimesWrong(progress.getTimesWrong() + 1);
             }
         } else {
+            // Record mới - set status = NEW
+            oldStatus = null;
             progress = UserVocabProgress.builder()
                     .user(user)
                     .vocab(vocab)
+                    .status(com.thuanthichlaptrinh.card_words.common.enums.VocabStatus.NEW)
                     .timesCorrect(isCorrect ? 1 : 0)
                     .timesWrong(isCorrect ? 0 : 1)
+                    .efFactor(2.5)
+                    .intervalDays(1)
+                    .repetition(0)
                     .build();
         }
 
+        // Calculate and update status using VocabStatusCalculator
+        com.thuanthichlaptrinh.card_words.common.enums.VocabStatus newStatus = com.thuanthichlaptrinh.card_words.common.utils.VocabStatusCalculator
+                .calculateStatus(
+                        oldStatus,
+                        progress.getTimesCorrect(),
+                        progress.getTimesWrong());
+        progress.setStatus(newStatus);
+
+        // Update review dates
+        progress.setLastReviewed(java.time.LocalDate.now());
+        if (progress.getIntervalDays() != null && progress.getIntervalDays() > 0) {
+            progress.setNextReviewDate(java.time.LocalDate.now().plusDays(progress.getIntervalDays()));
+        }
+
         userVocabProgressRepository.save(progress);
+
+        // Log status change
+        if (oldStatus != newStatus) {
+            log.info("Word-Definition Matching - Vocab status updated: userId={}, vocabId={}, {} -> {}, accuracy={}",
+                    user.getId(), vocab.getId(), oldStatus, newStatus,
+                    com.thuanthichlaptrinh.card_words.common.utils.VocabStatusCalculator.formatAccuracy(
+                            progress.getTimesCorrect(), progress.getTimesWrong()));
+        }
     }
 
     @Transactional(readOnly = true)
@@ -332,5 +369,15 @@ public class WordDefinitionMatchingService {
                                 .build())
                         .collect(Collectors.toSet()) : null)
                 .build();
+    }
+
+    // Record streak in separate method to avoid transaction issues
+    private void recordStreakActivitySafely(User user) {
+        try {
+            streakService.recordActivity(user);
+            log.info("Streak activity recorded for user: {}", user.getId());
+        } catch (Exception e) {
+            log.error("Failed to record streak activity: {}", e.getMessage(), e);
+        }
     }
 }

@@ -18,8 +18,8 @@ public class QuickQuizAnswerRequest {
     @NotNull(message = "Question number không được để trống")
     private Integer questionNumber;
 
-    @NotNull(message = "Câu trả lời không được để trống")
-    private Integer selectedOptionIndex; // 0, 1, hoặc 2
+    // Nullable for skip/timeout case
+    private Integer selectedOptionIndex; // 0, 1, 2, 3 (null = skip)
 
     @NotNull(message = "Thời gian trả lời không được để trống")
     private Integer timeTaken;

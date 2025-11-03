@@ -112,4 +112,16 @@ public class UserVocabProgressService {
                 .collect(Collectors.toList());
     }
 
+    // Get vocabs learned today
+    @Transactional(readOnly = true)
+    public List<UserVocabProgressResponse> getVocabsLearnedToday(UUID userId) {
+        log.info("Getting vocabs learned today for user: {}", userId);
+
+        List<UserVocabProgress> progressList = userVocabProgressRepository.findLearnedVocabsByDate(userId, LocalDate.now());
+
+        return progressList.stream()
+                .map(userVocabProgressMapper::toUserVocabProgressResponse)
+                .collect(Collectors.toList());
+    }
+
 }

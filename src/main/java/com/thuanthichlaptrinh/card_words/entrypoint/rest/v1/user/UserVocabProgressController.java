@@ -90,6 +90,19 @@ public class UserVocabProgressController {
                 response));
     }
 
+    @GetMapping("/learned-today")
+    @Operation(summary = "Lấy từ đã học trong ngày", description = "Hiển thị những từ vựng mà user đã học trong ngày hôm nay (dựa trên created_at)", security = @SecurityRequirement(name = "Bearer Authentication"))
+    public ResponseEntity<ApiResponse<List<UserVocabProgressResponse>>> getVocabsLearnedToday(
+            Authentication authentication) {
+
+        UUID userId = getUserIdFromAuth(authentication);
+        List<UserVocabProgressResponse> response = userVocabProgressService.getVocabsLearnedToday(userId);
+
+        return ResponseEntity.ok(ApiResponse.success(
+                "Lấy danh sách từ đã học trong ngày thành công. Tổng: " + response.size() + " từ",
+                response));
+    }
+
     private UUID getUserIdFromAuth(Authentication authentication) {
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();

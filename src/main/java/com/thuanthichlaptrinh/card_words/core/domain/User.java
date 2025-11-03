@@ -26,7 +26,9 @@ import java.util.stream.Collectors;
         @Index(name = "idx_user_email", columnList = "email"),
         @Index(name = "idx_user_status", columnList = "status"),
         @Index(name = "idx_user_activated", columnList = "activated"),
-        @Index(name = "idx_user_activation_key", columnList = "activation_key")
+        @Index(name = "idx_user_activation_key", columnList = "activation_key"),
+        @Index(name = "idx_user_current_streak", columnList = "current_streak"),
+        @Index(name = "idx_user_last_activity", columnList = "last_activity_date")
 })
 public class User extends BaseUUIDEntity implements UserDetails {
 
@@ -73,6 +75,22 @@ public class User extends BaseUUIDEntity implements UserDetails {
     @Column(length = 50)
     private String status;
 
+    // Streak fields
+    @Builder.Default
+    @Column(name = "current_streak")
+    private Integer currentStreak = 0;
+
+    @Builder.Default
+    @Column(name = "longest_streak")
+    private Integer longestStreak = 0;
+
+    @Column(name = "last_activity_date")
+    private LocalDate lastActivityDate;
+
+    @Builder.Default
+    @Column(name = "total_study_days")
+    private Integer totalStudyDays = 0;
+
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"), indexes = {
@@ -96,6 +114,10 @@ public class User extends BaseUUIDEntity implements UserDetails {
     @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Notification> notifications = new HashSet<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserGameSetting> gameSettings = new HashSet<>();
 
     // UserDetails implementation
     @Override
