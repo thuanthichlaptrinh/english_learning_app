@@ -33,10 +33,10 @@ public class RedisKeyConstants {
     public static final String GAME_LEADERBOARD = PREFIX + ":game:leaderboard"; // Sorted Set
 
     // Quick Quiz
-    public static final String QUIZ_SESSION_QUESTIONS = PREFIX + ":game:quickquiz:session";
-    public static final String QUIZ_SESSION_QUESTION_START = PREFIX + ":game:quickquiz:session";
-    public static final String QUIZ_SESSION_TIMELIMIT = PREFIX + ":game:quickquiz:session";
-    public static final String QUIZ_SESSION_META = PREFIX + ":game:quickquiz:session";
+    public static final String QUIZ_SESSION_QUESTIONS = PREFIX + ":game:quickquiz:session:questions";
+    public static final String QUIZ_SESSION_QUESTION_START = PREFIX + ":game:quickquiz:session:q";
+    public static final String QUIZ_SESSION_TIMELIMIT = PREFIX + ":game:quickquiz:session:timelimit";
+    public static final String QUIZ_SESSION_META = PREFIX + ":game:quickquiz:session:meta";
 
     // Image Word Matching
     public static final String IMAGE_MATCHING_SESSION = PREFIX + ":game:imagematching:session";
@@ -93,8 +93,8 @@ public class RedisKeyConstants {
     public static final String RATE_LIMIT_CUSTOM = PREFIX + ":ratelimit:custom";
 
     // ==================== AUTH KEYS ====================
-    public static final String TOKEN_BLACKLIST = PREFIX + ":auth:blacklist"; // String
-    public static final String REFRESH_TOKEN = PREFIX + ":auth:refresh"; // String
+    public static final String TOKEN_BLACKLIST = PREFIX + ":auth:blacklist";
+    public static final String REFRESH_TOKEN = PREFIX + ":auth:refresh";
     public static final String USER_SESSION = PREFIX + ":auth:session";
     public static final String PASSWORD_RESET_TOKEN = PREFIX + ":auth:passwordreset";
     public static final String EMAIL_VERIFICATION_TOKEN = PREFIX + ":auth:emailverify";
