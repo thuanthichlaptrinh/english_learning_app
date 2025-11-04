@@ -34,6 +34,7 @@ public class QuickQuizService {
     private final VocabRepository vocabRepository;
     private final UserVocabProgressRepository userVocabProgressRepository;
     private final StreakService streakService;
+    private final LeaderboardService leaderboardService;
 
     // Redis services for distributed caching
     private final GameSessionCacheService gameSessionCacheService;
@@ -750,6 +751,14 @@ public class QuickQuizService {
 
         log.info("Game finished. Score: {}, Accuracy: {}%, Duration: {}s",
                 session.getScore(), String.format("%.1f", accuracy), duration);
+
+        // ✨ UPDATE LEADERBOARD after game finished
+        try {
+            leaderboardService.updateUserScore(session.getUser().getId(), "quick-quiz", session.getScore());
+            log.info("📊 Leaderboard updated for user: {}, score: {}", session.getUser().getId(), session.getScore());
+        } catch (Exception e) {
+            log.error("❌ Failed to update leaderboard: {}", e.getMessage(), e);
+        }
     }
 
     // Record streak in separate method to avoid transaction issues
