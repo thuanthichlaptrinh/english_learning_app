@@ -1,19 +1,15 @@
 package com.thuanthichlaptrinh.card_words.core.service.redis;
 
-import com.thuanthichlaptrinh.card_words.configuration.redis.RedisKeyConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import com.thuanthichlaptrinh.card_words.common.constants.RedisKeyConstants;
 
 import java.time.Duration;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- * Authentication Cache Service
- * Manages JWT token blacklist, refresh tokens, and authentication-related
- * caching
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -29,9 +25,7 @@ public class AuthenticationCacheService {
 
     // ==================== JWT TOKEN BLACKLIST ====================
 
-    /**
-     * Add JWT token to blacklist (for logout)
-     */
+    // Add JWT token to blacklist (for logout)
     public void blacklistToken(String token, long expirationSeconds) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.JWT_BLACKLIST, token);
         Duration ttl = Duration.ofSeconds(expirationSeconds);
@@ -40,9 +34,7 @@ public class AuthenticationCacheService {
         log.info("✅ Blacklisted JWT token (expires in {} seconds)", expirationSeconds);
     }
 
-    /**
-     * Check if JWT token is blacklisted
-     */
+    // Check if JWT token is blacklisted
     public boolean isTokenBlacklisted(String token) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.JWT_BLACKLIST, token);
         boolean blacklisted = redisService.exists(key);
@@ -54,9 +46,7 @@ public class AuthenticationCacheService {
         return blacklisted;
     }
 
-    /**
-     * Remove token from blacklist (rare use case)
-     */
+    // Remove token from blacklist (rare use case)
     public void unblacklistToken(String token) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.JWT_BLACKLIST, token);
         redisService.delete(key);
@@ -65,26 +55,20 @@ public class AuthenticationCacheService {
 
     // ==================== REFRESH TOKENS ====================
 
-    /**
-     * Store refresh token for user
-     */
+    // Store refresh token for user
     public void storeRefreshToken(UUID userId, String refreshToken) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.REFRESH_TOKEN, userId);
         redisService.set(key, refreshToken, REFRESH_TOKEN_TTL);
         log.info("✅ Stored refresh token for user {}", userId);
     }
 
-    /**
-     * Get refresh token for user
-     */
+    // Get refresh token for user
     public String getRefreshToken(UUID userId) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.REFRESH_TOKEN, userId);
         return redisService.getString(key);
     }
 
-    /**
-     * Validate refresh token
-     */
+    // Validate refresh token
     public boolean validateRefreshToken(UUID userId, String refreshToken) {
         String storedToken = getRefreshToken(userId);
         boolean valid = storedToken != null && storedToken.equals(refreshToken);
@@ -96,9 +80,7 @@ public class AuthenticationCacheService {
         return valid;
     }
 
-    /**
-     * Delete refresh token (on logout)
-     */
+    // Delete refresh token (on logout)
     public void deleteRefreshToken(UUID userId) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.REFRESH_TOKEN, userId);
         redisService.delete(key);
@@ -107,9 +89,7 @@ public class AuthenticationCacheService {
 
     // ==================== LOGIN ATTEMPTS ====================
 
-    /**
-     * Increment failed login attempts for email
-     */
+    // Increment failed login attempts for email
     public long incrementLoginAttempts(String email) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.LOGIN_ATTEMPTS, email);
         Long attempts = redisService.increment(key);
@@ -130,35 +110,27 @@ public class AuthenticationCacheService {
         return attempts;
     }
 
-    /**
-     * Get current login attempt count
-     */
+    // Get current login attempt count
     public long getLoginAttempts(String email) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.LOGIN_ATTEMPTS, email);
         String attemptsStr = redisService.getString(key);
         return attemptsStr != null ? Long.parseLong(attemptsStr) : 0;
     }
 
-    /**
-     * Check if account is locked due to failed attempts
-     */
+    // Check if account is locked due to failed attempts
     public boolean isAccountLocked(String email) {
         long attempts = getLoginAttempts(email);
         return attempts >= MAX_LOGIN_ATTEMPTS;
     }
 
-    /**
-     * Reset login attempts after successful login
-     */
+    // Reset login attempts after successful login
     public void resetLoginAttempts(String email) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.LOGIN_ATTEMPTS, email);
         redisService.delete(key);
         log.info("✅ Reset login attempts for email: {}", email);
     }
 
-    /**
-     * Get remaining time until unlock (in seconds)
-     */
+    // Get remaining time until unlock (in seconds)
     public Long getTimeUntilUnlock(String email) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.LOGIN_ATTEMPTS, email);
         Long ttl = redisService.getTTL(key);
@@ -167,35 +139,27 @@ public class AuthenticationCacheService {
 
     // ==================== USER SESSIONS ====================
 
-    /**
-     * Store user session data
-     */
+    // Store user session data
     public void storeUserSession(UUID userId, String sessionId, String sessionData) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.USER_SESSION, userId, sessionId);
         redisService.set(key, sessionData, SESSION_TTL);
         log.debug("✅ Stored session for user {}: {}", userId, sessionId);
     }
 
-    /**
-     * Get user session data
-     */
+    // Get user session data
     public String getUserSession(UUID userId, String sessionId) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.USER_SESSION, userId, sessionId);
         return redisService.getString(key);
     }
 
-    /**
-     * Delete user session
-     */
+    // Delete user session
     public void deleteUserSession(UUID userId, String sessionId) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.USER_SESSION, userId, sessionId);
         redisService.delete(key);
         log.info("✅ Deleted session {} for user {}", sessionId, userId);
     }
 
-    /**
-     * Delete all sessions for user (force logout from all devices)
-     */
+    // Delete all sessions for user (force logout from all devices)
     public void deleteAllUserSessions(UUID userId) {
         String pattern = RedisKeyConstants.buildKey(RedisKeyConstants.USER_SESSION, userId) + "*";
         Set<String> sessionKeys = redisService.keys(pattern);
@@ -206,9 +170,7 @@ public class AuthenticationCacheService {
         }
     }
 
-    /**
-     * Extend user session TTL (activity-based)
-     */
+    // Extend user session TTL (activity-based)
     public void extendUserSession(UUID userId, String sessionId) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.USER_SESSION, userId, sessionId);
         redisService.expire(key, SESSION_TTL);
@@ -217,26 +179,20 @@ public class AuthenticationCacheService {
 
     // ==================== ACTIVE USERS ====================
 
-    /**
-     * Mark user as active (online)
-     */
+    // Mark user as active (online)
     public void markUserActive(UUID userId) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.USER_ACTIVE, userId);
         redisService.set(key, System.currentTimeMillis(), Duration.ofMinutes(5));
         log.debug("✅ Marked user {} as active", userId);
     }
 
-    /**
-     * Check if user is active
-     */
+    // Check if user is active
     public boolean isUserActive(UUID userId) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.USER_ACTIVE, userId);
         return redisService.exists(key);
     }
 
-    /**
-     * Get all active users count
-     */
+    // Get all active users count
     public long getActiveUsersCount() {
         String pattern = RedisKeyConstants.USER_ACTIVE + "*";
         Set<String> activeUserKeys = redisService.keys(pattern);
@@ -245,18 +201,14 @@ public class AuthenticationCacheService {
 
     // ==================== PASSWORD RESET ====================
 
-    /**
-     * Store password reset token
-     */
+    // Store password reset token
     public void storePasswordResetToken(String email, String resetToken) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.PASSWORD_RESET_TOKEN, email);
         redisService.set(key, resetToken, Duration.ofHours(1));
         log.info("✅ Stored password reset token for email: {}", email);
     }
 
-    /**
-     * Validate password reset token
-     */
+    // Validate password reset token
     public boolean validatePasswordResetToken(String email, String resetToken) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.PASSWORD_RESET_TOKEN, email);
         String storedToken = redisService.getString(key);
@@ -274,9 +226,7 @@ public class AuthenticationCacheService {
         return valid;
     }
 
-    /**
-     * Delete password reset token
-     */
+    // Delete password reset token
     public void deletePasswordResetToken(String email) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.PASSWORD_RESET_TOKEN, email);
         redisService.delete(key);
@@ -285,18 +235,14 @@ public class AuthenticationCacheService {
 
     // ==================== EMAIL VERIFICATION ====================
 
-    /**
-     * Store email verification token
-     */
+    // Store email verification token
     public void storeEmailVerificationToken(String email, String verificationToken) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.EMAIL_VERIFICATION_TOKEN, email);
         redisService.set(key, verificationToken, Duration.ofHours(24));
         log.info("✅ Stored email verification token for: {}", email);
     }
 
-    /**
-     * Validate email verification token
-     */
+    // Validate email verification token
     public boolean validateEmailVerificationToken(String email, String verificationToken) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.EMAIL_VERIFICATION_TOKEN, email);
         String storedToken = redisService.getString(key);
@@ -315,18 +261,14 @@ public class AuthenticationCacheService {
 
     // ==================== TWO-FACTOR AUTHENTICATION ====================
 
-    /**
-     * Store 2FA code
-     */
+    // Store 2FA code
     public void store2FACode(UUID userId, String code) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.TWO_FA_CODE, userId);
         redisService.set(key, code, Duration.ofMinutes(5));
         log.info("✅ Stored 2FA code for user {}", userId);
     }
 
-    /**
-     * Validate 2FA code
-     */
+    // Validate 2FA code
     public boolean validate2FACode(UUID userId, String code) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.TWO_FA_CODE, userId);
         String storedCode = redisService.getString(key);
@@ -345,16 +287,12 @@ public class AuthenticationCacheService {
 
     // ==================== UTILITY ====================
 
-    /**
-     * Check if Redis is available
-     */
+    // Check if Redis is available
     public boolean isRedisAvailable() {
         return redisService.ping();
     }
 
-    /**
-     * Clean up expired authentication data (maintenance task)
-     */
+    // Clean up expired authentication data (maintenance task)
     public void cleanupExpiredData() {
         log.info("🧹 Starting authentication data cleanup...");
 
@@ -366,4 +304,5 @@ public class AuthenticationCacheService {
         log.info("✅ Cleanup completed: {} blacklisted tokens, {} login attempts tracked, {} active sessions",
                 blacklistedTokens, loginAttempts, activeSessions);
     }
+
 }

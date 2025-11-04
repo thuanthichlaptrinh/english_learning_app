@@ -2,7 +2,7 @@ package com.thuanthichlaptrinh.card_words.core.service.redis;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.thuanthichlaptrinh.card_words.configuration.redis.RedisKeyConstants;
+import com.thuanthichlaptrinh.card_words.common.constants.RedisKeyConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,10 +11,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 
-/**
- * User Statistics Cache Service
- * Manages caching for user statistics and progress
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -49,7 +45,7 @@ public class UserStatsCacheService {
     public <T> T getUserStats(UUID userId, Class<T> clazz) {
         try {
             String key = RedisKeyConstants.buildKey(RedisKeyConstants.USER_STATS, userId);
-            String json = (String) redisService.get(key);
+            String json = redisService.getAsString(key);
 
             if (json == null) {
                 log.debug("⚠️ Cache miss: user stats for {}", userId);
@@ -94,7 +90,7 @@ public class UserStatsCacheService {
     public <T> T getUserQuizStats(UUID userId, Class<T> clazz) {
         try {
             String key = RedisKeyConstants.buildKey(RedisKeyConstants.USER_QUIZ_STATS, userId);
-            String json = (String) redisService.get(key);
+            String json = redisService.getAsString(key);
             return json != null ? objectMapper.readValue(json, clazz) : null;
         } catch (Exception e) {
             log.error("❌ Failed to get quiz stats: userId={}", userId);
@@ -153,7 +149,7 @@ public class UserStatsCacheService {
     public Map<String, Object> getUserVocabProgress(UUID userId) {
         try {
             String key = RedisKeyConstants.buildKey(RedisKeyConstants.USER_VOCAB_PROGRESS, userId);
-            String json = (String) redisService.get(key);
+            String json = redisService.getAsString(key);
 
             if (json == null) {
                 return null;
@@ -219,7 +215,7 @@ public class UserStatsCacheService {
     public <T> T getUserStreak(UUID userId, Class<T> clazz) {
         try {
             String key = RedisKeyConstants.buildKey(RedisKeyConstants.USER_STREAK, userId);
-            String json = (String) redisService.get(key);
+            String json = redisService.getAsString(key);
 
             if (json == null) {
                 return null;

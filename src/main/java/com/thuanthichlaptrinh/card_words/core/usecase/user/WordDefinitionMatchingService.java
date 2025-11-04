@@ -45,7 +45,7 @@ public class WordDefinitionMatchingService {
     private final UserRepository userRepository;
     private final UserVocabProgressRepository userVocabProgressRepository;
     private final StreakService streakService;
-    
+
     // Redis cache service for distributed caching
     private final GameSessionCacheService gameSessionCacheService;
 

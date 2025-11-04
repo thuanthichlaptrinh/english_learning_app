@@ -323,14 +323,22 @@ public class QuickQuizService {
 
     // 6. Initialize session caches (questions, time limits, timestamps)
     private void initializeSessionCaches(Long sessionId, List<QuestionData> allQuestions, int timePerQuestion) {
+        log.info("🚀 Initializing caches for session {}: {} questions, {} sec per question",
+                sessionId, allQuestions.size(), timePerQuestion);
+
         // Cache questions for this session in Redis (30 min TTL)
+        log.info("📝 Step 1: Caching questions...");
         gameSessionCacheService.cacheQuizQuestions(sessionId, allQuestions);
 
         // Cache time limit for this session in Redis (convert seconds to milliseconds)
+        log.info("⏱️ Step 2: Caching time limit...");
         gameSessionCacheService.cacheSessionTimeLimit(sessionId, timePerQuestion * 1000);
 
         // Record start time for question 1
+        log.info("🕐 Step 3: Caching question start time...");
         gameSessionCacheService.cacheQuestionStartTime(sessionId, 1, LocalDateTime.now());
+
+        log.info("✅ All caches initialized for session {}", sessionId);
     }
 
     // 7. Build first question response

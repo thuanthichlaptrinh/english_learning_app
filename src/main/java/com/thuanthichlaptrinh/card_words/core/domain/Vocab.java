@@ -1,5 +1,6 @@
 package com.thuanthichlaptrinh.card_words.core.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -53,6 +54,7 @@ public class Vocab extends BaseEntity {
         @Column(length = 255)
         private String credit;
 
+        @JsonIgnore
         @Builder.Default
         @ManyToMany(fetch = FetchType.LAZY)
         @JoinTable(name = "vocab_types", joinColumns = @JoinColumn(name = "vocab_id"), inverseJoinColumns = @JoinColumn(name = "type_id"), indexes = {
@@ -61,6 +63,7 @@ public class Vocab extends BaseEntity {
         })
         private Set<Type> types = new HashSet<>();
 
+        @JsonIgnore
         @Builder.Default
         @ManyToMany(fetch = FetchType.LAZY)
         @JoinTable(name = "vocab_topics", joinColumns = @JoinColumn(name = "vocab_id"), inverseJoinColumns = @JoinColumn(name = "topic_id"), indexes = {
@@ -69,14 +72,17 @@ public class Vocab extends BaseEntity {
         })
         private Set<Topic> topics = new HashSet<>();
 
+        @JsonIgnore
         @Builder.Default
         @ManyToMany(mappedBy = "vocabs", fetch = FetchType.LAZY)
         private Set<Package> packages = new HashSet<>();
 
+        @JsonIgnore
         @Builder.Default
         @OneToMany(mappedBy = "vocab", cascade = CascadeType.ALL)
         private Set<UserVocabProgress> userProgress = new HashSet<>();
 
+        @JsonIgnore
         @Builder.Default
         @OneToMany(mappedBy = "vocab", cascade = CascadeType.ALL)
         private Set<GameSessionDetail> gameSessionDetails = new HashSet<>();

@@ -3,7 +3,7 @@ package com.thuanthichlaptrinh.card_words.core.service.redis;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.thuanthichlaptrinh.card_words.configuration.redis.RedisKeyConstants;
+import com.thuanthichlaptrinh.card_words.common.constants.RedisKeyConstants;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.game.QuestionData;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,13 +11,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
-/**
- * Game Session Cache Service
- * Manages Redis cache for all game sessions (Quick Quiz, Image Matching, Word
- * Definition)
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -32,27 +29,27 @@ public class GameSessionCacheService {
 
     // ==================== QUICK QUIZ ====================
 
-    /**
-     * Cache questions for Quick Quiz session
-     */
+    // Cache questions for Quick Quiz session
     public void cacheQuizQuestions(Long sessionId, List<QuestionData> questions) {
         try {
             String key = RedisKeyConstants.buildKey(RedisKeyConstants.QUIZ_SESSION_QUESTIONS, sessionId);
+            log.info("🔑 Attempting to cache questions with key: {}", key);
             String json = objectMapper.writeValueAsString(questions);
+            log.info("📝 JSON serialized successfully, length: {} chars", json.length());
             redisService.set(key, json, SESSION_TTL);
             log.info("✅ Cached {} questions for quiz session {}", questions.size(), sessionId);
         } catch (JsonProcessingException e) {
-            log.error("❌ Failed to cache quiz questions: sessionId={}, error={}", sessionId, e.getMessage());
+            log.error("❌ Failed to cache quiz questions (JSON): sessionId={}, error={}", sessionId, e.getMessage(), e);
+        } catch (Exception e) {
+            log.error("❌ Failed to cache quiz questions (Redis): sessionId={}, error={}", sessionId, e.getMessage(), e);
         }
     }
 
-    /**
-     * Get cached questions for Quick Quiz session
-     */
+    // Get cached questions for Quick Quiz session
     public List<QuestionData> getQuizQuestions(Long sessionId) {
         try {
             String key = RedisKeyConstants.buildKey(RedisKeyConstants.QUIZ_SESSION_QUESTIONS, sessionId);
-            String json = (String) redisService.get(key);
+            String json = redisService.getAsString(key);
 
             if (json == null) {
                 log.warn("⚠️ No cached questions found for session {}", sessionId);
@@ -69,9 +66,6 @@ public class GameSessionCacheService {
         }
     }
 
-    /**
-     * Cache question start time
-     */
     public void cacheQuestionStartTime(Long sessionId, int questionNumber, LocalDateTime startTime) {
         String key = RedisKeyConstants.buildKey(
                 RedisKeyConstants.QUIZ_SESSION_QUESTION_START,
@@ -81,9 +75,6 @@ public class GameSessionCacheService {
         log.debug("✅ Cached start time for session {} question {}", sessionId, questionNumber);
     }
 
-    /**
-     * Get question start time
-     */
     public LocalDateTime getQuestionStartTime(Long sessionId, int questionNumber) {
         String key = RedisKeyConstants.buildKey(
                 RedisKeyConstants.QUIZ_SESSION_QUESTION_START,
@@ -92,26 +83,22 @@ public class GameSessionCacheService {
         return redisService.get(key, LocalDateTime.class);
     }
 
-    /**
-     * Cache session time limit
-     */
     public void cacheSessionTimeLimit(Long sessionId, int timeLimitMs) {
-        String key = RedisKeyConstants.buildKey(RedisKeyConstants.QUIZ_SESSION_TIMELIMIT, sessionId);
-        redisService.set(key, timeLimitMs, SESSION_TTL);
-        log.debug("✅ Cached time limit {} ms for session {}", timeLimitMs, sessionId);
+        try {
+            String key = RedisKeyConstants.buildKey(RedisKeyConstants.QUIZ_SESSION_TIMELIMIT, sessionId);
+            log.info("🔑 Attempting to cache time limit with key: {}, value: {}", key, timeLimitMs);
+            redisService.set(key, timeLimitMs, SESSION_TTL);
+            log.info("✅ Cached time limit {} ms for session {}", timeLimitMs, sessionId);
+        } catch (Exception e) {
+            log.error("❌ Failed to cache time limit: sessionId={}, error={}", sessionId, e.getMessage(), e);
+        }
     }
 
-    /**
-     * Get session time limit
-     */
     public Integer getSessionTimeLimit(Long sessionId) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.QUIZ_SESSION_TIMELIMIT, sessionId);
         return redisService.get(key, Integer.class);
     }
 
-    /**
-     * Delete all quiz session cache
-     */
     public void deleteQuizSessionCache(Long sessionId) {
         List<String> keys = new ArrayList<>();
         keys.add(RedisKeyConstants.buildKey(RedisKeyConstants.QUIZ_SESSION_QUESTIONS, sessionId));
@@ -132,27 +119,27 @@ public class GameSessionCacheService {
 
     // ==================== IMAGE WORD MATCHING ====================
 
-    /**
-     * Cache Image Word Matching session data
-     */
     public void cacheImageMatchingSession(Long sessionId, Object sessionData) {
         try {
             String key = RedisKeyConstants.buildKey(RedisKeyConstants.IMAGE_MATCHING_SESSION, sessionId);
+            log.info("🔑 Attempting to cache image-matching session with key: {}", key);
             String json = objectMapper.writeValueAsString(sessionData);
+            log.info("📝 JSON serialized successfully, length: {} chars", json.length());
             redisService.set(key, json, SESSION_TTL);
             log.info("✅ Cached image matching session {}", sessionId);
         } catch (JsonProcessingException e) {
-            log.error("❌ Failed to cache image matching session: {}", e.getMessage());
+            log.error("❌ Failed to cache image matching session (JSON): sessionId={}, error={}", sessionId,
+                    e.getMessage(), e);
+        } catch (Exception e) {
+            log.error("❌ Failed to cache image matching session (Redis): sessionId={}, error={}", sessionId,
+                    e.getMessage(), e);
         }
     }
 
-    /**
-     * Get Image Word Matching session data
-     */
     public <T> T getImageMatchingSession(Long sessionId, Class<T> clazz) {
         try {
             String key = RedisKeyConstants.buildKey(RedisKeyConstants.IMAGE_MATCHING_SESSION, sessionId);
-            String json = (String) redisService.get(key);
+            String json = redisService.getAsString(key);
 
             if (json == null) {
                 return null;
@@ -165,26 +152,17 @@ public class GameSessionCacheService {
         }
     }
 
-    /**
-     * Delete Image Word Matching session cache
-     */
     public void deleteImageMatchingSession(Long sessionId) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.IMAGE_MATCHING_SESSION, sessionId);
         redisService.delete(key);
         log.info("✅ Deleted image matching session cache: {}", sessionId);
     }
 
-    /**
-     * Set user's active Image Matching game
-     */
     public void setUserActiveImageMatching(UUID userId, Long sessionId) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.IMAGE_MATCHING_USER_ACTIVE, userId);
         redisService.set(key, sessionId, SESSION_TTL);
     }
 
-    /**
-     * Get user's active Image Matching game
-     */
     public Long getUserActiveImageMatching(UUID userId) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.IMAGE_MATCHING_USER_ACTIVE, userId);
         return redisService.get(key, Long.class);
@@ -192,27 +170,27 @@ public class GameSessionCacheService {
 
     // ==================== WORD DEFINITION MATCHING ====================
 
-    /**
-     * Cache Word Definition Matching session data
-     */
     public void cacheWordDefSession(Long sessionId, Object sessionData) {
         try {
             String key = RedisKeyConstants.buildKey(RedisKeyConstants.WORD_DEF_SESSION, sessionId);
+            log.info("🔑 Attempting to cache word-def session with key: {}", key);
             String json = objectMapper.writeValueAsString(sessionData);
+            log.info("📝 JSON serialized successfully, length: {} chars", json.length());
             redisService.set(key, json, SESSION_TTL);
             log.info("✅ Cached word definition session {}", sessionId);
         } catch (JsonProcessingException e) {
-            log.error("❌ Failed to cache word definition session: {}", e.getMessage());
+            log.error("❌ Failed to cache word definition session (JSON): sessionId={}, error={}", sessionId,
+                    e.getMessage(), e);
+        } catch (Exception e) {
+            log.error("❌ Failed to cache word definition session (Redis): sessionId={}, error={}", sessionId,
+                    e.getMessage(), e);
         }
     }
 
-    /**
-     * Get Word Definition Matching session data
-     */
     public <T> T getWordDefSession(Long sessionId, Class<T> clazz) {
         try {
             String key = RedisKeyConstants.buildKey(RedisKeyConstants.WORD_DEF_SESSION, sessionId);
-            String json = (String) redisService.get(key);
+            String json = redisService.getAsString(key);
 
             if (json == null) {
                 return null;
@@ -225,26 +203,17 @@ public class GameSessionCacheService {
         }
     }
 
-    /**
-     * Delete Word Definition Matching session cache
-     */
     public void deleteWordDefSession(Long sessionId) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.WORD_DEF_SESSION, sessionId);
         redisService.delete(key);
         log.info("✅ Deleted word definition session cache: {}", sessionId);
     }
 
-    /**
-     * Set user's active Word Definition game
-     */
     public void setUserActiveWordDef(UUID userId, Long sessionId) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.WORD_DEF_USER_ACTIVE, userId);
         redisService.set(key, sessionId, SESSION_TTL);
     }
 
-    /**
-     * Get user's active Word Definition game
-     */
     public Long getUserActiveWordDef(UUID userId) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.WORD_DEF_USER_ACTIVE, userId);
         return redisService.get(key, Long.class);
@@ -278,9 +247,7 @@ public class GameSessionCacheService {
         return allowed;
     }
 
-    /**
-     * Check and increment rate limit for Image Matching
-     */
+    // Check and increment rate limit for Image Matching
     public boolean checkImageMatchingRateLimit(UUID userId) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.RATE_LIMIT_IMAGE_MATCHING, userId);
 
@@ -296,9 +263,7 @@ public class GameSessionCacheService {
         return count <= MAX_GAMES_PER_5_MIN;
     }
 
-    /**
-     * Check and increment rate limit for Word Definition
-     */
+    // Check and increment rate limit for Word Definition
     public boolean checkWordDefRateLimit(UUID userId) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.RATE_LIMIT_WORD_DEF, userId);
 
@@ -314,9 +279,7 @@ public class GameSessionCacheService {
         return count <= MAX_GAMES_PER_5_MIN;
     }
 
-    /**
-     * Get current rate limit count
-     */
+    // Get current rate limit count
     public int getRateLimitCount(UUID userId, String gameType) {
         String key;
         switch (gameType.toLowerCase()) {
@@ -339,9 +302,7 @@ public class GameSessionCacheService {
 
     // ==================== UTILITY ====================
 
-    /**
-     * Check if Redis is connected
-     */
+    // Check if Redis is connected
     public boolean isRedisAvailable() {
         return redisService.ping();
     }

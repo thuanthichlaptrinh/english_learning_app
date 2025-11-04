@@ -122,14 +122,15 @@ public class StreakService {
         // Tính toán streak mới
         StreakCalculation calculation = calculateStreakFromDates(studyDates, today);
 
-        // So sánh với streak cũ để detect changes
-        int oldStreak = user.getCurrentStreak();
-        int oldLongest = user.getLongestStreak();
+        // So sánh với streak cũ để detect changes (handle null for new users)
+        int oldStreak = user.getCurrentStreak() != null ? user.getCurrentStreak() : 0;
+        int oldLongest = user.getLongestStreak() != null ? user.getLongestStreak() : 0;
 
         if (!alreadyStudiedToday) {
             if (calculation.currentStreak > oldStreak) {
                 streakIncreased = true;
-                log.info("Streak increased from {} to {} for user: {}", oldStreak, calculation.currentStreak, user.getId());
+                log.info("Streak increased from {} to {} for user: {}", oldStreak, calculation.currentStreak,
+                        user.getId());
             }
 
             if (calculation.longestStreak > oldLongest) {
@@ -262,4 +263,3 @@ public class StreakService {
         }
     }
 }
-

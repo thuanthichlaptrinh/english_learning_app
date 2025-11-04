@@ -3,7 +3,7 @@ package com.thuanthichlaptrinh.card_words.core.service.redis;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.thuanthichlaptrinh.card_words.configuration.redis.RedisKeyConstants;
+import com.thuanthichlaptrinh.card_words.common.constants.RedisKeyConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,10 +11,6 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.util.*;
 
-/**
- * Vocabulary Cache Service
- * Manages caching for vocabularies, topics, and types
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -51,7 +47,7 @@ public class VocabularyCacheService {
     public <T> T getVocabDetail(Long vocabId, Class<T> clazz) {
         try {
             String key = RedisKeyConstants.buildKey(RedisKeyConstants.VOCAB_DETAIL, vocabId);
-            String json = (String) redisService.get(key);
+            String json = redisService.getAsString(key);
 
             if (json == null) {
                 log.debug("⚠️ Cache miss: vocab detail id={}", vocabId);
@@ -96,7 +92,7 @@ public class VocabularyCacheService {
     public <T> List<T> getVocabsByTopic(Long topicId, TypeReference<List<T>> typeRef) {
         try {
             String key = RedisKeyConstants.buildKey(RedisKeyConstants.VOCAB_BY_TOPIC, topicId);
-            String json = (String) redisService.get(key);
+            String json = redisService.getAsString(key);
 
             if (json == null) {
                 log.debug("⚠️ Cache miss: vocabs by topic={}", topicId);
@@ -130,7 +126,7 @@ public class VocabularyCacheService {
     public <T> List<T> getVocabsByCEFR(String cefrLevel, TypeReference<List<T>> typeRef) {
         try {
             String key = RedisKeyConstants.buildKey(RedisKeyConstants.VOCAB_BY_CEFR, cefrLevel);
-            String json = (String) redisService.get(key);
+            String json = redisService.getAsString(key);
 
             if (json == null) {
                 log.debug("⚠️ Cache miss: vocabs by CEFR={}", cefrLevel);
@@ -180,7 +176,7 @@ public class VocabularyCacheService {
     public <T> T getTopicDetail(Long topicId, Class<T> clazz) {
         try {
             String key = RedisKeyConstants.buildKey(RedisKeyConstants.TOPIC_DETAIL, topicId);
-            String json = (String) redisService.get(key);
+            String json = redisService.getAsString(key);
 
             if (json == null) {
                 return null;
@@ -213,7 +209,7 @@ public class VocabularyCacheService {
     public <T> List<T> getAllTopics(TypeReference<List<T>> typeRef) {
         try {
             String key = RedisKeyConstants.TOPIC_LIST;
-            String json = (String) redisService.get(key);
+            String json = redisService.getAsString(key);
 
             if (json == null) {
                 log.debug("⚠️ Cache miss: all topics");
@@ -257,7 +253,7 @@ public class VocabularyCacheService {
     public <T> T getTypeDetail(Long typeId, Class<T> clazz) {
         try {
             String key = RedisKeyConstants.buildKey(RedisKeyConstants.TYPE_DETAIL, typeId);
-            String json = (String) redisService.get(key);
+            String json = redisService.getAsString(key);
 
             if (json == null) {
                 return null;
@@ -290,7 +286,7 @@ public class VocabularyCacheService {
     public <T> List<T> getAllTypes(TypeReference<List<T>> typeRef) {
         try {
             String key = RedisKeyConstants.TYPE_LIST;
-            String json = (String) redisService.get(key);
+            String json = redisService.getAsString(key);
 
             if (json == null) {
                 log.debug("⚠️ Cache miss: all types");

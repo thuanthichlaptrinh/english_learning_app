@@ -1,6 +1,6 @@
 package com.thuanthichlaptrinh.card_words.core.service.redis;
 
-import com.thuanthichlaptrinh.card_words.configuration.redis.RedisKeyConstants;
+import com.thuanthichlaptrinh.card_words.common.constants.RedisKeyConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,10 +11,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * Leaderboard Cache Service
- * Manages Redis Sorted Sets for real-time leaderboards
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor

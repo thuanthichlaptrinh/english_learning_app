@@ -1,5 +1,6 @@
 package com.thuanthichlaptrinh.card_words.core.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,6 +21,7 @@ public class Type extends BaseLongEntity {
     @Column(nullable = false, unique = true, length = 50)
     private String name;
 
+    @JsonIgnore
     @Builder.Default
     @ManyToMany(mappedBy = "types", fetch = FetchType.LAZY)
     private Set<Vocab> vocabs = new HashSet<>();

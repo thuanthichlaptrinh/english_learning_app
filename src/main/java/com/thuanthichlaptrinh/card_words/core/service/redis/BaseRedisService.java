@@ -10,10 +10,6 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Base Redis Service
- * Provides common Redis operations with error handling and logging
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -41,6 +37,11 @@ public class BaseRedisService {
         } catch (Exception e) {
             log.error("❌ Redis SET with TTL failed: key={}, error={}", key, e.getMessage());
         }
+    }
+
+    // Set value with TTL in seconds (convenience method)
+    public void set(String key, Object value, long ttlSeconds) {
+        set(key, value, Duration.ofSeconds(ttlSeconds));
     }
 
     public <T> T get(String key, Class<T> clazz) {
@@ -76,6 +77,34 @@ public class BaseRedisService {
             return value;
         } catch (Exception e) {
             log.error("❌ Redis GET String failed: key={}, error={}", key, e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Safely get value as String from Redis
+     * Handles both String and other types by converting to String
+     */
+    public String getAsString(String key) {
+        try {
+            Object value = redisTemplate.opsForValue().get(key);
+            if (value == null) {
+                log.debug("⚠️ Redis GET: key={}, result=null", key);
+                return null;
+            }
+
+            // Safe conversion to String
+            String result;
+            if (value instanceof String) {
+                result = (String) value;
+            } else {
+                result = String.valueOf(value);
+            }
+
+            log.debug("✅ Redis GET as String: key={}, found=true", key);
+            return result;
+        } catch (Exception e) {
+            log.error("❌ Redis GET as String failed: key={}, error={}", key, e.getMessage());
             return null;
         }
     }
@@ -121,6 +150,11 @@ public class BaseRedisService {
             log.error("❌ Redis EXPIRE failed: key={}, error={}", key, e.getMessage());
             return false;
         }
+    }
+
+    // Set expire time using seconds (convenience method)
+    public boolean expire(String key, long seconds) {
+        return expire(key, Duration.ofSeconds(seconds));
     }
 
     public Long getExpire(String key) {
@@ -226,6 +260,24 @@ public class BaseRedisService {
             log.error("❌ Redis HDEL failed: key={}, error={}", key, e.getMessage());
             return 0L;
         }
+    }
+
+    // Set multiple hash fields at once with TTL
+    public void hSetAll(String key, Map<String, String> map, long ttlSeconds) {
+        try {
+            redisTemplate.opsForHash().putAll(key, map);
+            if (ttlSeconds > 0) {
+                redisTemplate.expire(key, Duration.ofSeconds(ttlSeconds));
+            }
+            log.debug("✅ Redis HMSET: key={}, fields={}, ttl={}s", key, map.size(), ttlSeconds);
+        } catch (Exception e) {
+            log.error("❌ Redis HMSET failed: key={}, error={}", key, e.getMessage());
+        }
+    }
+
+    // Set multiple hash fields at once without TTL
+    public void hSetAll(String key, Map<String, String> map) {
+        hSetAll(key, map, 0);
     }
 
     // ==================== LIST OPERATIONS ====================
@@ -335,6 +387,16 @@ public class BaseRedisService {
             log.error("❌ Redis SCARD failed: key={}, error={}", key, e.getMessage());
             return 0L;
         }
+    }
+
+    // Alias for sRem (more intuitive naming)
+    public Long sRemove(String key, Object... values) {
+        return sRem(key, values);
+    }
+
+    // Alias for sCard (more intuitive naming)
+    public Long sSize(String key) {
+        return sCard(key);
     }
 
     // ==================== SORTED SET OPERATIONS ====================
@@ -447,4 +509,5 @@ public class BaseRedisService {
             return false;
         }
     }
+
 }

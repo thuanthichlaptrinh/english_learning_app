@@ -1,5 +1,6 @@
 package com.thuanthichlaptrinh.card_words.core.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,14 +24,17 @@ public class Topic extends BaseLongEntity {
     @Column(length = 500)
     private String description;
 
+    @JsonIgnore
     @Builder.Default
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL)
     private Set<Package> packages = new HashSet<>();
 
+    @JsonIgnore
     @Builder.Default
     @ManyToMany(mappedBy = "topics", fetch = FetchType.LAZY)
     private Set<Vocab> vocabs = new HashSet<>();
 
+    @JsonIgnore
     @Builder.Default
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL)
     private Set<GameSession> gameSessions = new HashSet<>();

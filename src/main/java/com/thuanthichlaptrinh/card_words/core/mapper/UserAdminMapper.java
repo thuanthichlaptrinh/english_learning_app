@@ -1,32 +1,44 @@
 package com.thuanthichlaptrinh.card_words.core.mapper;
 
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
-import org.mapstruct.factory.Mappers;
+import org.springframework.stereotype.Component;
 
 import com.thuanthichlaptrinh.card_words.core.domain.Role;
 import com.thuanthichlaptrinh.card_words.core.domain.User;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.user.UserAdminResponse;
 
-@Mapper(componentModel = "spring")
-public interface UserAdminMapper {
+@Component
+public class UserAdminMapper {
 
-    UserAdminMapper INSTANCE = Mappers.getMapper(UserAdminMapper.class);
-
-    @Mapping(target = "roles", source = "roles", qualifiedByName = "mapRolesToNames")
-    UserAdminResponse toUserAdminResponse(User user);
-
-    @Named("mapRolesToNames")
-    default List<String> mapRolesToNames(Set<Role> roles) {
-        if (roles == null) {
-            return List.of();
+    public UserAdminResponse toUserAdminResponse(User user) {
+        if (user == null) {
+            return null;
         }
-        return roles.stream()
-                .map(Role::getName)
-                .toList();
+
+        UserAdminResponse response = new UserAdminResponse();
+        response.setId(user.getId());
+        response.setEmail(user.getEmail());
+        response.setName(user.getName());
+        response.setAvatar(user.getAvatar());
+        response.setGender(user.getGender());
+        response.setDateOfBirth(user.getDateOfBirth());
+        response.setCurrentLevel(user.getCurrentLevel());
+        response.setActivated(user.getActivated());
+        response.setBanned(user.getBanned());
+        response.setStatus(user.getStatus());
+        response.setCreatedAt(user.getCreatedAt());
+        response.setUpdatedAt(user.getUpdatedAt());
+
+        // Map roles to list of role names
+        if (user.getRoles() != null) {
+            List<String> roleNames = user.getRoles().stream()
+                    .map(Role::getName)
+                    .collect(Collectors.toList());
+            response.setRoles(roleNames);
+        }
+
+        return response;
     }
 }
