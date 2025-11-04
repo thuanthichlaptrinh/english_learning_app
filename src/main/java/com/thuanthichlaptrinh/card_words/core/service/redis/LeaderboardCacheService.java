@@ -42,10 +42,10 @@ public class LeaderboardCacheService {
     public void updateQuizDailyScore(UUID userId, double totalScore) {
         String today = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.LEADERBOARD_QUIZ_DAILY, today);
-        
+
         redisService.zAdd(key, userId.toString(), totalScore);
         redisService.expire(key, DAILY_LEADERBOARD_TTL);
-        
+
         log.debug("✅ Updated daily quiz score: user={}, score={}, date={}", userId, totalScore, today);
     }
 
@@ -55,10 +55,10 @@ public class LeaderboardCacheService {
     public void updateQuizWeeklyScore(UUID userId, double totalScore) {
         String weekKey = getWeekKey();
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.LEADERBOARD_QUIZ_WEEKLY, weekKey);
-        
+
         redisService.zAdd(key, userId.toString(), totalScore);
         redisService.expire(key, WEEKLY_LEADERBOARD_TTL);
-        
+
         log.debug("✅ Updated weekly quiz score: user={}, score={}, week={}", userId, totalScore, weekKey);
     }
 
@@ -68,7 +68,7 @@ public class LeaderboardCacheService {
     public List<LeaderboardEntry> getQuizGlobalTop(int topN) {
         String key = RedisKeyConstants.LEADERBOARD_QUIZ_GLOBAL;
         Set<Object> topUsers = redisService.zRevRange(key, 0, topN - 1);
-        
+
         return convertToLeaderboardEntries(key, topUsers);
     }
 
@@ -79,7 +79,7 @@ public class LeaderboardCacheService {
         String dateStr = date.format(DateTimeFormatter.ISO_LOCAL_DATE);
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.LEADERBOARD_QUIZ_DAILY, dateStr);
         Set<Object> topUsers = redisService.zRevRange(key, 0, topN - 1);
-        
+
         return convertToLeaderboardEntries(key, topUsers);
     }
 
@@ -125,7 +125,7 @@ public class LeaderboardCacheService {
     public List<LeaderboardEntry> getStreakGlobalTop(int topN) {
         String key = RedisKeyConstants.LEADERBOARD_STREAK_GLOBAL;
         Set<Object> topUsers = redisService.zRevRange(key, 0, topN - 1);
-        
+
         return convertToLeaderboardEntries(key, topUsers);
     }
 
@@ -135,7 +135,7 @@ public class LeaderboardCacheService {
     public List<LeaderboardEntry> getBestStreakTop(int topN) {
         String key = RedisKeyConstants.LEADERBOARD_STREAK_BEST;
         Set<Object> topUsers = redisService.zRevRange(key, 0, topN - 1);
-        
+
         return convertToLeaderboardEntries(key, topUsers);
     }
 
@@ -156,11 +156,12 @@ public class LeaderboardCacheService {
     public List<LeaderboardEntry> getImageMatchingTop(int topN) {
         String key = RedisKeyConstants.LEADERBOARD_IMAGE_MATCHING_GLOBAL;
         Set<Object> topUsers = redisService.zRevRange(key, 0, topN - 1);
-        
+
         return convertToLeaderboardEntries(key, topUsers);
     }
 
-    // ==================== WORD DEFINITION MATCHING LEADERBOARDS ====================
+    // ==================== WORD DEFINITION MATCHING LEADERBOARDS
+    // ====================
 
     /**
      * Update user score in Word Definition global leaderboard
@@ -177,7 +178,7 @@ public class LeaderboardCacheService {
     public List<LeaderboardEntry> getWordDefTop(int topN) {
         String key = RedisKeyConstants.LEADERBOARD_WORD_DEF_GLOBAL;
         Set<Object> topUsers = redisService.zRevRange(key, 0, topN - 1);
-        
+
         return convertToLeaderboardEntries(key, topUsers);
     }
 
@@ -198,7 +199,7 @@ public class LeaderboardCacheService {
     public List<LeaderboardEntry> getVocabMasteryTop(int topN) {
         String key = RedisKeyConstants.LEADERBOARD_VOCAB_MASTERY;
         Set<Object> topUsers = redisService.zRevRange(key, 0, topN - 1);
-        
+
         return convertToLeaderboardEntries(key, topUsers);
     }
 
@@ -256,7 +257,7 @@ public class LeaderboardCacheService {
      */
     public void incrementScore(String leaderboardKey, UUID userId, double incrementBy) {
         redisService.zAdd(leaderboardKey, userId.toString(), incrementBy);
-        log.debug("✅ Incremented score: user={}, increment={}, leaderboard={}", 
+        log.debug("✅ Incremented score: user={}, increment={}, leaderboard={}",
                 userId, incrementBy, leaderboardKey);
     }
 
@@ -275,7 +276,7 @@ public class LeaderboardCacheService {
                     String userIdStr = userId.toString();
                     Double score = redisService.zScore(key, userIdStr);
                     Long rank = redisService.zRank(key, userIdStr);
-                    
+
                     return LeaderboardEntry.builder()
                             .userId(UUID.fromString(userIdStr))
                             .score(score != null ? score : 0.0)

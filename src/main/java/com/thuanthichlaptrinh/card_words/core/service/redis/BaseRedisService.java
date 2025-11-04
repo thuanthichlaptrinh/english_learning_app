@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 public class BaseRedisService {
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private final StringRedisTemplate stringRedisTemplate;  // Auto-configured by Spring Boot
+    private final StringRedisTemplate stringRedisTemplate; // Auto-configured by Spring Boot
     private final RedisTemplate<String, Long> longRedisTemplate;
 
     // ==================== STRING OPERATIONS ====================
@@ -266,7 +266,7 @@ public class BaseRedisService {
     public List<Object> lRange(String key, long start, long end) {
         try {
             List<Object> list = redisTemplate.opsForList().range(key, start, end);
-            log.debug("✅ Redis LRANGE: key={}, start={}, end={}, size={}", 
+            log.debug("✅ Redis LRANGE: key={}, start={}, end={}, size={}",
                     key, start, end, list != null ? list.size() : 0);
             return list != null ? list : Collections.emptyList();
         } catch (Exception e) {
@@ -353,7 +353,7 @@ public class BaseRedisService {
     public Set<Object> zRange(String key, long start, long end) {
         try {
             Set<Object> set = redisTemplate.opsForZSet().range(key, start, end);
-            log.debug("✅ Redis ZRANGE: key={}, start={}, end={}, size={}", 
+            log.debug("✅ Redis ZRANGE: key={}, start={}, end={}, size={}",
                     key, start, end, set != null ? set.size() : 0);
             return set != null ? set : Collections.emptySet();
         } catch (Exception e) {
@@ -365,7 +365,7 @@ public class BaseRedisService {
     public Set<Object> zRevRange(String key, long start, long end) {
         try {
             Set<Object> set = redisTemplate.opsForZSet().reverseRange(key, start, end);
-            log.debug("✅ Redis ZREVRANGE: key={}, start={}, end={}, size={}", 
+            log.debug("✅ Redis ZREVRANGE: key={}, start={}, end={}, size={}",
                     key, start, end, set != null ? set.size() : 0);
             return set != null ? set : Collections.emptySet();
         } catch (Exception e) {

@@ -50,12 +50,12 @@ public class UserStatsCacheService {
         try {
             String key = RedisKeyConstants.buildKey(RedisKeyConstants.USER_STATS, userId);
             String json = (String) redisService.get(key);
-            
+
             if (json == null) {
                 log.debug("⚠️ Cache miss: user stats for {}", userId);
                 return null;
             }
-            
+
             return objectMapper.readValue(json, clazz);
         } catch (Exception e) {
             log.error("❌ Failed to get user stats: userId={}, error={}", userId, e.getMessage());
@@ -154,11 +154,11 @@ public class UserStatsCacheService {
         try {
             String key = RedisKeyConstants.buildKey(RedisKeyConstants.USER_VOCAB_PROGRESS, userId);
             String json = (String) redisService.get(key);
-            
+
             if (json == null) {
                 return null;
             }
-            
+
             return objectMapper.readValue(json, Map.class);
         } catch (Exception e) {
             log.error("❌ Failed to get vocab progress: userId={}", userId);
@@ -189,11 +189,11 @@ public class UserStatsCacheService {
     public Long incrementLearnedVocabCount(UUID userId) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.USER_LEARNED_COUNT, userId);
         Long newCount = redisService.increment(key);
-        
+
         if (newCount != null && newCount == 1) {
             redisService.expire(key, USER_PROGRESS_TTL);
         }
-        
+
         return newCount;
     }
 
@@ -220,11 +220,11 @@ public class UserStatsCacheService {
         try {
             String key = RedisKeyConstants.buildKey(RedisKeyConstants.USER_STREAK, userId);
             String json = (String) redisService.get(key);
-            
+
             if (json == null) {
                 return null;
             }
-            
+
             return objectMapper.readValue(json, clazz);
         } catch (Exception e) {
             log.error("❌ Failed to get user streak: userId={}", userId);
@@ -299,11 +299,11 @@ public class UserStatsCacheService {
     public Long incrementDailyGameCount(UUID userId, String date) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.USER_DAILY_GAMES, userId, date);
         Long count = redisService.increment(key);
-        
+
         if (count != null && count == 1) {
             redisService.expire(key, Duration.ofHours(26)); // 24h + 2h buffer
         }
-        
+
         return count;
     }
 
@@ -321,14 +321,14 @@ public class UserStatsCacheService {
      */
     public Long incrementDailyXP(UUID userId, String date, long xpAmount) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.USER_DAILY_XP, userId, date);
-        
+
         // Redis increment only works with 1, so we add the amount
         Long currentXP = redisService.get(key, Long.class);
         long newXP = (currentXP != null ? currentXP : 0) + xpAmount;
-        
+
         redisService.set(key, newXP, Duration.ofHours(26));
         log.debug("✅ Added {} XP to user {} for date {}: total={}", xpAmount, userId, date, newXP);
-        
+
         return newXP;
     }
 
@@ -347,15 +347,14 @@ public class UserStatsCacheService {
      */
     public void invalidateAllUserCaches(UUID userId) {
         List<String> patterns = Arrays.asList(
-            RedisKeyConstants.buildKey(RedisKeyConstants.USER_STATS, userId),
-            RedisKeyConstants.buildKey(RedisKeyConstants.USER_QUIZ_STATS, userId),
-            RedisKeyConstants.buildKey(RedisKeyConstants.USER_IMAGE_MATCHING_STATS, userId),
-            RedisKeyConstants.buildKey(RedisKeyConstants.USER_WORD_DEF_STATS, userId),
-            RedisKeyConstants.buildKey(RedisKeyConstants.USER_VOCAB_PROGRESS, userId),
-            RedisKeyConstants.buildKey(RedisKeyConstants.USER_STREAK, userId),
-            RedisKeyConstants.buildKey(RedisKeyConstants.USER_ACHIEVEMENTS, userId)
-        );
-        
+                RedisKeyConstants.buildKey(RedisKeyConstants.USER_STATS, userId),
+                RedisKeyConstants.buildKey(RedisKeyConstants.USER_QUIZ_STATS, userId),
+                RedisKeyConstants.buildKey(RedisKeyConstants.USER_IMAGE_MATCHING_STATS, userId),
+                RedisKeyConstants.buildKey(RedisKeyConstants.USER_WORD_DEF_STATS, userId),
+                RedisKeyConstants.buildKey(RedisKeyConstants.USER_VOCAB_PROGRESS, userId),
+                RedisKeyConstants.buildKey(RedisKeyConstants.USER_STREAK, userId),
+                RedisKeyConstants.buildKey(RedisKeyConstants.USER_ACHIEVEMENTS, userId));
+
         redisService.delete(patterns);
         log.info("✅ Invalidated all caches for user {}", userId);
     }

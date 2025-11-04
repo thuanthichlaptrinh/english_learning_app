@@ -44,10 +44,10 @@ public class RedisConfig {
      */
     private ObjectMapper createRedisObjectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
-        
+
         // Register JavaTimeModule for LocalDateTime, LocalDate, etc.
         objectMapper.registerModule(new JavaTimeModule());
-        
+
         // Enable polymorphic type handling for Redis cache objects
         // This allows storing different object types in Redis with type information
         objectMapper.activateDefaultTyping(
@@ -55,9 +55,8 @@ public class RedisConfig {
                         .allowIfBaseType(Object.class)
                         .build(),
                 ObjectMapper.DefaultTyping.NON_FINAL,
-                JsonTypeInfo.As.PROPERTY
-        );
-        
+                JsonTypeInfo.As.PROPERTY);
+
         return objectMapper;
     }
 
@@ -70,27 +69,29 @@ public class RedisConfig {
     public RedisTemplate<String, Object> redisTemplate() {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory);
-        
+
         // Use String serializer for keys
         StringRedisSerializer stringSerializer = new StringRedisSerializer();
         template.setKeySerializer(stringSerializer);
         template.setHashKeySerializer(stringSerializer);
-        
+
         // Use JSON serializer for values
-        GenericJackson2JsonRedisSerializer jsonSerializer = 
-                new GenericJackson2JsonRedisSerializer(createRedisObjectMapper());
+        GenericJackson2JsonRedisSerializer jsonSerializer = new GenericJackson2JsonRedisSerializer(
+                createRedisObjectMapper());
         template.setValueSerializer(jsonSerializer);
         template.setHashValueSerializer(jsonSerializer);
-        
+
         template.afterPropertiesSet();
-        
+
         log.info("✅ Primary RedisTemplate initialized");
         return template;
     }
 
     /**
-     * Note: stringRedisTemplate is already provided by Spring Boot Auto-configuration
-     * We don't need to create it here - just @Autowire StringRedisTemplate where needed
+     * Note: stringRedisTemplate is already provided by Spring Boot
+     * Auto-configuration
+     * We don't need to create it here - just @Autowire StringRedisTemplate where
+     * needed
      */
 
     /**
@@ -101,16 +102,16 @@ public class RedisConfig {
     public RedisTemplate<String, Long> longRedisTemplate() {
         RedisTemplate<String, Long> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory);
-        
+
         StringRedisSerializer stringSerializer = new StringRedisSerializer();
         template.setKeySerializer(stringSerializer);
-        
-        GenericJackson2JsonRedisSerializer jsonSerializer = 
-                new GenericJackson2JsonRedisSerializer(createRedisObjectMapper());
+
+        GenericJackson2JsonRedisSerializer jsonSerializer = new GenericJackson2JsonRedisSerializer(
+                createRedisObjectMapper());
         template.setValueSerializer(jsonSerializer);
-        
+
         template.afterPropertiesSet();
-        
+
         log.info("✅ Long RedisTemplate initialized");
         return template;
     }
@@ -125,47 +126,43 @@ public class RedisConfig {
                 .entryTtl(Duration.ofHours(1))
                 .serializeKeysWith(
                         RedisSerializationContext.SerializationPair.fromSerializer(
-                                new StringRedisSerializer()
-                        )
-                )
+                                new StringRedisSerializer()))
                 .serializeValuesWith(
                         RedisSerializationContext.SerializationPair.fromSerializer(
-                                new GenericJackson2JsonRedisSerializer(createRedisObjectMapper())
-                        )
-                )
+                                new GenericJackson2JsonRedisSerializer(createRedisObjectMapper())))
                 .disableCachingNullValues();
 
         // Custom TTL for specific caches
         Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
-        
+
         // Game Sessions - 30 minutes
-        cacheConfigurations.put("gameSessions", 
+        cacheConfigurations.put("gameSessions",
                 defaultConfig.entryTtl(Duration.ofMinutes(30)));
-        
+
         // Vocabularies - 24 hours
-        cacheConfigurations.put("vocabularies", 
+        cacheConfigurations.put("vocabularies",
                 defaultConfig.entryTtl(Duration.ofHours(24)));
-        
+
         // User Stats - 10 minutes
-        cacheConfigurations.put("userStats", 
+        cacheConfigurations.put("userStats",
                 defaultConfig.entryTtl(Duration.ofMinutes(10)));
-        
+
         // Leaderboards - 5 minutes
-        cacheConfigurations.put("leaderboards", 
+        cacheConfigurations.put("leaderboards",
                 defaultConfig.entryTtl(Duration.ofMinutes(5)));
-        
+
         // Topics & Types - 12 hours
-        cacheConfigurations.put("topics", 
+        cacheConfigurations.put("topics",
                 defaultConfig.entryTtl(Duration.ofHours(12)));
-        cacheConfigurations.put("types", 
+        cacheConfigurations.put("types",
                 defaultConfig.entryTtl(Duration.ofHours(12)));
-        
+
         // Auth tokens - 7 days
-        cacheConfigurations.put("authTokens", 
+        cacheConfigurations.put("authTokens",
                 defaultConfig.entryTtl(Duration.ofDays(7)));
-        
+
         // Rate limiting - 5 minutes
-        cacheConfigurations.put("rateLimits", 
+        cacheConfigurations.put("rateLimits",
                 defaultConfig.entryTtl(Duration.ofMinutes(5)));
 
         RedisCacheManager cacheManager = RedisCacheManager.builder(redisConnectionFactory)
@@ -174,9 +171,9 @@ public class RedisConfig {
                 .transactionAware()
                 .build();
 
-        log.info("✅ Redis CacheManager initialized with {} custom cache configurations", 
+        log.info("✅ Redis CacheManager initialized with {} custom cache configurations",
                 cacheConfigurations.size());
-        
+
         return cacheManager;
     }
 }

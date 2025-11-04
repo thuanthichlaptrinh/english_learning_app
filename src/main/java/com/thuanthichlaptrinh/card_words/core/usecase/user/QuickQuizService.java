@@ -34,7 +34,7 @@ public class QuickQuizService {
     private final VocabRepository vocabRepository;
     private final UserVocabProgressRepository userVocabProgressRepository;
     private final StreakService streakService;
-    
+
     // Redis services for distributed caching
     private final GameSessionCacheService gameSessionCacheService;
     private final RateLimitingService rateLimitingService;
@@ -464,15 +464,15 @@ public class QuickQuizService {
     // 7. Validate server-side timestamp (anti-cheat)
     private void validateServerTimestamp(QuickQuizAnswerRequest request, int timeLimit) {
         LocalDateTime startTime = gameSessionCacheService.getQuestionStartTime(
-                request.getSessionId(), 
-                request.getQuestionNumber()
-        );
-        
+                request.getSessionId(),
+                request.getQuestionNumber());
+
         if (startTime != null) {
             long actualTimeTaken = Duration.between(startTime, LocalDateTime.now()).toMillis();
 
             // Cho phép client báo cáo thời gian nhỏ hơn server (do network delay)
-            // Nhưng không cho phép quá nhanh (< MIN_ANSWER_TIME) hoặc quá lâu (> timeLimit + tolerance)
+            // Nhưng không cho phép quá nhanh (< MIN_ANSWER_TIME) hoặc quá lâu (> timeLimit
+            // + tolerance)
             if (actualTimeTaken > timeLimit + TIME_TOLERANCE_MS) {
                 log.warn("Time exceeded. Client: {}ms, Server: {}ms, Limit: {}ms",
                         request.getTimeTaken(), actualTimeTaken, timeLimit);
@@ -588,10 +588,9 @@ public class QuickQuizService {
 
         // Record start time for next question in Redis
         gameSessionCacheService.cacheQuestionStartTime(
-                request.getSessionId(), 
-                request.getQuestionNumber() + 1, 
-                LocalDateTime.now()
-        );
+                request.getSessionId(),
+                request.getQuestionNumber() + 1,
+                LocalDateTime.now());
 
         Integer timeLimit = gameSessionCacheService.getSessionTimeLimit(request.getSessionId());
         if (timeLimit == null) {
@@ -683,20 +682,19 @@ public class QuickQuizService {
     // Rate limiting check using Redis
     private void checkRateLimit(UUID userId) {
         RateLimitingService.RateLimitResult result = rateLimitingService.checkGameRateLimit(
-                userId, 
-                "quickquiz", 
-                MAX_GAMES_PER_5_MIN, 
-                Duration.ofMinutes(5)
-        );
-        
+                userId,
+                "quickquiz",
+                MAX_GAMES_PER_5_MIN,
+                Duration.ofMinutes(5));
+
         if (!result.isAllowed()) {
             throw new ErrorException(
                     "Too many game sessions. Maximum " + MAX_GAMES_PER_5_MIN +
-                            " games per 5 minutes. Please wait " + result.getResetInSeconds() + 
+                            " games per 5 minutes. Please wait " + result.getResetInSeconds() +
                             " seconds before starting a new game.");
         }
-        
-        log.debug("User {} passed rate limit check: {}/{} games", 
+
+        log.debug("User {} passed rate limit check: {}/{} games",
                 userId, result.getCurrentCount(), MAX_GAMES_PER_5_MIN);
     }
 

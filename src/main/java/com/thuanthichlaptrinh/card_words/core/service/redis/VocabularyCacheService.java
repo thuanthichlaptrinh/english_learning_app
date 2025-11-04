@@ -52,12 +52,12 @@ public class VocabularyCacheService {
         try {
             String key = RedisKeyConstants.buildKey(RedisKeyConstants.VOCAB_DETAIL, vocabId);
             String json = (String) redisService.get(key);
-            
+
             if (json == null) {
                 log.debug("⚠️ Cache miss: vocab detail id={}", vocabId);
                 return null;
             }
-            
+
             return objectMapper.readValue(json, clazz);
         } catch (Exception e) {
             log.error("❌ Failed to get vocab detail: id={}, error={}", vocabId, e.getMessage());
@@ -97,12 +97,12 @@ public class VocabularyCacheService {
         try {
             String key = RedisKeyConstants.buildKey(RedisKeyConstants.VOCAB_BY_TOPIC, topicId);
             String json = (String) redisService.get(key);
-            
+
             if (json == null) {
                 log.debug("⚠️ Cache miss: vocabs by topic={}", topicId);
                 return null;
             }
-            
+
             return objectMapper.readValue(json, typeRef);
         } catch (Exception e) {
             log.error("❌ Failed to get vocabs by topic: topicId={}", topicId);
@@ -131,12 +131,12 @@ public class VocabularyCacheService {
         try {
             String key = RedisKeyConstants.buildKey(RedisKeyConstants.VOCAB_BY_CEFR, cefrLevel);
             String json = (String) redisService.get(key);
-            
+
             if (json == null) {
                 log.debug("⚠️ Cache miss: vocabs by CEFR={}", cefrLevel);
                 return null;
             }
-            
+
             return objectMapper.readValue(json, typeRef);
         } catch (Exception e) {
             log.error("❌ Failed to get vocabs by CEFR: level={}", cefrLevel);
@@ -181,11 +181,11 @@ public class VocabularyCacheService {
         try {
             String key = RedisKeyConstants.buildKey(RedisKeyConstants.TOPIC_DETAIL, topicId);
             String json = (String) redisService.get(key);
-            
+
             if (json == null) {
                 return null;
             }
-            
+
             return objectMapper.readValue(json, clazz);
         } catch (Exception e) {
             log.error("❌ Failed to get topic detail: id={}", topicId);
@@ -214,12 +214,12 @@ public class VocabularyCacheService {
         try {
             String key = RedisKeyConstants.TOPIC_LIST;
             String json = (String) redisService.get(key);
-            
+
             if (json == null) {
                 log.debug("⚠️ Cache miss: all topics");
                 return null;
             }
-            
+
             return objectMapper.readValue(json, typeRef);
         } catch (Exception e) {
             log.error("❌ Failed to get all topics");
@@ -258,11 +258,11 @@ public class VocabularyCacheService {
         try {
             String key = RedisKeyConstants.buildKey(RedisKeyConstants.TYPE_DETAIL, typeId);
             String json = (String) redisService.get(key);
-            
+
             if (json == null) {
                 return null;
             }
-            
+
             return objectMapper.readValue(json, clazz);
         } catch (Exception e) {
             log.error("❌ Failed to get type detail: id={}", typeId);
@@ -291,12 +291,12 @@ public class VocabularyCacheService {
         try {
             String key = RedisKeyConstants.TYPE_LIST;
             String json = (String) redisService.get(key);
-            
+
             if (json == null) {
                 log.debug("⚠️ Cache miss: all types");
                 return null;
             }
-            
+
             return objectMapper.readValue(json, typeRef);
         } catch (Exception e) {
             log.error("❌ Failed to get all types");
@@ -353,10 +353,9 @@ public class VocabularyCacheService {
      */
     public void invalidateTopicVocabCaches(Long topicId) {
         List<String> keys = Arrays.asList(
-            RedisKeyConstants.buildKey(RedisKeyConstants.VOCAB_BY_TOPIC, topicId),
-            RedisKeyConstants.buildKey(RedisKeyConstants.VOCAB_STATS_BY_TOPIC, topicId)
-        );
-        
+                RedisKeyConstants.buildKey(RedisKeyConstants.VOCAB_BY_TOPIC, topicId),
+                RedisKeyConstants.buildKey(RedisKeyConstants.VOCAB_STATS_BY_TOPIC, topicId));
+
         redisService.delete(keys);
         log.info("✅ Invalidated vocab caches for topic {}", topicId);
     }
@@ -366,20 +365,19 @@ public class VocabularyCacheService {
      */
     public void invalidateAllVocabCaches() {
         List<String> patterns = Arrays.asList(
-            RedisKeyConstants.VOCAB_DETAIL + "*",
-            RedisKeyConstants.VOCAB_BY_TOPIC + "*",
-            RedisKeyConstants.VOCAB_BY_CEFR + "*",
-            RedisKeyConstants.VOCAB_STATS_TOTAL,
-            RedisKeyConstants.VOCAB_STATS_BY_TOPIC + "*"
-        );
-        
+                RedisKeyConstants.VOCAB_DETAIL + "*",
+                RedisKeyConstants.VOCAB_BY_TOPIC + "*",
+                RedisKeyConstants.VOCAB_BY_CEFR + "*",
+                RedisKeyConstants.VOCAB_STATS_TOTAL,
+                RedisKeyConstants.VOCAB_STATS_BY_TOPIC + "*");
+
         patterns.forEach(pattern -> {
             Set<String> keys = redisService.keys(pattern);
             if (!keys.isEmpty()) {
                 redisService.delete(new ArrayList<>(keys));
             }
         });
-        
+
         log.warn("⚠️ Invalidated all vocabulary caches");
     }
 
@@ -388,12 +386,12 @@ public class VocabularyCacheService {
      */
     public void warmUpCache(List<?> vocabs, List<?> topics, List<?> types) {
         log.info("🔥 Starting cache warm-up...");
-        
+
         cacheAllTopics(topics);
         cacheAllTypes(types);
         cacheTotalVocabCount(vocabs.size());
-        
-        log.info("✅ Cache warm-up completed: {} vocabs, {} topics, {} types", 
+
+        log.info("✅ Cache warm-up completed: {} vocabs, {} topics, {} types",
                 vocabs.size(), topics.size(), types.size());
     }
 }

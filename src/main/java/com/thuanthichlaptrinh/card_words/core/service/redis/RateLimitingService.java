@@ -36,6 +36,7 @@ public class RateLimitingService {
 
     /**
      * Check API rate limit for user
+     * 
      * @return RateLimitResult with allowed status and remaining requests
      */
     public RateLimitResult checkApiRateLimit(UUID userId) {
@@ -111,7 +112,7 @@ public class RateLimitingService {
                 log.warn("⚠️ Unknown game type: {}", gameType);
                 return RateLimitResult.allowed(maxGames);
         }
-        
+
         return checkRateLimit(key, maxGames, window, gameType);
     }
 
@@ -124,26 +125,26 @@ public class RateLimitingService {
         try {
             // Increment counter
             Long currentCount = redisService.increment(key);
-            
+
             if (currentCount == null) {
                 log.error("❌ Failed to increment rate limit counter: {}", key);
                 return RateLimitResult.error();
             }
-            
+
             // Set TTL on first request
             if (currentCount == 1) {
                 redisService.expire(key, window);
             }
-            
+
             // Calculate remaining requests
             long remaining = Math.max(0, maxRequests - currentCount);
             boolean allowed = currentCount <= maxRequests;
-            
+
             if (!allowed) {
                 Long ttl = redisService.getTTL(key);
-                log.warn("⚠️ {} rate limit exceeded: key={}, count={}/{}, reset in {} seconds", 
+                log.warn("⚠️ {} rate limit exceeded: key={}, count={}/{}, reset in {} seconds",
                         limitType, key, currentCount, maxRequests, ttl);
-                
+
                 return RateLimitResult.builder()
                         .allowed(false)
                         .currentCount(currentCount)
@@ -152,9 +153,9 @@ public class RateLimitingService {
                         .resetInSeconds(ttl != null ? ttl : 0)
                         .build();
             }
-            
+
             log.debug("✅ {} rate limit check passed: {}/{}", limitType, currentCount, maxRequests);
-            
+
             return RateLimitResult.builder()
                     .allowed(true)
                     .currentCount(currentCount)
@@ -162,7 +163,7 @@ public class RateLimitingService {
                     .remaining(remaining)
                     .resetInSeconds(window.getSeconds())
                     .build();
-                    
+
         } catch (Exception e) {
             log.error("❌ Rate limit check failed: key={}, error={}", key, e.getMessage());
             // Fail open: allow request on error
@@ -223,43 +224,43 @@ public class RateLimitingService {
     public boolean checkTokenBucket(String identifier, int bucketCapacity, int refillRate, Duration refillInterval) {
         String bucketKey = RedisKeyConstants.buildKey("rate_limit:token_bucket", identifier);
         String lastRefillKey = bucketKey + ":last_refill";
-        
+
         // Get current tokens
         Long currentTokens = redisService.get(bucketKey, Long.class);
         Long lastRefill = redisService.get(lastRefillKey, Long.class);
-        
+
         long now = System.currentTimeMillis();
-        
+
         // Initialize bucket if not exists
         if (currentTokens == null) {
             currentTokens = (long) bucketCapacity;
             redisService.set(bucketKey, currentTokens, Duration.ofHours(1));
         }
-        
+
         if (lastRefill == null) {
             lastRefill = now;
             redisService.set(lastRefillKey, lastRefill, Duration.ofHours(1));
         }
-        
+
         // Calculate tokens to add based on time elapsed
         long timeSinceLastRefill = now - lastRefill;
         long intervalsElapsed = timeSinceLastRefill / refillInterval.toMillis();
-        
+
         if (intervalsElapsed > 0) {
             long tokensToAdd = intervalsElapsed * refillRate;
             currentTokens = Math.min(bucketCapacity, currentTokens + tokensToAdd);
-            
+
             redisService.set(bucketKey, currentTokens, Duration.ofHours(1));
             redisService.set(lastRefillKey, now, Duration.ofHours(1));
         }
-        
+
         // Check if we have tokens available
         if (currentTokens > 0) {
             redisService.decrement(bucketKey);
             log.debug("✅ Token bucket: consumed token, {} remaining", currentTokens - 1);
             return true;
         }
-        
+
         log.warn("⚠️ Token bucket empty: {}", identifier);
         return false;
     }
@@ -274,9 +275,9 @@ public class RateLimitingService {
         long emailLimits = redisService.keys(RedisKeyConstants.RATE_LIMIT_EMAIL + "*").size();
         long searchLimits = redisService.keys(RedisKeyConstants.RATE_LIMIT_SEARCH + "*").size();
         long gameLimits = redisService.keys(RedisKeyConstants.RATE_LIMIT_QUIZ + "*").size() +
-                          redisService.keys(RedisKeyConstants.RATE_LIMIT_IMAGE_MATCHING + "*").size() +
-                          redisService.keys(RedisKeyConstants.RATE_LIMIT_WORD_DEF + "*").size();
-        
+                redisService.keys(RedisKeyConstants.RATE_LIMIT_IMAGE_MATCHING + "*").size() +
+                redisService.keys(RedisKeyConstants.RATE_LIMIT_WORD_DEF + "*").size();
+
         return RateLimitStats.builder()
                 .activeApiLimits(apiLimits)
                 .activeEmailLimits(emailLimits)
@@ -298,7 +299,7 @@ public class RateLimitingService {
         private int limit;
         private long remaining;
         private long resetInSeconds;
-        
+
         public static RateLimitResult allowed(int limit) {
             return RateLimitResult.builder()
                     .allowed(true)
@@ -308,7 +309,7 @@ public class RateLimitingService {
                     .resetInSeconds(0)
                     .build();
         }
-        
+
         public static RateLimitResult error() {
             // Fail open: allow request on error
             return RateLimitResult.builder()

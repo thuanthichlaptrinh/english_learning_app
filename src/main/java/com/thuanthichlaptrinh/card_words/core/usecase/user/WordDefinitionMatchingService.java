@@ -7,6 +7,7 @@ import com.thuanthichlaptrinh.card_words.core.domain.GameSessionDetail;
 import com.thuanthichlaptrinh.card_words.core.domain.User;
 import com.thuanthichlaptrinh.card_words.core.domain.UserVocabProgress;
 import com.thuanthichlaptrinh.card_words.core.domain.Vocab;
+import com.thuanthichlaptrinh.card_words.core.service.redis.GameSessionCacheService;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.GameRepository;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.GameSessionDetailRepository;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.GameSessionRepository;
@@ -28,12 +29,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -48,11 +45,9 @@ public class WordDefinitionMatchingService {
     private final UserRepository userRepository;
     private final UserVocabProgressRepository userVocabProgressRepository;
     private final StreakService streakService;
-
-    private final Cache<Long, SessionData> sessionCache = Caffeine.newBuilder()
-            .expireAfterWrite(2, TimeUnit.HOURS) // Tăng lên 2 giờ
-            .maximumSize(10000)
-            .build();
+    
+    // Redis cache service for distributed caching
+    private final GameSessionCacheService gameSessionCacheService;
 
     private static final String GAME_NAME = "Word-Definition Matching";
     private static final int DEFAULT_PAIRS = 5;
@@ -89,7 +84,7 @@ public class WordDefinitionMatchingService {
         session = gameSessionRepository.save(session);
 
         SessionData sessionData = new SessionData(session.getId(), vocabs);
-        sessionCache.put(session.getId(), sessionData);
+        gameSessionCacheService.cacheWordDefSession(session.getId(), sessionData);
 
         List<VocabResponse> vocabResponses = vocabs.stream()
                 .map(this::mapToVocabResponse)
@@ -109,7 +104,7 @@ public class WordDefinitionMatchingService {
     public WordDefinitionMatchingResultResponse submitAnswer(WordDefinitionMatchingAnswerRequest request) {
         log.info("Submitting answer for session: {}", request.getSessionId());
 
-        SessionData sessionData = sessionCache.getIfPresent(request.getSessionId());
+        SessionData sessionData = gameSessionCacheService.getWordDefSession(request.getSessionId(), SessionData.class);
         if (sessionData == null) {
             throw new ErrorException("Session không tồn tại hoặc đã hết hạn");
         }
@@ -192,7 +187,7 @@ public class WordDefinitionMatchingService {
         session.setFinishedAt(LocalDateTime.now());
         gameSessionRepository.save(session);
 
-        sessionCache.invalidate(request.getSessionId());
+        gameSessionCacheService.deleteWordDefSession(request.getSessionId());
 
         // Record streak activity AFTER transaction completes
         recordStreakActivitySafely(session.getUser());
@@ -320,7 +315,7 @@ public class WordDefinitionMatchingService {
 
     @Transactional(readOnly = true)
     public WordDefinitionMatchingSessionResponse getSession(Long sessionId) {
-        SessionData sessionData = sessionCache.getIfPresent(sessionId);
+        SessionData sessionData = gameSessionCacheService.getWordDefSession(sessionId, SessionData.class);
         if (sessionData == null) {
             throw new ErrorException("Session không tồn tại hoặc đã hết hạn");
         }

@@ -3,6 +3,7 @@ package com.thuanthichlaptrinh.card_words.core.usecase.user;
 import com.thuanthichlaptrinh.card_words.common.exceptions.ErrorException;
 import com.thuanthichlaptrinh.card_words.common.helper.UserLeaderboardData;
 import com.thuanthichlaptrinh.card_words.core.domain.*;
+import com.thuanthichlaptrinh.card_words.core.service.redis.GameSessionCacheService;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.*;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.game.ImageWordMatchingAnswerRequest;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.game.ImageWordMatchingStartRequest;
@@ -25,12 +26,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -45,11 +42,9 @@ public class ImageWordMatchingService {
     private final UserRepository userRepository;
     private final UserVocabProgressRepository userVocabProgressRepository;
     private final StreakService streakService;
-
-    private final Cache<Long, SessionData> sessionCache = Caffeine.newBuilder()
-            .expireAfterWrite(2, TimeUnit.HOURS) // Tăng lên 2 giờ
-            .maximumSize(10000) // Max 10000 sessions in cache
-            .build();
+    
+    // Redis cache service for distributed caching
+    private final GameSessionCacheService gameSessionCacheService;
 
     private static final String GAME_NAME = "Image-Word Matching";
     private static final int DEFAULT_PAIRS = 5;
@@ -89,9 +84,9 @@ public class ImageWordMatchingService {
                 .build();
         session = gameSessionRepository.save(session);
 
-        // Store session data in cache (without gameMode and level)
+        // Store session data in Redis cache
         SessionData sessionData = new SessionData(session.getId(), vocabs);
-        sessionCache.put(session.getId(), sessionData);
+        gameSessionCacheService.cacheImageMatchingSession(session.getId(), sessionData);
 
         List<VocabResponse> vocabResponses = vocabs.stream()
                 .map(this::mapToVocabResponse)
@@ -111,8 +106,8 @@ public class ImageWordMatchingService {
     public ImageWordMatchingResultResponse submitAnswer(ImageWordMatchingAnswerRequest request) {
         log.info("Submitting Image-Word Matching answer: sessionId={}", request.getSessionId());
 
-        // Get session from cache
-        SessionData sessionData = sessionCache.getIfPresent(request.getSessionId());
+        // Get session from Redis cache
+        SessionData sessionData = gameSessionCacheService.getImageMatchingSession(request.getSessionId(), SessionData.class);
         if (sessionData == null) {
             throw new ErrorException("Session không tồn tại hoặc đã hết hạn");
         }
@@ -198,8 +193,8 @@ public class ImageWordMatchingService {
         session.setFinishedAt(endTime);
         gameSessionRepository.save(session);
 
-        // Remove from cache
-        sessionCache.invalidate(request.getSessionId());
+        // Remove from Redis cache
+        gameSessionCacheService.deleteImageMatchingSession(request.getSessionId());
 
         // Record streak activity AFTER transaction completes
         recordStreakActivitySafely(session.getUser());
@@ -353,8 +348,8 @@ public class ImageWordMatchingService {
         GameSession session = gameSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new ErrorException("Session not found: " + sessionId));
 
-        // Get session data from cache
-        SessionData sessionData = sessionCache.getIfPresent(sessionId);
+        // Get session data from Redis cache
+        SessionData sessionData = gameSessionCacheService.getImageMatchingSession(sessionId, SessionData.class);
         if (sessionData == null) {
             throw new ErrorException("Session cache expired. Please start a new game.");
         }

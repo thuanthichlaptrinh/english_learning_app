@@ -11,7 +11,8 @@ import java.util.UUID;
 
 /**
  * Authentication Cache Service
- * Manages JWT token blacklist, refresh tokens, and authentication-related caching
+ * Manages JWT token blacklist, refresh tokens, and authentication-related
+ * caching
  */
 @Slf4j
 @Service
@@ -34,7 +35,7 @@ public class AuthenticationCacheService {
     public void blacklistToken(String token, long expirationSeconds) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.JWT_BLACKLIST, token);
         Duration ttl = Duration.ofSeconds(expirationSeconds);
-        
+
         redisService.set(key, "blacklisted", ttl);
         log.info("✅ Blacklisted JWT token (expires in {} seconds)", expirationSeconds);
     }
@@ -45,11 +46,11 @@ public class AuthenticationCacheService {
     public boolean isTokenBlacklisted(String token) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.JWT_BLACKLIST, token);
         boolean blacklisted = redisService.exists(key);
-        
+
         if (blacklisted) {
             log.warn("⚠️ Attempted to use blacklisted token");
         }
-        
+
         return blacklisted;
     }
 
@@ -87,11 +88,11 @@ public class AuthenticationCacheService {
     public boolean validateRefreshToken(UUID userId, String refreshToken) {
         String storedToken = getRefreshToken(userId);
         boolean valid = storedToken != null && storedToken.equals(refreshToken);
-        
+
         if (!valid) {
             log.warn("⚠️ Invalid refresh token for user {}", userId);
         }
-        
+
         return valid;
     }
 
@@ -112,20 +113,20 @@ public class AuthenticationCacheService {
     public long incrementLoginAttempts(String email) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.LOGIN_ATTEMPTS, email);
         Long attempts = redisService.increment(key);
-        
+
         if (attempts == null) {
             return 0;
         }
-        
+
         // Set TTL on first attempt
         if (attempts == 1) {
             redisService.expire(key, LOGIN_ATTEMPT_TTL);
         }
-        
+
         if (attempts >= MAX_LOGIN_ATTEMPTS) {
             log.warn("⚠️ Max login attempts reached for email: {}", email);
         }
-        
+
         return attempts;
     }
 
@@ -198,7 +199,7 @@ public class AuthenticationCacheService {
     public void deleteAllUserSessions(UUID userId) {
         String pattern = RedisKeyConstants.buildKey(RedisKeyConstants.USER_SESSION, userId) + "*";
         Set<String> sessionKeys = redisService.keys(pattern);
-        
+
         if (!sessionKeys.isEmpty()) {
             redisService.delete(sessionKeys.stream().toList());
             log.info("✅ Deleted {} sessions for user {}", sessionKeys.size(), userId);
@@ -259,9 +260,9 @@ public class AuthenticationCacheService {
     public boolean validatePasswordResetToken(String email, String resetToken) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.PASSWORD_RESET_TOKEN, email);
         String storedToken = redisService.getString(key);
-        
+
         boolean valid = storedToken != null && storedToken.equals(resetToken);
-        
+
         if (valid) {
             // Delete token after validation (one-time use)
             redisService.delete(key);
@@ -269,7 +270,7 @@ public class AuthenticationCacheService {
         } else {
             log.warn("⚠️ Invalid password reset token for: {}", email);
         }
-        
+
         return valid;
     }
 
@@ -299,16 +300,16 @@ public class AuthenticationCacheService {
     public boolean validateEmailVerificationToken(String email, String verificationToken) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.EMAIL_VERIFICATION_TOKEN, email);
         String storedToken = redisService.getString(key);
-        
+
         boolean valid = storedToken != null && storedToken.equals(verificationToken);
-        
+
         if (valid) {
             redisService.delete(key);
             log.info("✅ Email verification token validated and consumed for: {}", email);
         } else {
             log.warn("⚠️ Invalid email verification token for: {}", email);
         }
-        
+
         return valid;
     }
 
@@ -329,16 +330,16 @@ public class AuthenticationCacheService {
     public boolean validate2FACode(UUID userId, String code) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.TWO_FA_CODE, userId);
         String storedCode = redisService.getString(key);
-        
+
         boolean valid = storedCode != null && storedCode.equals(code);
-        
+
         if (valid) {
             redisService.delete(key);
             log.info("✅ 2FA code validated for user {}", userId);
         } else {
             log.warn("⚠️ Invalid 2FA code for user {}", userId);
         }
-        
+
         return valid;
     }
 
@@ -356,12 +357,12 @@ public class AuthenticationCacheService {
      */
     public void cleanupExpiredData() {
         log.info("🧹 Starting authentication data cleanup...");
-        
+
         // Redis automatically removes expired keys, but we can log the cleanup
         int blacklistedTokens = redisService.keys(RedisKeyConstants.JWT_BLACKLIST + "*").size();
         int loginAttempts = redisService.keys(RedisKeyConstants.LOGIN_ATTEMPTS + "*").size();
         int activeSessions = redisService.keys(RedisKeyConstants.USER_SESSION + "*").size();
-        
+
         log.info("✅ Cleanup completed: {} blacklisted tokens, {} login attempts tracked, {} active sessions",
                 blacklistedTokens, loginAttempts, activeSessions);
     }
