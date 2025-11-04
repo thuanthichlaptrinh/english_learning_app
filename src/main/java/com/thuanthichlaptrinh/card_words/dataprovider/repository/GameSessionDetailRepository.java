@@ -22,4 +22,5 @@ public interface GameSessionDetailRepository extends JpaRepository<GameSessionDe
 
     // Admin method
     List<GameSessionDetail> findBySessionId(Long sessionId);
+
 }

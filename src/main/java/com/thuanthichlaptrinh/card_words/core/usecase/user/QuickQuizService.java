@@ -2,6 +2,8 @@ package com.thuanthichlaptrinh.card_words.core.usecase.user;
 
 import com.thuanthichlaptrinh.card_words.common.exceptions.ErrorException;
 import com.thuanthichlaptrinh.card_words.core.domain.*;
+import com.thuanthichlaptrinh.card_words.core.service.redis.GameSessionCacheService;
+import com.thuanthichlaptrinh.card_words.core.service.redis.RateLimitingService;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.*;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.game.QuickQuizAnswerRequest;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.game.QuickQuizStartRequest;
@@ -20,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -33,12 +34,10 @@ public class QuickQuizService {
     private final VocabRepository vocabRepository;
     private final UserVocabProgressRepository userVocabProgressRepository;
     private final StreakService streakService;
-
-    private final Map<Long, List<QuestionData>> sessionQuestionsCache = new ConcurrentHashMap<>();
-    private final Map<Long, Map<Integer, LocalDateTime>> questionStartTimes = new ConcurrentHashMap<>();
-    private final Map<Long, Integer> sessionTimeLimits = new ConcurrentHashMap<>();
-
-    private final Map<UUID, List<LocalDateTime>> userGameStarts = new ConcurrentHashMap<>();
+    
+    // Redis services for distributed caching
+    private final GameSessionCacheService gameSessionCacheService;
+    private final RateLimitingService rateLimitingService;
 
     private static final String GAME_NAME = "Quick Reflex Quiz";
     private static final int BASE_POINTS = 10;
@@ -324,17 +323,14 @@ public class QuickQuizService {
 
     // 6. Initialize session caches (questions, time limits, timestamps)
     private void initializeSessionCaches(Long sessionId, List<QuestionData> allQuestions, int timePerQuestion) {
-        // Cache questions for this session
-        sessionQuestionsCache.put(sessionId, allQuestions);
+        // Cache questions for this session in Redis (30 min TTL)
+        gameSessionCacheService.cacheQuizQuestions(sessionId, allQuestions);
 
-        // Cache time limit for this session (convert seconds to milliseconds)
-        sessionTimeLimits.put(sessionId, timePerQuestion * 1000);
-
-        // Initialize question start times map
-        questionStartTimes.put(sessionId, new ConcurrentHashMap<>());
+        // Cache time limit for this session in Redis (convert seconds to milliseconds)
+        gameSessionCacheService.cacheSessionTimeLimit(sessionId, timePerQuestion * 1000);
 
         // Record start time for question 1
-        questionStartTimes.get(sessionId).put(1, LocalDateTime.now());
+        gameSessionCacheService.cacheQuestionStartTime(sessionId, 1, LocalDateTime.now());
     }
 
     // 7. Build first question response
@@ -399,9 +395,9 @@ public class QuickQuizService {
         return session;
     }
 
-    // 2. Get cached questions
+    // 2. Get cached questions from Redis
     private List<QuestionData> getCachedQuestions(Long sessionId) {
-        List<QuestionData> cachedQuestions = sessionQuestionsCache.get(sessionId);
+        List<QuestionData> cachedQuestions = gameSessionCacheService.getQuizQuestions(sessionId);
         if (cachedQuestions == null || cachedQuestions.isEmpty()) {
             throw new ErrorException("Session questions not found. Please start a new game.");
         }
@@ -451,7 +447,7 @@ public class QuickQuizService {
         }
 
         // Check timeout
-        Integer timeLimit = sessionTimeLimits.get(request.getSessionId());
+        Integer timeLimit = gameSessionCacheService.getSessionTimeLimit(request.getSessionId());
         if (timeLimit == null) {
             timeLimit = 3000; // Default 3 seconds
         }
@@ -467,14 +463,16 @@ public class QuickQuizService {
 
     // 7. Validate server-side timestamp (anti-cheat)
     private void validateServerTimestamp(QuickQuizAnswerRequest request, int timeLimit) {
-        Map<Integer, LocalDateTime> sessionTimes = questionStartTimes.get(request.getSessionId());
-        if (sessionTimes != null && sessionTimes.containsKey(request.getQuestionNumber())) {
-            LocalDateTime startTime = sessionTimes.get(request.getQuestionNumber());
+        LocalDateTime startTime = gameSessionCacheService.getQuestionStartTime(
+                request.getSessionId(), 
+                request.getQuestionNumber()
+        );
+        
+        if (startTime != null) {
             long actualTimeTaken = Duration.between(startTime, LocalDateTime.now()).toMillis();
 
             // Cho phép client báo cáo thời gian nhỏ hơn server (do network delay)
-            // Nhưng không cho phép quá nhanh (< MIN_ANSWER_TIME) hoặc quá lâu (> timeLimit
-            // + tolerance)
+            // Nhưng không cho phép quá nhanh (< MIN_ANSWER_TIME) hoặc quá lâu (> timeLimit + tolerance)
             if (actualTimeTaken > timeLimit + TIME_TOLERANCE_MS) {
                 log.warn("Time exceeded. Client: {}ms, Server: {}ms, Limit: {}ms",
                         request.getTimeTaken(), actualTimeTaken, timeLimit);
@@ -588,13 +586,14 @@ public class QuickQuizService {
             List<QuestionData> cachedQuestions) {
         QuestionData nextQuestionData = cachedQuestions.get(request.getQuestionNumber());
 
-        // Record start time for next question
-        Map<Integer, LocalDateTime> sessionTimes = questionStartTimes.get(request.getSessionId());
-        if (sessionTimes != null) {
-            sessionTimes.put(request.getQuestionNumber() + 1, LocalDateTime.now());
-        }
+        // Record start time for next question in Redis
+        gameSessionCacheService.cacheQuestionStartTime(
+                request.getSessionId(), 
+                request.getQuestionNumber() + 1, 
+                LocalDateTime.now()
+        );
 
-        Integer timeLimit = sessionTimeLimits.get(request.getSessionId());
+        Integer timeLimit = gameSessionCacheService.getSessionTimeLimit(request.getSessionId());
         if (timeLimit == null) {
             timeLimit = 3000;
         }
@@ -612,9 +611,8 @@ public class QuickQuizService {
         // Record streak AFTER finishing game (outside main transaction)
         recordStreakActivitySafely(session.getUser());
 
-        sessionQuestionsCache.remove(session.getId());
-        questionStartTimes.remove(session.getId());
-        sessionTimeLimits.remove(session.getId());
+        // Cleanup Redis caches
+        gameSessionCacheService.deleteQuizSessionCache(session.getId());
     }
 
     // 12. Build answer response
@@ -682,30 +680,24 @@ public class QuickQuizService {
                 .build();
     }
 
-    // Rate limiting check
+    // Rate limiting check using Redis
     private void checkRateLimit(UUID userId) {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime fiveMinutesAgo = now.minusMinutes(5);
-
-        // Get or create user's game start history
-        List<LocalDateTime> gameStarts = userGameStarts.computeIfAbsent(
-                userId,
-                k -> new ArrayList<>());
-
-        // Remove old entries (older than 5 minutes)
-        gameStarts.removeIf(time -> time.isBefore(fiveMinutesAgo));
-
-        // Check if exceeded limit
-        if (gameStarts.size() >= MAX_GAMES_PER_5_MIN) {
+        RateLimitingService.RateLimitResult result = rateLimitingService.checkGameRateLimit(
+                userId, 
+                "quickquiz", 
+                MAX_GAMES_PER_5_MIN, 
+                Duration.ofMinutes(5)
+        );
+        
+        if (!result.isAllowed()) {
             throw new ErrorException(
                     "Too many game sessions. Maximum " + MAX_GAMES_PER_5_MIN +
-                            " games per 5 minutes. Please wait before starting a new game.");
+                            " games per 5 minutes. Please wait " + result.getResetInSeconds() + 
+                            " seconds before starting a new game.");
         }
-
-        // Add current game start time
-        gameStarts.add(now);
-
-        log.debug("User {} has started {} games in last 5 minutes", userId, gameStarts.size());
+        
+        log.debug("User {} passed rate limit check: {}/{} games", 
+                userId, result.getCurrentCount(), MAX_GAMES_PER_5_MIN);
     }
 
     // Calculate current streak
