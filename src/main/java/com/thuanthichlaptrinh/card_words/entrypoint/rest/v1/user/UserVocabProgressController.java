@@ -1,7 +1,9 @@
 package com.thuanthichlaptrinh.card_words.entrypoint.rest.v1.user;
 
+import com.thuanthichlaptrinh.card_words.core.domain.User;
 import com.thuanthichlaptrinh.card_words.core.usecase.user.UserVocabProgressService;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.ApiResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.DailyVocabStatsResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.user.UserVocabProgressResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.user.UserVocabStatsResponse;
 
@@ -103,11 +105,29 @@ public class UserVocabProgressController {
                 response));
     }
 
+    @GetMapping("/stats/last-7-days")
+    @Operation(summary = "Thống kê số từ học trong 7 ngày gần nhất", description = "Lấy số lượng từ vựng đã học trong 7 ngày gần nhất, bao gồm tên ngày trong tuần và số lượng từ mỗi ngày. "
+            +
+            "Response bao gồm cả những ngày không có từ nào được học (count = 0). " +
+            "Dữ liệu được sắp xếp từ cũ đến mới (7 ngày trước -> hôm nay).", security = @SecurityRequirement(name = "Bearer Authentication"))
+    public ResponseEntity<ApiResponse<List<DailyVocabStatsResponse>>> getVocabStatsLast7Days(
+            Authentication authentication) {
+
+        UUID userId = getUserIdFromAuth(authentication);
+        List<DailyVocabStatsResponse> response = userVocabProgressService.getVocabStatsLast7Days(userId);
+
+        long totalWords = response.stream().mapToLong(DailyVocabStatsResponse::getCount).sum();
+
+        return ResponseEntity.ok(ApiResponse.success(
+                String.format("Lấy thống kê 7 ngày thành công. Tổng: %d từ trong 7 ngày", totalWords),
+                response));
+    }
+
     private UUID getUserIdFromAuth(Authentication authentication) {
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            if (userDetails instanceof com.thuanthichlaptrinh.card_words.core.domain.User) {
-                return ((com.thuanthichlaptrinh.card_words.core.domain.User) userDetails).getId();
+            if (userDetails instanceof User) {
+                return ((User) userDetails).getId();
             }
         }
         throw new RuntimeException("Unable to get user ID from authentication");

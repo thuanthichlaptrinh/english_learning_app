@@ -4,6 +4,7 @@ import com.thuanthichlaptrinh.card_words.common.enums.VocabStatus;
 import com.thuanthichlaptrinh.card_words.core.domain.UserVocabProgress;
 import com.thuanthichlaptrinh.card_words.core.mapper.UserVocabProgressMapper;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.UserVocabProgressRepository;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.DailyVocabStatsResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.user.UserVocabProgressResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.user.UserVocabStatsResponse;
 
@@ -13,8 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.time.format.TextStyle;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -117,11 +119,58 @@ public class UserVocabProgressService {
     public List<UserVocabProgressResponse> getVocabsLearnedToday(UUID userId) {
         log.info("Getting vocabs learned today for user: {}", userId);
 
-        List<UserVocabProgress> progressList = userVocabProgressRepository.findLearnedVocabsByDate(userId, LocalDate.now());
+        List<UserVocabProgress> progressList = userVocabProgressRepository.findLearnedVocabsByDate(userId,
+                LocalDate.now());
 
         return progressList.stream()
                 .map(userVocabProgressMapper::toUserVocabProgressResponse)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Lấy thống kê số từ vựng đã học trong 7 ngày gần nhất
+     * 
+     * @param userId ID của user
+     * @return Danh sách thống kê theo ngày (7 ngày gần nhất, bao gồm cả ngày không
+     *         có từ học)
+     */
+    @Transactional(readOnly = true)
+    public List<DailyVocabStatsResponse> getVocabStatsLast7Days(UUID userId) {
+        log.info("Getting vocab stats for last 7 days for user: {}", userId);
+
+        LocalDate today = LocalDate.now();
+        LocalDate startDate = today.minusDays(6); // 7 ngày gần nhất bao gồm hôm nay
+
+        // Convert to LocalDateTime (start of day)
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+
+        // Lấy dữ liệu từ database
+        List<Object[]> rawResults = userVocabProgressRepository.countVocabsLearnedByDateForLast7Days(userId,
+                startDateTime);
+
+        // Chuyển thành Map để dễ tra cứu (date -> count)
+        Map<LocalDate, Long> countByDate = rawResults.stream()
+                .collect(Collectors.toMap(
+                        arr -> (LocalDate) arr[0],
+                        arr -> (Long) arr[1]));
+
+        // Tạo response cho đủ 7 ngày (kể cả ngày không có dữ liệu)
+        List<DailyVocabStatsResponse> response = new ArrayList<>();
+        for (int i = 6; i >= 0; i--) {
+            LocalDate date = today.minusDays(i);
+            Long count = countByDate.getOrDefault(date, 0L);
+            String dayName = date.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+
+            response.add(DailyVocabStatsResponse.builder()
+                    .date(date)
+                    .dayName(dayName)
+                    .count(count)
+                    .build());
+        }
+
+        log.info("Retrieved stats for {} days, total records: {}", response.size(),
+                response.stream().mapToLong(DailyVocabStatsResponse::getCount).sum());
+        return response;
     }
 
 }
