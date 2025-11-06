@@ -50,5 +50,5 @@ firebase-service-account.json
 src/main/resources/firebase-service-account.json
 
 ### Documentation (Local only) ###
-docs/
-*.md
+# docs/
+# *.md

@@ -1,0 +1,116 @@
+services:
+    # ============================================
+    # SPRING BOOT APPLICATION
+    # ============================================
+    app:
+        build: .
+        container_name: card-words-app
+        ports:
+            - '8080:8080'
+        environment:
+            # Kết nối đến DATABASE SERVER CHUNG (không phải container)
+            - POSTGRES_HOST=${POSTGRES_HOST} # your-database-server.com
+            - POSTGRES_PORT=${POSTGRES_PORT}
+            - POSTGRES_DB=${POSTGRES_DB}
+            - POSTGRES_USER=${POSTGRES_USER}
+            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+            # Redis local (mỗi máy có cache riêng)
+            - REDIS_HOST=redis
+            - REDIS_PORT=6379
+            - REDIS_DB=${REDIS_DB}
+            - REDIS_PASSWORD=${REDIS_PASSWORD}
+
+            # Spring Boot
+            - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+            - SERVER_PORT=8080
+
+            # JWT (PHẢI GIỐNG NHAU trên tất cả máy)
+            - JWT_SECRET=${JWT_SECRET}
+            - JWT_EXPIRATION=${JWT_EXPIRATION}
+
+            # Google OAuth
+            - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+            - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+            - GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI}
+
+            # Firebase
+            - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID}
+            - FIREBASE_STORAGE_BUCKET=${FIREBASE_STORAGE_BUCKET}
+            - FIREBASE_DATABASE_URL=${FIREBASE_DATABASE_URL}
+
+        depends_on:
+            - redis
+
+        networks:
+            - card-words-network
+
+        restart: unless-stopped
+
+    # ============================================
+    # REDIS (LOCAL CACHE)
+    # ============================================
+    redis:
+        image: redis:7-alpine
+        container_name: card-words-redis
+        ports:
+            - '6379:6379'
+        volumes:
+            - redis_data:/data
+        command: redis-server --appendonly yes
+        networks:
+            - card-words-network
+        restart: unless-stopped
+        healthcheck:
+            test: ['CMD', 'redis-cli', 'ping']
+            interval: 5s
+            timeout: 3s
+            retries: 5
+
+    # ============================================
+    # PGADMIN (Optional - để quản lý database)
+    # ============================================
+    pgadmin:
+        image: dpage/pgadmin4
+        container_name: card-words-pgadmin
+        environment:
+            - PGADMIN_DEFAULT_EMAIL=admin@cardwords.com
+            - PGADMIN_DEFAULT_PASSWORD=admin
+        ports:
+            - '5050:80'
+        volumes:
+            - pgadmin_data:/var/lib/pgadmin
+        networks:
+            - card-words-network
+        restart: unless-stopped
+
+# ============================================
+# VOLUMES
+# ============================================
+volumes:
+    redis_data:
+        driver: local
+    pgadmin_data:
+        driver: local
+    # KHÔNG CÓ postgres_data nữa vì dùng remote database
+
+# ============================================
+# NETWORKS
+# ============================================
+networks:
+    card-words-network:
+        driver: bridge
+# ============================================
+# HƯỚNG DẪN SỬ DỤNG
+# ============================================
+# 1. Rename file này thành docker-compose.yml
+# 2. Copy .env.shared-db-example thành .env
+# 3. Sửa thông tin database server trong .env:
+#    POSTGRES_HOST=your-database-server.com
+#    POSTGRES_USER=your-username
+#    POSTGRES_PASSWORD=your-password
+# 4. Chạy: docker-compose up -d
+#
+# ✅ TẤT CẢ MÁY CÙNG KẾT NỐI ĐẾN 1 DATABASE
+# ✅ Data tự động đồng bộ (vì cùng 1 database)
+# ✅ Không cần backup/restore giữa các máy

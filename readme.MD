@@ -548,6 +548,140 @@ Chi tiet trong folder `docs/`:
 -   `REDIS_IMPLEMENTATION_PLAN.md` - Ke hoach Redis caching
 -   `PHASE_3_LEADERBOARD_COMPLETE.md` - Tai lieu Phase 3
 -   `STREAK_FEATURE_COMPLETED.md` - Tai lieu Streak System
+
+---
+
+## 📦 Backup & Restore Database
+
+### ⚠️ QUAN TRỌNG: Data Portability
+
+Khi mang code sang máy khác, Docker volumes sẽ **KHÔNG** được transfer tự động. Database sẽ chỉ có:
+
+-   ✅ **Schema** (tables, constraints) - từ Flyway migrations
+-   ✅ **2 roles** (ROLE_ADMIN, ROLE_USER) - từ DataInitializer
+-   ✅ **2 admin accounts** (admin1@cardwords.com, admin2@cardwords.com) với password `Admin@123` - từ DataInitializer
+-   ❌ **KHÔNG CÓ** user data, vocab, topics, game_sessions
+
+### 🔄 Backup Database (Máy hiện tại)
+
+**Trên máy có data:**
+
+```bash
+# Linux/Mac
+./backup-database.sh
+
+# Windows
+backup-database.bat
+```
+
+-   File backup được lưu tại: `database-backups/card_words_YYYYMMDD_HHMMSS.sql`
+-   Script tự động giữ 5 bản backup gần nhất
+
+### 📥 Restore Database (Máy mới)
+
+**Trên máy mới hoặc máy chưa có data:**
+
+```bash
+# 1. Start Docker containers
+docker-compose up -d
+
+# 2. Đợi app khởi động xong (check logs)
+docker logs -f card-words-app
+# Chờ đến khi thấy: "Started CardWordsApplication"
+
+# 3. Restore database
+# Linux/Mac:
+./restore-database.sh database-backups/card_words_20250116_120000.sql
+
+# Windows:
+restore-database.bat database-backups\card_words_20250116_120000.sql
+```
+
+### 💡 Lưu ý khi di chuyển sang máy khác
+
+1. **Copy các file cần thiết:**
+
+    ```
+    📁 card-words/
+    ├── database-backups/         ← QUAN TRỌNG: Copy folder này
+    │   └── card_words_*.sql
+    ├── backup-database.sh        ← Script backup
+    ├── restore-database.sh       ← Script restore
+    ├── .env                      ← Environment variables
+    └── docker-compose.yml
+    ```
+
+2. **Quy trình setup trên máy mới:**
+
+    ```bash
+    # Bước 1: Clone code
+    git clone <your-repo>
+    cd card-words
+
+    # Bước 2: Copy file backup từ máy cũ (hoặc pull từ Git nếu đã commit)
+    # database-backups/card_words_*.sql
+
+    # Bước 3: Start Docker
+    docker-compose up -d
+
+    # Bước 4: Đợi app start xong
+    docker logs -f card-words-app
+
+    # Bước 5: Restore database
+    ./restore-database.sh database-backups/card_words_*.sql
+
+    # ✅ Done! Database đã có đầy đủ data
+    ```
+
+3. **Nếu không có file backup:**
+
+    - Database sẽ rỗng (chỉ có schema và 2 admin accounts)
+    - Cần import lại data từ PgAdmin hoặc SQL dump
+    - Hoặc populate data mới qua API
+
+### 🔒 Bảo mật file backup
+
+**KHÔNG commit file backup vào Git nếu chứa:**
+
+-   User passwords (ngay cả đã hash)
+-   Sensitive user data (email, phone numbers)
+-   Production data
+
+**Khuyến nghị:**
+
+-   Add vào `.gitignore`:
+    ```gitignore
+    database-backups/
+    *.sql
+    ```
+-   Sử dụng secure storage (AWS S3, Google Drive, BitBucket Artifacts)
+-   Encrypt backup files trước khi share
+
+### 📊 Docker Volume Management (Nâng cao)
+
+**Backup toàn bộ PostgreSQL volume:**
+
+```bash
+# Export volume
+docker run --rm \
+  -v card-words_postgres_data:/data \
+  -v $(pwd):/backup \
+  alpine tar czf /backup/postgres_volume.tar.gz -C /data .
+```
+
+**Restore volume:**
+
+```bash
+# Import volume
+docker volume create card-words_postgres_data
+docker run --rm \
+  -v card-words_postgres_data:/data \
+  -v $(pwd):/backup \
+  alpine tar xzf /backup/postgres_volume.tar.gz -C /data
+```
+
+---
+
 -   `GAME_ALGORITHMS_DESIGN.md` - Thuat toan game
 -   `FLYWAY_MIGRATION_GUIDE.md` - Huong dan migration DB
 
@@ -565,6 +699,6 @@ MIT License - xem file LICENSE de biet them chi tiet
 
 ## Contact
 
--   **Author**: Thuan (thuanthichlaptrinh)
--   **Email**: thuanthichlaptrinh@example.com
+-   **Author**: Ngo Minh Thuan (thuanthichlaptrinh)
+-   **Email**: thuanthichlaptrinh@gmail.com
 -   **GitHub**: https://github.com/thuanthichlaptrinh/card_words
