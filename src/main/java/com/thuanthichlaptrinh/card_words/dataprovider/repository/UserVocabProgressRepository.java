@@ -224,4 +224,13 @@ public interface UserVocabProgressRepository extends JpaRepository<UserVocabProg
         List<Object[]> countVocabsLearnedByDateForLast7Days(
                         @Param("userId") UUID userId,
                         @Param("startDate") LocalDateTime startDate);
+
+        // Get vocab count by CEFR level
+        @Query("SELECT v.cefr, COUNT(uvp) " +
+                        "FROM UserVocabProgress uvp " +
+                        "JOIN uvp.vocab v " +
+                        "WHERE uvp.user.id = :userId " +
+                        "GROUP BY v.cefr " +
+                        "ORDER BY v.cefr")
+        List<Object[]> countVocabsLearnedByCEFR(@Param("userId") UUID userId);
 }

@@ -7,6 +7,7 @@ import com.thuanthichlaptrinh.card_words.dataprovider.repository.UserVocabProgre
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.DailyVocabStatsResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.user.UserVocabProgressResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.user.UserVocabStatsResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.vocab.VocabStatsByCEFRResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -141,7 +142,6 @@ public class UserVocabProgressService {
         LocalDate today = LocalDate.now();
         LocalDate startDate = today.minusDays(6); // 7 ngày gần nhất bao gồm hôm nay
 
-        // Convert to LocalDateTime (start of day)
         LocalDateTime startDateTime = startDate.atStartOfDay();
 
         // Lấy dữ liệu từ database
@@ -171,6 +171,45 @@ public class UserVocabProgressService {
         log.info("Retrieved stats for {} days, total records: {}", response.size(),
                 response.stream().mapToLong(DailyVocabStatsResponse::getCount).sum());
         return response;
+    }
+
+    /**
+     * Lấy thống kê số từ vựng đã học theo cấp bậc CEFR
+     * 
+     * @param userId ID của user
+     * @return Thống kê số từ theo từng cấp bậc CEFR (A1, A2, B1, B2, C1, C2)
+     */
+    @Transactional(readOnly = true)
+    public VocabStatsByCEFRResponse getVocabStatsByCEFR(UUID userId) {
+        log.info("Getting vocab stats by CEFR for user: {}", userId);
+
+        List<Object[]> rawResults = userVocabProgressRepository.countVocabsLearnedByCEFR(userId);
+
+        Map<String, Long> statsMap = new java.util.LinkedHashMap<>();
+
+        String[] cefrLevels = { "A1", "A2", "B1", "B2", "C1", "C2" };
+        for (String level : cefrLevels) {
+            statsMap.put(level, 0L);
+        }
+
+        // Fill dữ liệu thực tế
+        long total = 0L;
+        for (Object[] row : rawResults) {
+            String cefr = (String) row[0];
+            Long count = (Long) row[1];
+
+            if (cefr != null && count != null) {
+                statsMap.put(cefr.toUpperCase(), count);
+                total += count;
+            }
+        }
+
+        log.info("Retrieved CEFR stats for user {}: total={} words", userId, total);
+
+        return VocabStatsByCEFRResponse.builder()
+                .stats(statsMap)
+                .total(total)
+                .build();
     }
 
 }

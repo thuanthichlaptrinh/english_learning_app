@@ -6,6 +6,7 @@ import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.ApiResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.DailyVocabStatsResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.user.UserVocabProgressResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.user.UserVocabStatsResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.vocab.VocabStatsByCEFRResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -106,10 +107,7 @@ public class UserVocabProgressController {
     }
 
     @GetMapping("/stats/last-7-days")
-    @Operation(summary = "Thống kê số từ học trong 7 ngày gần nhất", description = "Lấy số lượng từ vựng đã học trong 7 ngày gần nhất, bao gồm tên ngày trong tuần và số lượng từ mỗi ngày. "
-            +
-            "Response bao gồm cả những ngày không có từ nào được học (count = 0). " +
-            "Dữ liệu được sắp xếp từ cũ đến mới (7 ngày trước -> hôm nay).", security = @SecurityRequirement(name = "Bearer Authentication"))
+    @Operation(summary = "Thống kê số từ học trong 7 ngày gần nhất", description = "Lấy số lượng từ vựng đã học trong 7 ngày gần nhất, bao gồm tên ngày trong tuần và số lượng từ mỗi ngày. Response bao gồm cả những ngày không có từ nào được học (count = 0). Dữ liệu được sắp xếp từ cũ đến mới (7 ngày trước -> hôm nay).", security = @SecurityRequirement(name = "Bearer Authentication"))
     public ResponseEntity<ApiResponse<List<DailyVocabStatsResponse>>> getVocabStatsLast7Days(
             Authentication authentication) {
 
@@ -120,6 +118,19 @@ public class UserVocabProgressController {
 
         return ResponseEntity.ok(ApiResponse.success(
                 String.format("Lấy thống kê 7 ngày thành công. Tổng: %d từ trong 7 ngày", totalWords),
+                response));
+    }
+
+    @GetMapping("/stats/by-cefr")
+    @Operation(summary = "Thống kê số từ đã học theo cấp bậc CEFR", description = "Lấy thống kê số lượng từ vựng đã học theo từng cấp bậc CEFR (A1, A2, B1, B2, C1, C2). Response bao gồm tất cả cấp bậc, kể cả cấp bậc chưa học từ nào (count = 0). Dữ liệu được sắp xếp theo thứ tự cấp bậc từ A1 đến C2.", security = @SecurityRequirement(name = "Bearer Authentication"))
+    public ResponseEntity<ApiResponse<VocabStatsByCEFRResponse>> getVocabStatsByCEFR(
+            Authentication authentication) {
+
+        UUID userId = getUserIdFromAuth(authentication);
+        VocabStatsByCEFRResponse response = userVocabProgressService.getVocabStatsByCEFR(userId);
+
+        return ResponseEntity.ok(ApiResponse.success(
+                String.format("Lấy thống kê theo CEFR thành công. Tổng: %d từ", response.getTotal()),
                 response));
     }
 
