@@ -16,11 +16,11 @@ if not exist %BACKUP_DIR% mkdir %BACKUP_DIR%
 echo 🔄 Starting database backup...
 
 REM Backup database
-docker exec card-words-postgres pg_dump -U postgres -d card_words > %BACKUP_FILE%
+docker exec card-words-postgres pg_dump -U postgres -d card_words > "%BACKUP_FILE%"
 
 if %ERRORLEVEL% EQU 0 (
     echo ✅ Backup successful: %BACKUP_FILE%
-    for %%A in (%BACKUP_FILE%) do echo 📦 File size: %%~zA bytes
+    for %%A in ("%BACKUP_FILE%") do echo 📦 File size: %%~zA bytes
 ) else (
     echo ❌ Backup failed!
     exit /b 1

@@ -9,12 +9,11 @@ import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.user.StreakResp
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -46,6 +45,9 @@ public class StreakService {
 
         // Tính toán streak từ study dates
         StreakCalculation calculation = calculateStreakFromDates(studyDates, today);
+
+        // Convert studyDates thành activityLog format
+        Map<String, Map<String, List<Integer>>> activityLog = buildActivityLog(studyDates);
 
         // Sync với User entity và LƯU VÀO DATABASE
         syncUserStreakData(user, calculation);
@@ -85,6 +87,7 @@ public class StreakService {
                 .streakStatus(status)
                 .daysUntilBreak(daysUntilBreak)
                 .message(message)
+                .activityLog(activityLog)
                 .build();
     }
 
@@ -94,7 +97,7 @@ public class StreakService {
      * Tính toán dựa trên user_vocab_progress created_at
      * Chạy trong transaction riêng để tránh conflict với transaction của game
      */
-    @Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public StreakRecordResponse recordActivity(User user) {
         log.info("Recording activity for user: {}", user.getId());
 
@@ -150,11 +153,11 @@ public class StreakService {
         }
 
         return StreakRecordResponse.builder()
+                .message(generateRecordMessage(calculation.currentStreak, isNewRecord, streakIncreased))
                 .currentStreak(calculation.currentStreak)
                 .longestStreak(calculation.longestStreak)
                 .isNewRecord(isNewRecord)
                 .streakIncreased(streakIncreased)
-                .message(generateRecordMessage(calculation.currentStreak, isNewRecord, streakIncreased))
                 .build();
     }
 
@@ -206,14 +209,23 @@ public class StreakService {
 
         int totalStudyDays = studyDates.size();
 
+        // ✅ FIX: Kiểm tra xem streak có bị gián đoạn không
+        // Nếu lastDate cách today > 1 ngày → streak đã bị break
+        boolean streakIsBroken = lastDate.isBefore(today.minusDays(1));
+
         // Tính current streak (từ ngày gần nhất về trước)
         int currentStreak = 0;
-        LocalDate checkDate = lastDate;
 
-        while (checkDate != null && studyDates.contains(checkDate)) {
-            currentStreak++;
-            checkDate = checkDate.minusDays(1);
+        if (!streakIsBroken) {
+            // Chỉ tính streak nếu chưa bị gián đoạn
+            LocalDate checkDate = lastDate;
+
+            while (checkDate != null && studyDates.contains(checkDate)) {
+                currentStreak++;
+                checkDate = checkDate.minusDays(1);
+            }
         }
+        // Nếu streakIsBroken = true → currentStreak = 0
 
         // Tính longest streak
         int longestStreak = 0;
@@ -244,6 +256,34 @@ public class StreakService {
         user.setLongestStreak(calculation.longestStreak);
         user.setLastActivityDate(calculation.lastActivityDate);
         user.setTotalStudyDays(calculation.totalStudyDays);
+    }
+
+    /**
+     * Convert studyDates thành activityLog format
+     * Format: { "2025": { "10": [29, 30, 31], "11": [1, 3, 4] } }
+     */
+    private Map<String, Map<String, List<Integer>>> buildActivityLog(Set<LocalDate> studyDates) {
+        Map<String, Map<String, List<Integer>>> activityLog = new LinkedHashMap<>();
+
+        for (LocalDate date : studyDates) {
+            String year = String.valueOf(date.getYear());
+            String month = String.valueOf(date.getMonthValue());
+            int day = date.getDayOfMonth();
+
+            // Tạo year map nếu chưa có
+            activityLog.putIfAbsent(year, new LinkedHashMap<>());
+
+            // Tạo month list nếu chưa có
+            activityLog.get(year).putIfAbsent(month, new ArrayList<>());
+
+            // Thêm day vào list
+            activityLog.get(year).get(month).add(day);
+        }
+
+        // Sort days trong mỗi month
+        activityLog.values().forEach(yearMap -> yearMap.values().forEach(Collections::sort));
+
+        return activityLog;
     }
 
     /**
