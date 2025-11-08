@@ -106,7 +106,7 @@ public class LeaderboardService {
 
         var entries = leaderboardCacheService.getImageMatchingTop(limit);
         List<LeaderboardEntryResponse> responses = convertToResponse(entries);
-        
+
         // Fallback to database if cache is empty
         if (responses.isEmpty()) {
             log.warn("⚠️ Redis cache empty for Image Matching, falling back to database");
@@ -116,7 +116,7 @@ public class LeaderboardService {
             responses = convertGameSessionsToResponses(sessions.getContent());
             log.info("✅ Retrieved {} players from database for Image Matching", responses.size());
         }
-        
+
         return responses;
     }
 
@@ -129,7 +129,7 @@ public class LeaderboardService {
 
         var entries = leaderboardCacheService.getWordDefTop(limit);
         List<LeaderboardEntryResponse> responses = convertToResponse(entries);
-        
+
         // Fallback to database if cache is empty
         if (responses.isEmpty()) {
             log.warn("⚠️ Redis cache empty for Word Definition, falling back to database");
@@ -139,7 +139,7 @@ public class LeaderboardService {
             responses = convertGameSessionsToResponses(sessions.getContent());
             log.info("✅ Retrieved {} players from database for Word Definition", responses.size());
         }
-        
+
         return responses;
     }
 
@@ -248,7 +248,8 @@ public class LeaderboardService {
     }
 
     /**
-     * Convert GameSession list to LeaderboardEntryResponse list (for database fallback)
+     * Convert GameSession list to LeaderboardEntryResponse list (for database
+     * fallback)
      */
     private List<LeaderboardEntryResponse> convertGameSessionsToResponses(List<GameSession> sessions) {
         List<LeaderboardEntryResponse> responses = new ArrayList<>();
