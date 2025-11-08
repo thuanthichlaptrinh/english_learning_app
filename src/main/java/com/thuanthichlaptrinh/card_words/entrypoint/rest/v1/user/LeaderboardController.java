@@ -3,6 +3,7 @@ package com.thuanthichlaptrinh.card_words.entrypoint.rest.v1.user;
 import com.thuanthichlaptrinh.card_words.core.domain.User;
 import com.thuanthichlaptrinh.card_words.core.usecase.user.LeaderboardService;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.LeaderboardEntryResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.TopPlayersResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,12 @@ public class LeaderboardController {
 
         private final LeaderboardService leaderboardService;
 
-        // ==================== QUICK QUIZ LEADERBOARDS ====================
+        @GetMapping("/top-players")
+        @Operation(summary = "Get top 10 players from all 3 games", description = "Lấy top 10 người chơi có điểm cao nhất từ cả 3 tựa game: Quick Quiz, Image Matching, và Word Definition")
+        public ResponseEntity<TopPlayersResponse> getTopPlayersAllGames() {
+                TopPlayersResponse response = leaderboardService.getTopPlayersAllGames();
+                return ResponseEntity.ok(response);
+        }
 
         @GetMapping("/quiz/global")
         @Operation(summary = "Get Quick Quiz global leaderboard", description = "Lấy bảng xếp hạng Quick Quiz toàn cầu")
@@ -44,7 +50,6 @@ public class LeaderboardController {
                         @RequestParam(defaultValue = "50") int limit) {
 
                 LocalDate targetDate = date != null ? date : LocalDate.now();
-                log.info("📅 GET /api/v1/leaderboard/quiz/daily - date={}, limit={}", targetDate, limit);
 
                 List<LeaderboardEntryResponse> leaderboard = leaderboardService.getQuizDailyLeaderboard(targetDate,
                                 Math.min(limit, 100));
@@ -54,10 +59,7 @@ public class LeaderboardController {
 
         @GetMapping("/quiz/my-rank")
         @Operation(summary = "Get my rank in Quick Quiz", description = "Lấy xếp hạng của tôi trong Quick Quiz")
-        public ResponseEntity<LeaderboardEntryResponse> getMyQuizRank(
-                        @AuthenticationPrincipal User user) {
-                log.info("🎯 GET /api/v1/leaderboard/quiz/my-rank - userId={}", user.getId());
-
+        public ResponseEntity<LeaderboardEntryResponse> getMyQuizRank(@AuthenticationPrincipal User user) {
                 LeaderboardEntryResponse myRank = leaderboardService.getUserQuizRank(user.getId());
 
                 if (myRank == null) {
@@ -67,14 +69,10 @@ public class LeaderboardController {
                 return ResponseEntity.ok(myRank);
         }
 
-        // ==================== STREAK LEADERBOARDS ====================
-
         @GetMapping("/streak/current")
         @Operation(summary = "Get current streak leaderboard", description = "Lấy bảng xếp hạng streak hiện tại")
         public ResponseEntity<List<LeaderboardEntryResponse>> getCurrentStreakLeaderboard(
                         @RequestParam(defaultValue = "50") int limit) {
-                log.info("🔥 GET /api/v1/leaderboard/streak/current - limit={}", limit);
-
                 List<LeaderboardEntryResponse> leaderboard = leaderboardService
                                 .getStreakLeaderboard(Math.min(limit, 100));
 
@@ -85,8 +83,6 @@ public class LeaderboardController {
         @Operation(summary = "Get best streak leaderboard", description = "Lấy bảng xếp hạng streak tốt nhất")
         public ResponseEntity<List<LeaderboardEntryResponse>> getBestStreakLeaderboard(
                         @RequestParam(defaultValue = "50") int limit) {
-                log.info("🏆 GET /api/v1/leaderboard/streak/best - limit={}", limit);
-
                 List<LeaderboardEntryResponse> leaderboard = leaderboardService
                                 .getBestStreakLeaderboard(Math.min(limit, 100));
 
@@ -99,7 +95,6 @@ public class LeaderboardController {
         @Operation(summary = "Get Image Matching leaderboard", description = "Lấy bảng xếp hạng Image Matching")
         public ResponseEntity<List<LeaderboardEntryResponse>> getImageMatchingLeaderboard(
                         @RequestParam(defaultValue = "50") int limit) {
-                log.info("🖼️ GET /api/v1/leaderboard/image-matching - limit={}", limit);
 
                 List<LeaderboardEntryResponse> leaderboard = leaderboardService
                                 .getImageMatchingLeaderboard(Math.min(limit, 100));
@@ -111,7 +106,6 @@ public class LeaderboardController {
         @Operation(summary = "Get Word Definition leaderboard", description = "Lấy bảng xếp hạng Word Definition")
         public ResponseEntity<List<LeaderboardEntryResponse>> getWordDefLeaderboard(
                         @RequestParam(defaultValue = "50") int limit) {
-                log.info("📖 GET /api/v1/leaderboard/word-definition - limit={}", limit);
 
                 List<LeaderboardEntryResponse> leaderboard = leaderboardService
                                 .getWordDefLeaderboard(Math.min(limit, 100));

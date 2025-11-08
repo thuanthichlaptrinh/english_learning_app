@@ -3,8 +3,19 @@ REM Script to backup Docker PostgreSQL database (Windows)
 
 setlocal enabledelayedexpansion
 
+REM Get date in YYYYMMDD format
 for /f "tokens=2-4 delims=/ " %%a in ('date /t') do (set mydate=%%c%%a%%b)
-for /f "tokens=1-2 delims=/:" %%a in ('time /t') do (set mytime=%%a%%b)
+
+REM Get time in 24-hour format HHMMSS (without AM/PM)
+for /f "tokens=1-4 delims=:.," %%a in ("%time%") do (
+    set hour=%%a
+    set minute=%%b
+    set second=%%c
+)
+REM Remove leading space from hour
+set hour=%hour: =0%
+set mytime=%hour%%minute%%second%
+
 set TIMESTAMP=%mydate%_%mytime%
 
 set BACKUP_DIR=database-backups
