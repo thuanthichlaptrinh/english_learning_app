@@ -28,7 +28,13 @@ echo 🔄 Starting database restore...
 REM Stop app
 docker stop card-words-app
 
+REM Drop and recreate database to avoid conflicts
+echo 🗑️  Dropping existing database...
+docker exec -i card-words-postgres psql -U postgres -c "DROP DATABASE IF EXISTS card_words;"
+docker exec -i card-words-postgres psql -U postgres -c "CREATE DATABASE card_words;"
+
 REM Restore database
+echo 📥 Restoring from backup...
 type "%BACKUP_FILE%" | docker exec -i card-words-postgres psql -U postgres -d card_words
 
 if %ERRORLEVEL% EQU 0 (

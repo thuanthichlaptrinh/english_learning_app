@@ -26,8 +26,8 @@ if not exist %BACKUP_DIR% mkdir %BACKUP_DIR%
 
 echo 🔄 Starting database backup...
 
-REM Backup database
-docker exec card-words-postgres pg_dump -U postgres -d card_words > "%BACKUP_FILE%"
+REM Backup database with proper encoding and clean format
+docker exec card-words-postgres pg_dump -U postgres -d card_words --encoding=UTF8 --clean --if-exists > "%BACKUP_FILE%"
 
 if %ERRORLEVEL% EQU 0 (
     echo ✅ Backup successful: %BACKUP_FILE%
