@@ -58,7 +58,8 @@ public class OfflineSyncService {
                 if (progress.isPresent()) {
                     VocabStatus status = progress.get().getStatus();
                     // Consider KNOWN and MASTERED as "learned"
-                    if (status == VocabStatus.KNOWN || status == VocabStatus.MASTERED) {
+                    if (status == VocabStatus.NEW || status == VocabStatus.UNKNOWN || status == VocabStatus.KNOWN
+                            || status == VocabStatus.MASTERED) {
                         learnedCount++;
                     }
                 }
