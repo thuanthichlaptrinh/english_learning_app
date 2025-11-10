@@ -1,0 +1,437 @@
+package com.thuanthichlaptrinh.card_words.core.usecase.user;
+
+import com.thuanthichlaptrinh.card_words.common.enums.VocabStatus;
+import com.thuanthichlaptrinh.card_words.core.domain.*;
+import com.thuanthichlaptrinh.card_words.dataprovider.repository.*;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.offline.*;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.offline.TopicProgressResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.offline.VocabWithProgressResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class OfflineSyncService {
+
+    private final TopicRepository topicRepository;
+    private final VocabRepository vocabRepository;
+    private final UserVocabProgressRepository userVocabProgressRepository;
+    private final GameSessionRepository gameSessionRepository;
+    private final GameSessionDetailRepository gameSessionDetailRepository;
+    private final GameRepository gameRepository;
+
+    /**
+     * Get all topics with learning progress percentage for user
+     */
+    @Transactional(readOnly = true)
+    public List<TopicProgressResponse> getTopicsWithProgress(UUID userId) {
+        log.info("Fetching topics with progress for user: {}", userId);
+
+        List<Topic> topics = topicRepository.findAll();
+        List<TopicProgressResponse> result = new ArrayList<>();
+
+        for (Topic topic : topics) {
+            // Get all vocabs in this topic
+            List<Vocab> vocabs = vocabRepository.findByTopicNameIgnoreCase(topic.getName());
+            int totalVocabs = vocabs.size();
+
+            if (totalVocabs == 0) {
+                result.add(buildTopicProgress(topic, 0, 0, 0.0));
+                continue;
+            }
+
+            // Count learned vocabs (status = LEARNED or REVIEWING)
+            int learnedCount = 0;
+            for (Vocab vocab : vocabs) {
+                Optional<UserVocabProgress> progress = userVocabProgressRepository.findByUserIdAndVocabId(userId,
+                        vocab.getId());
+
+                if (progress.isPresent()) {
+                    VocabStatus status = progress.get().getStatus();
+                    // Consider KNOWN and MASTERED as "learned"
+                    if (status == VocabStatus.KNOWN || status == VocabStatus.MASTERED) {
+                        learnedCount++;
+                    }
+                }
+            }
+
+            // Calculate percentage
+            double progressPercent = (totalVocabs > 0)
+                    ? Math.round((learnedCount * 100.0 / totalVocabs) * 100.0) / 100.0
+                    : 0.0;
+
+            result.add(buildTopicProgress(topic, totalVocabs, learnedCount, progressPercent));
+        }
+
+        log.info("Retrieved {} topics with progress", result.size());
+        return result;
+    }
+
+    /**
+     * Get vocabs by topic with user progress
+     */
+    @Transactional(readOnly = true)
+    public List<VocabWithProgressResponse> getVocabsByTopic(UUID userId, Long topicId) {
+        log.info("Fetching vocabs for topic {} and user {}", topicId, userId);
+
+        Topic topic = topicRepository.findById(topicId)
+                .orElseThrow(() -> new IllegalArgumentException("Topic not found: " + topicId));
+
+        List<Vocab> vocabs = vocabRepository.findByTopicNameIgnoreCase(topic.getName());
+
+        return vocabs.stream()
+                .map(vocab -> buildVocabWithProgress(vocab, userId))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get recently learned vocabs (last 30 days)
+     */
+    @Transactional(readOnly = true)
+    public List<VocabWithProgressResponse> getRecentVocabs(UUID userId) {
+        log.info("Fetching recent vocabs for user: {}", userId);
+
+        LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
+        List<UserVocabProgress> recentProgress = userVocabProgressRepository.findByUserIdAndLastReviewedAtAfter(userId,
+                thirtyDaysAgo);
+
+        return recentProgress.stream()
+                .map(progress -> buildVocabWithProgress(progress.getVocab(), userId))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Batch sync: Upload game sessions and vocab progress in one transaction
+     */
+    @Transactional
+    public Map<String, Object> syncBatch(UUID userId, BatchSyncRequest request) {
+        log.info("Starting batch sync for user: {}, clientId: {}", userId, request.getClientId());
+
+        int syncedSessions = 0;
+        int syncedProgress = 0;
+        int skippedDuplicates = 0;
+        List<String> errors = new ArrayList<>();
+
+        // Sync game sessions
+        if (request.getGameSessions() != null) {
+            for (OfflineGameSessionRequest sessionReq : request.getGameSessions()) {
+                try {
+                    if (isDuplicateSession(userId, sessionReq)) {
+                        skippedDuplicates++;
+                        continue;
+                    }
+                    syncGameSession(userId, sessionReq);
+                    syncedSessions++;
+                } catch (Exception e) {
+                    log.error("Failed to sync session: {}", sessionReq.getClientSessionId(), e);
+                    errors.add("Session " + sessionReq.getClientSessionId() + ": " + e.getMessage());
+                }
+            }
+        }
+
+        // Sync vocab progress
+        if (request.getVocabProgress() != null) {
+            for (OfflineVocabProgressRequest progressReq : request.getVocabProgress()) {
+                try {
+                    syncVocabProgress(userId, progressReq);
+                    syncedProgress++;
+                } catch (Exception e) {
+                    log.error("Failed to sync progress for vocab: {}", progressReq.getVocabId(), e);
+                    errors.add("Vocab " + progressReq.getVocabId() + ": " + e.getMessage());
+                }
+            }
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("syncedGameSessions", syncedSessions);
+        result.put("syncedVocabProgress", syncedProgress);
+        result.put("skippedDuplicates", skippedDuplicates);
+        result.put("errors", errors);
+        result.put("serverTimestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+
+        log.info("Batch sync completed: {} sessions, {} progress, {} skipped",
+                syncedSessions, syncedProgress, skippedDuplicates);
+
+        return result;
+    }
+
+    /**
+     * Upload game sessions individually
+     */
+    @Transactional
+    public int syncGameSessions(UUID userId, List<OfflineGameSessionRequest> sessions) {
+        log.info("Syncing {} game sessions for user: {}", sessions.size(), userId);
+
+        int syncedCount = 0;
+        for (OfflineGameSessionRequest sessionReq : sessions) {
+            try {
+                if (!isDuplicateSession(userId, sessionReq)) {
+                    syncGameSession(userId, sessionReq);
+                    syncedCount++;
+                }
+            } catch (Exception e) {
+                log.error("Failed to sync session: {}", sessionReq.getClientSessionId(), e);
+            }
+        }
+
+        return syncedCount;
+    }
+
+    /**
+     * Upload vocab progress individually
+     */
+    @Transactional
+    public int syncVocabProgress(UUID userId, List<OfflineVocabProgressRequest> progressList) {
+        log.info("Syncing {} vocab progress for user: {}", progressList.size(), userId);
+
+        int syncedCount = 0;
+        for (OfflineVocabProgressRequest progressReq : progressList) {
+            try {
+                syncVocabProgress(userId, progressReq);
+                syncedCount++;
+            } catch (Exception e) {
+                log.error("Failed to sync progress for vocab: {}", progressReq.getVocabId(), e);
+            }
+        }
+
+        return syncedCount;
+    }
+
+    /**
+     * Sync game session details individually
+     * Use case: Upload details for an existing session, or batch upload details
+     * only
+     */
+    @Transactional
+    public int syncGameSessionDetails(UUID userId, Long sessionId, List<OfflineGameDetailRequest> details) {
+        log.info("Syncing {} game session details for session: {}", details.size(), sessionId);
+
+        // Verify session exists and belongs to user
+        GameSession session = gameSessionRepository.findById(sessionId)
+                .orElseThrow(() -> new IllegalArgumentException("Game session not found: " + sessionId));
+
+        if (!session.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("Session does not belong to user");
+        }
+
+        int syncedCount = 0;
+        for (OfflineGameDetailRequest detail : details) {
+            try {
+                syncGameSessionDetail(session, detail);
+                syncedCount++;
+            } catch (Exception e) {
+                log.error("Failed to sync detail for vocab: {}", detail.getVocabId(), e);
+            }
+        }
+
+        log.info("Successfully synced {} details for session: {}", syncedCount, sessionId);
+        return syncedCount;
+    }
+
+    /**
+     * Check for updates since last sync
+     */
+    @Transactional(readOnly = true)
+    public Map<String, Object> checkForUpdates(String lastSyncTime) {
+        log.info("Checking for updates since: {}", lastSyncTime);
+
+        LocalDateTime lastSync = LocalDateTime.parse(lastSyncTime, DateTimeFormatter.ISO_DATE_TIME);
+
+        // Count new vocabs
+        long newVocabsCount = vocabRepository.findAll().stream()
+                .filter(v -> v.getCreatedAt() != null && v.getCreatedAt().isAfter(lastSync))
+                .count();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("hasUpdates", newVocabsCount > 0);
+        result.put("newVocabsCount", newVocabsCount);
+        result.put("lastSyncTime", lastSyncTime);
+        result.put("serverTime", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+
+        return result;
+    }
+
+    // ==================== PRIVATE HELPER METHODS ====================
+
+    private TopicProgressResponse buildTopicProgress(Topic topic, int vocabCount, int learnedCount,
+            double progressPercent) {
+        return TopicProgressResponse.builder()
+                .id(topic.getId())
+                .name(topic.getName())
+                // .nameVi(null) // Topic doesn't have nameVi
+                // .description(topic.getDescription())
+                // .vocabCount(vocabCount)
+                // .learnedCount(learnedCount)
+                .progressPercent(progressPercent)
+                // .cefr(null) // Topics don't have CEFR
+                // .lastUpdated(topic.getUpdatedAt())
+                // .createdAt(topic.getCreatedAt())
+                .build();
+    }
+
+    private VocabWithProgressResponse buildVocabWithProgress(Vocab vocab, UUID userId) {
+        VocabWithProgressResponse.VocabWithProgressResponseBuilder builder = VocabWithProgressResponse.builder()
+                .id(vocab.getId())
+                .word(vocab.getWord())
+                .img(vocab.getImg())
+                .audio(vocab.getAudio())
+                .cefr(vocab.getCefr())
+                .word(vocab.getWord())
+                .meaningVi(vocab.getMeaningVi())
+                .transcription(vocab.getTranscription())
+                .interpret(vocab.getInterpret())
+                .exampleSentence(vocab.getExampleSentence())
+                .credit(vocab.getCredit());
+
+        // // Add user progress if exists
+        // Optional<UserVocabProgress> progress =
+        // userVocabProgressRepository.findByUserIdAndVocabId(userId,
+        // vocab.getId());
+
+        // if (progress.isPresent()) {
+        // UserVocabProgress p = progress.get();
+        // // Convert LocalDate to LocalDateTime for compatibility
+        // builder.status(p.getStatus())
+        // .lastReviewedAt(p.getLastReviewed() != null ?
+        // p.getLastReviewed().atStartOfDay() : null)
+        // .nextReviewAt(p.getNextReviewDate() != null ?
+        // p.getNextReviewDate().atStartOfDay() : null)
+        // .easeFactor(p.getEfFactor())
+        // .repetitions(p.getRepetition())
+        // .interval(p.getIntervalDays());
+        // }
+
+        return builder.build();
+    }
+
+    private boolean isDuplicateSession(UUID userId, OfflineGameSessionRequest request) {
+        LocalDateTime startTime = LocalDateTime.parse(request.getStartedAt(),
+                DateTimeFormatter.ISO_DATE_TIME);
+
+        // Check by userId + gameId + startedAt (within 1 second tolerance)
+        List<GameSession> existingSessions = gameSessionRepository
+                .findByGameIdAndUserIdOrderByStartedAtDesc(request.getGameId(), userId);
+
+        return existingSessions.stream()
+                .anyMatch(session -> Math.abs(
+                        java.time.Duration.between(session.getStartedAt(), startTime).getSeconds()) < 1);
+    }
+
+    private void syncGameSession(UUID userId, OfflineGameSessionRequest request) {
+        User user = new User();
+        user.setId(userId);
+
+        Game game = gameRepository.findById(request.getGameId())
+                .orElseThrow(() -> new IllegalArgumentException("Game not found: " + request.getGameId()));
+
+        LocalDateTime startTime = LocalDateTime.parse(request.getStartedAt(),
+                DateTimeFormatter.ISO_DATE_TIME);
+        LocalDateTime finishTime = request.getFinishedAt() != null
+                ? LocalDateTime.parse(request.getFinishedAt(), DateTimeFormatter.ISO_DATE_TIME)
+                : null;
+
+        GameSession session = GameSession.builder()
+                .user(user)
+                .game(game)
+                .topic(null)
+                .startedAt(startTime)
+                .finishedAt(finishTime)
+                .totalQuestions(request.getTotalQuestions())
+                .correctCount(request.getCorrectCount())
+                .score(request.getScore())
+                .build();
+
+        session = gameSessionRepository.save(session);
+
+        // Save details
+        if (request.getDetails() != null) {
+            for (OfflineGameDetailRequest detail : request.getDetails()) {
+                syncGameSessionDetail(session, detail);
+            }
+        }
+
+        log.info("Synced game session: {}", session.getId());
+    }
+
+    private void syncVocabProgress(UUID userId, OfflineVocabProgressRequest request) {
+        User user = new User();
+        user.setId(userId);
+
+        Vocab vocab = vocabRepository.findById(request.getVocabId())
+                .orElseThrow(() -> new IllegalArgumentException("Vocab not found: " + request.getVocabId()));
+
+        Optional<UserVocabProgress> existingProgress = userVocabProgressRepository.findByUserIdAndVocabId(userId,
+                request.getVocabId());
+
+        // Convert LocalDateTime to LocalDate
+        LocalDateTime lastReviewedDT = LocalDateTime.parse(request.getLastReviewedAt(),
+                DateTimeFormatter.ISO_DATE_TIME);
+        LocalDateTime nextReviewDT = LocalDateTime.parse(request.getNextReviewAt(),
+                DateTimeFormatter.ISO_DATE_TIME);
+
+        LocalDate lastReviewed = lastReviewedDT.toLocalDate();
+        LocalDate nextReview = nextReviewDT.toLocalDate();
+
+        UserVocabProgress progress;
+        if (existingProgress.isPresent()) {
+            // Update existing (merge strategy: client data wins if newer)
+            progress = existingProgress.get();
+            LocalDate serverLastReviewed = progress.getLastReviewed();
+
+            if (serverLastReviewed == null || lastReviewed.isAfter(serverLastReviewed)) {
+                updateProgress(progress, request, lastReviewed, nextReview);
+            } else {
+                log.debug("Server data is newer, skipping update for vocab: {}", request.getVocabId());
+            }
+        } else {
+            // Create new
+            progress = UserVocabProgress.builder()
+                    .user(user)
+                    .vocab(vocab)
+                    .status(request.getStatus())
+                    .lastReviewed(lastReviewed)
+                    .nextReviewDate(nextReview)
+                    .efFactor(request.getEaseFactor())
+                    .repetition(request.getRepetitions())
+                    .intervalDays(request.getInterval())
+                    .build();
+        }
+
+        userVocabProgressRepository.save(progress);
+        log.debug("Synced vocab progress: {}", request.getVocabId());
+    }
+
+    private void updateProgress(UserVocabProgress progress, OfflineVocabProgressRequest request,
+            LocalDate lastReviewed, LocalDate nextReview) {
+        progress.setStatus(request.getStatus());
+        progress.setLastReviewed(lastReviewed);
+        progress.setNextReviewDate(nextReview);
+        progress.setEfFactor(request.getEaseFactor());
+        progress.setRepetition(request.getRepetitions());
+        progress.setIntervalDays(request.getInterval());
+    }
+
+    private void syncGameSessionDetail(GameSession session, OfflineGameDetailRequest detail) {
+        Vocab vocab = new Vocab();
+        vocab.setId(detail.getVocabId());
+
+        GameSessionDetail detailEntity = GameSessionDetail.builder()
+                .session(session)
+                .vocab(vocab)
+                .isCorrect(detail.getIsCorrect())
+                .timeTaken(detail.getTimeTaken())
+                .build();
+
+        gameSessionDetailRepository.save(detailEntity);
+        log.debug("Synced game session detail for vocab: {}", detail.getVocabId());
+    }
+}

@@ -233,4 +233,12 @@ public interface UserVocabProgressRepository extends JpaRepository<UserVocabProg
                         "GROUP BY v.cefr " +
                         "ORDER BY v.cefr")
         List<Object[]> countVocabsLearnedByCEFR(@Param("userId") UUID userId);
+
+        // For offline sync - get recent vocabs
+        @Query("SELECT uvp FROM UserVocabProgress uvp LEFT JOIN FETCH uvp.vocab " +
+                        "WHERE uvp.user.id = :userId AND uvp.lastReviewed > :after " +
+                        "ORDER BY uvp.lastReviewed DESC")
+        List<UserVocabProgress> findByUserIdAndLastReviewedAtAfter(
+                        @Param("userId") UUID userId,
+                        @Param("after") LocalDateTime after);
 }
