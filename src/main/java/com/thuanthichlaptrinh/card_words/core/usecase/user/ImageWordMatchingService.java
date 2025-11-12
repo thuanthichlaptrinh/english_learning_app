@@ -547,12 +547,12 @@ public class ImageWordMatchingService {
                                                 .build())
                                 .collect(Collectors.toSet());
 
-                Set<VocabResponse.TopicInfo> topicInfos = vocab.getTopics().stream()
-                                .map(topic -> VocabResponse.TopicInfo.builder()
-                                                .id(topic.getId())
-                                                .name(topic.getName())
+                Set<VocabResponse.TopicInfo> topicInfos = vocab.getTopic() != null
+                                ? Collections.singleton(VocabResponse.TopicInfo.builder()
+                                                .id(vocab.getTopic().getId())
+                                                .name(vocab.getTopic().getName())
                                                 .build())
-                                .collect(Collectors.toSet());
+                                : Collections.emptySet();
 
                 return VocabResponse.builder()
                                 .id(vocab.getId())

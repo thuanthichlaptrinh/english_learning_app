@@ -3,7 +3,6 @@ package com.thuanthichlaptrinh.card_words.core.usecase.user;
 import com.thuanthichlaptrinh.card_words.common.enums.VocabStatus;
 import com.thuanthichlaptrinh.card_words.common.exceptions.ErrorException;
 import com.thuanthichlaptrinh.card_words.common.exceptions.Exceptions;
-import com.thuanthichlaptrinh.card_words.core.domain.Topic;
 import com.thuanthichlaptrinh.card_words.core.domain.User;
 import com.thuanthichlaptrinh.card_words.core.domain.UserVocabProgress;
 import com.thuanthichlaptrinh.card_words.core.domain.Vocab;
@@ -254,7 +253,6 @@ public class LearnVocabService {
             log.error("Failed to record streak activity: {}", e.getMessage());
         }
 
-
         String message = generateMessage(request.getIsCorrect(), progress.getStatus());
 
         return ReviewResultResponse.builder()
@@ -298,8 +296,8 @@ public class LearnVocabService {
             List<UserVocabProgress> allProgress = userVocabProgressRepository.findByUserIdWithVocab(user.getId());
             masteredVocabs = allProgress.stream()
                     .filter(p -> VocabStatus.MASTERED.equals(p.getStatus()))
-                    .filter(p -> p.getVocab().getTopics().stream()
-                            .anyMatch(t -> t.getName().equalsIgnoreCase(topicName)))
+                    .filter(p -> p.getVocab().getTopic() != null
+                            && p.getVocab().getTopic().getName().equalsIgnoreCase(topicName))
                     .count();
 
             // Tổng = Từ mới + Từ đang học + Từ thành thạo
@@ -445,7 +443,7 @@ public class LearnVocabService {
                 .cefr(vocab.getCefr())
                 .img(vocab.getImg())
                 .audio(vocab.getAudio())
-                .topics(vocab.getTopics().stream().map(Topic::getName).collect(Collectors.toList()))
+                .topics(vocab.getTopic() != null ? List.of(vocab.getTopic().getName()) : List.of())
                 .types(vocab.getTypes().stream()
                         .map(type -> type.getName())
                         .collect(Collectors.toList()))
@@ -469,7 +467,7 @@ public class LearnVocabService {
                 .cefr(vocab.getCefr())
                 .img(vocab.getImg())
                 .audio(vocab.getAudio())
-                .topics(vocab.getTopics().stream().map(Topic::getName).collect(Collectors.toList()))
+                .topics(vocab.getTopic() != null ? List.of(vocab.getTopic().getName()) : List.of())
                 .types(vocab.getTypes().stream()
                         .map(type -> type.getName())
                         .collect(Collectors.toList()))

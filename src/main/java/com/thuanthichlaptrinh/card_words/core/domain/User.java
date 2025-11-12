@@ -55,6 +55,10 @@ public class User extends BaseUUIDEntity implements UserDetails {
     @Builder.Default
     private CEFRLevel currentLevel = CEFRLevel.A1;
 
+    @Column(name = "level_test_completed", nullable = false)
+    @Builder.Default
+    private Boolean levelTestCompleted = false;
+
     @Builder.Default
     @Column(nullable = false)
     private Boolean activated = false;

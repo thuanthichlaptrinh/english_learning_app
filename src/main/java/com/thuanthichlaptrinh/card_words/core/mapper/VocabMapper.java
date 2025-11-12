@@ -20,12 +20,13 @@ public class VocabMapper {
                                                 .build())
                                 .collect(Collectors.toSet());
 
-                Set<VocabResponse.TopicInfo> topicInfos = vocab.getTopics().stream()
-                                .map(topic -> VocabResponse.TopicInfo.builder()
-                                                .id(topic.getId())
-                                                .name(topic.getName())
+                // Convert single topic to Set for backward compatibility
+                Set<VocabResponse.TopicInfo> topicInfos = vocab.getTopic() != null
+                                ? Set.of(VocabResponse.TopicInfo.builder()
+                                                .id(vocab.getTopic().getId())
+                                                .name(vocab.getTopic().getName())
                                                 .build())
-                                .collect(Collectors.toSet());
+                                : Set.of();
 
                 return VocabResponse.builder()
                                 .id(vocab.getId())

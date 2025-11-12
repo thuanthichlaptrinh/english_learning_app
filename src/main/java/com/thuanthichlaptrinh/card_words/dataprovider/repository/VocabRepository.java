@@ -22,25 +22,25 @@ public interface VocabRepository extends JpaRepository<Vocab, UUID> {
 
     List<Vocab> findByCefr(String cefr);
 
-    @Query("SELECT v FROM Vocab v LEFT JOIN FETCH v.types LEFT JOIN FETCH v.topics WHERE v.word LIKE %:keyword% OR v.meaningVi LIKE %:keyword%")
+    @Query("SELECT v FROM Vocab v LEFT JOIN FETCH v.types LEFT JOIN FETCH v.topic WHERE v.word LIKE %:keyword% OR v.meaningVi LIKE %:keyword%")
     Page<Vocab> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
 
-    @Query("SELECT v FROM Vocab v LEFT JOIN FETCH v.types LEFT JOIN FETCH v.topics WHERE v.cefr = :cefr")
+    @Query("SELECT v FROM Vocab v LEFT JOIN FETCH v.types LEFT JOIN FETCH v.topic WHERE v.cefr = :cefr")
     Page<Vocab> findByCefrWithPaging(@Param("cefr") String cefr, Pageable pageable);
 
-    @Query("SELECT v FROM Vocab v LEFT JOIN FETCH v.types LEFT JOIN FETCH v.topics WHERE v.id = :id")
+    @Query("SELECT v FROM Vocab v LEFT JOIN FETCH v.types LEFT JOIN FETCH v.topic WHERE v.id = :id")
     Optional<Vocab> findByIdWithTypesAndTopics(@Param("id") UUID id);
 
-    @Query("SELECT v FROM Vocab v LEFT JOIN FETCH v.types LEFT JOIN FETCH v.topics WHERE v.word = :word")
+    @Query("SELECT v FROM Vocab v LEFT JOIN FETCH v.types LEFT JOIN FETCH v.topic WHERE v.word = :word")
     Optional<Vocab> findByWordWithTypesAndTopics(@Param("word") String word);
 
-    @Query("SELECT v FROM Vocab v LEFT JOIN FETCH v.types LEFT JOIN FETCH v.topics")
+    @Query("SELECT v FROM Vocab v LEFT JOIN FETCH v.types LEFT JOIN FETCH v.topic")
     Page<Vocab> findAllWithTypesAndTopics(Pageable pageable);
 
-    @Query("SELECT DISTINCT v FROM Vocab v JOIN v.topics t WHERE LOWER(t.name) = LOWER(:topicName)")
+    @Query("SELECT DISTINCT v FROM Vocab v WHERE LOWER(v.topic.name) = LOWER(:topicName)")
     List<Vocab> findByTopicNameIgnoreCase(@Param("topicName") String topicName);
 
-    @Query("SELECT DISTINCT v FROM Vocab v JOIN v.topics t WHERE LOWER(t.name) = LOWER(:topicName) AND v.cefr = :cefr")
+    @Query("SELECT DISTINCT v FROM Vocab v WHERE LOWER(v.topic.name) = LOWER(:topicName) AND v.cefr = :cefr")
     List<Vocab> findByTopicNameAndCefr(@Param("topicName") String topicName, @Param("cefr") String cefr);
 
 }

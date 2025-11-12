@@ -357,12 +357,12 @@ public class WordDefinitionMatchingService {
                                 .name(type.getName())
                                 .build())
                         .collect(Collectors.toSet()) : null)
-                .topics(vocab.getTopics() != null ? vocab.getTopics().stream()
-                        .map(topic -> VocabResponse.TopicInfo.builder()
-                                .id(topic.getId())
-                                .name(topic.getName())
+                .topics(vocab.getTopic() != null
+                        ? Collections.singleton(VocabResponse.TopicInfo.builder()
+                                .id(vocab.getTopic().getId())
+                                .name(vocab.getTopic().getName())
                                 .build())
-                        .collect(Collectors.toSet()) : null)
+                        : Collections.emptySet())
                 .build();
     }
 

@@ -67,9 +67,8 @@ public interface UserVocabProgressRepository extends JpaRepository<UserVocabProg
         // Queries for review by topic with pagination
         @Query("SELECT uvp FROM UserVocabProgress uvp " +
                         "LEFT JOIN FETCH uvp.vocab v " +
-                        "LEFT JOIN v.topics t " +
                         "WHERE uvp.user.id = :userId " +
-                        "AND LOWER(t.name) = LOWER(:topicName) " +
+                        "AND LOWER(v.topic.name) = LOWER(:topicName) " +
                         "AND uvp.nextReviewDate IS NOT NULL " +
                         "AND uvp.nextReviewDate <= :date " +
                         "ORDER BY uvp.nextReviewDate ASC")
@@ -91,8 +90,7 @@ public interface UserVocabProgressRepository extends JpaRepository<UserVocabProg
                         org.springframework.data.domain.Pageable pageable);
 
         @Query("SELECT v FROM Vocab v " +
-                        "LEFT JOIN v.topics t " +
-                        "WHERE LOWER(t.name) = LOWER(:topicName) " +
+                        "WHERE LOWER(v.topic.name) = LOWER(:topicName) " +
                         "AND v.id NOT IN (SELECT uvp.vocab.id FROM UserVocabProgress uvp WHERE uvp.user.id = :userId) "
                         +
                         "ORDER BY v.word ASC")
@@ -113,9 +111,8 @@ public interface UserVocabProgressRepository extends JpaRepository<UserVocabProg
         // Lấy từ đang học (KNOWN hoặc UNKNOWN) theo topic - KHÔNG dùng nextReviewDate
         @Query("SELECT uvp FROM UserVocabProgress uvp " +
                         "LEFT JOIN FETCH uvp.vocab v " +
-                        "LEFT JOIN v.topics t " +
                         "WHERE uvp.user.id = :userId " +
-                        "AND LOWER(t.name) = LOWER(:topicName) " +
+                        "AND LOWER(v.topic.name) = LOWER(:topicName) " +
                         "AND (uvp.status = 'KNOWN' OR uvp.status = 'UNKNOWN') " +
                         "ORDER BY uvp.updatedAt DESC")
         org.springframework.data.domain.Page<UserVocabProgress> findLearningVocabsByTopicPaged(
@@ -144,9 +141,8 @@ public interface UserVocabProgressRepository extends JpaRepository<UserVocabProg
 
         @Query("SELECT uvp FROM UserVocabProgress uvp " +
                         "LEFT JOIN FETCH uvp.vocab v " +
-                        "LEFT JOIN v.topics t " +
                         "WHERE uvp.user.id = :userId " +
-                        "AND LOWER(t.name) = LOWER(:topicName) " +
+                        "AND LOWER(v.topic.name) = LOWER(:topicName) " +
                         "AND uvp.status = 'NEW' " +
                         "ORDER BY uvp.createdAt ASC")
         org.springframework.data.domain.Page<UserVocabProgress> findNewVocabsByUserAndTopicPaged(
@@ -157,9 +153,8 @@ public interface UserVocabProgressRepository extends JpaRepository<UserVocabProg
         // Queries for review by topic (non-paged - keep for backward compatibility)
         @Query("SELECT uvp FROM UserVocabProgress uvp " +
                         "LEFT JOIN FETCH uvp.vocab v " +
-                        "LEFT JOIN v.topics t " +
                         "WHERE uvp.user.id = :userId " +
-                        "AND LOWER(t.name) = LOWER(:topicName) " +
+                        "AND LOWER(v.topic.name) = LOWER(:topicName) " +
                         "AND uvp.nextReviewDate IS NOT NULL " +
                         "AND uvp.nextReviewDate <= :date " +
                         "ORDER BY uvp.nextReviewDate ASC")
@@ -168,8 +163,7 @@ public interface UserVocabProgressRepository extends JpaRepository<UserVocabProg
                         @Param("date") LocalDate date);
 
         @Query("SELECT v FROM Vocab v " +
-                        "LEFT JOIN v.topics t " +
-                        "WHERE LOWER(t.name) = LOWER(:topicName) " +
+                        "WHERE LOWER(v.topic.name) = LOWER(:topicName) " +
                         "AND v.id NOT IN (SELECT uvp.vocab.id FROM UserVocabProgress uvp WHERE uvp.user.id = :userId) "
                         +
                         "ORDER BY v.word ASC")
@@ -203,11 +197,11 @@ public interface UserVocabProgressRepository extends JpaRepository<UserVocabProg
         List<UserVocabProgress> findLearningVocabs(@Param("userId") UUID userId);
 
         // Get learning vocabs by topic (KNOWN or UNKNOWN) - non-paged
+        // Get learning vocabs by topic (KNOWN or UNKNOWN) - non-paged
         @Query("SELECT uvp FROM UserVocabProgress uvp " +
                         "LEFT JOIN FETCH uvp.vocab v " +
-                        "LEFT JOIN v.topics t " +
                         "WHERE uvp.user.id = :userId " +
-                        "AND LOWER(t.name) = LOWER(:topicName) " +
+                        "AND LOWER(v.topic.name) = LOWER(:topicName) " +
                         "AND (uvp.status = 'KNOWN' OR uvp.status = 'UNKNOWN') " +
                         "ORDER BY uvp.updatedAt DESC")
         List<UserVocabProgress> findLearningVocabsByTopic(

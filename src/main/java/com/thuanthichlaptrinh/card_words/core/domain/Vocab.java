@@ -64,18 +64,9 @@ public class Vocab extends BaseEntity {
         private Set<Type> types = new HashSet<>();
 
         @JsonIgnore
-        @Builder.Default
-        @ManyToMany(fetch = FetchType.LAZY)
-        @JoinTable(name = "vocab_topics", joinColumns = @JoinColumn(name = "vocab_id"), inverseJoinColumns = @JoinColumn(name = "topic_id"), indexes = {
-                        @Index(name = "idx_vocab_topics_vocab_id", columnList = "vocab_id"),
-                        @Index(name = "idx_vocab_topics_topic_id", columnList = "topic_id")
-        })
-        private Set<Topic> topics = new HashSet<>();
-
-        @JsonIgnore
-        @Builder.Default
-        @ManyToMany(mappedBy = "vocabs", fetch = FetchType.LAZY)
-        private Set<Package> packages = new HashSet<>();
+        @OneToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "topic_id", unique = true)
+        private Topic topic;
 
         @JsonIgnore
         @Builder.Default

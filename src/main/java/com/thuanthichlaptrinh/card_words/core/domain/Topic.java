@@ -25,14 +25,8 @@ public class Topic extends BaseLongEntity {
     private String description;
 
     @JsonIgnore
-    @Builder.Default
-    @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL)
-    private Set<Package> packages = new HashSet<>();
-
-    @JsonIgnore
-    @Builder.Default
-    @ManyToMany(mappedBy = "topics", fetch = FetchType.LAZY)
-    private Set<Vocab> vocabs = new HashSet<>();
+    @OneToOne(mappedBy = "topic", fetch = FetchType.LAZY)
+    private Vocab vocab;
 
     @JsonIgnore
     @Builder.Default
