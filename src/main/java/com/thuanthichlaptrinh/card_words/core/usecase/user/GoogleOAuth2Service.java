@@ -112,22 +112,41 @@ public class GoogleOAuth2Service {
     private GoogleIdToken.Payload verifyGoogleToken(String idToken)
             throws GeneralSecurityException, IOException {
 
+        log.info("🔍 Verifying Google ID token...");
+        log.info("🔑 Google Client ID configured: {}", googleClientId);
+        log.info("📏 ID Token length: {}", idToken != null ? idToken.length() : 0);
+        log.info("📝 ID Token first 50 chars: {}",
+                idToken != null && idToken.length() > 50 ? idToken.substring(0, 50) + "..." : idToken);
+
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
                 new NetHttpTransport(), JSON_FACTORY)
                 .setAudience(Collections.singletonList(googleClientId))
                 .build();
 
-        GoogleIdToken token = verifier.verify(idToken);
-        if (token == null) {
-            throw new ErrorException("Token Google không hợp lệ");
+        GoogleIdToken token = null;
+        try {
+            token = verifier.verify(idToken);
+        } catch (Exception e) {
+            log.error("Error parsing/verifying Google token: {}", e.getMessage());
+            throw new ErrorException("Token Google không đúng định dạng hoặc không hợp lệ: " + e.getMessage());
         }
 
+        if (token == null) {
+            log.error("Token verification returned null. Possible reasons:");
+            log.error("1. Token đã hết hạn");
+            log.error("2. Google Client ID không khớp (configured: {})", googleClientId);
+            log.error("3. Token không phải từ Google OAuth2");
+            log.error("4. Token đã bị thu hồi");
+            throw new ErrorException("Token Google không hợp lệ - verify trả về null");
+        }
+
+        log.info("Google token verified successfully for email: {}", token.getPayload().getEmail());
         return token.getPayload();
     }
 
     private User createNewGoogleUser(String email, String fullName, String avatar) {
         // Lấy role USER mặc định
-        Role userRole = roleRepository.findByName("USER")
+        Role userRole = roleRepository.findByName("ROLE_USER")
                 .orElseThrow(() -> new ErrorException("Không tìm thấy role USER"));
 
         User user = User.builder()

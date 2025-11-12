@@ -6,7 +6,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.thuanthichlaptrinh.card_words.core.usecase.admin.VocabExcelExportService;
 import com.thuanthichlaptrinh.card_words.core.usecase.user.VocabService;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.vocab.BulkCreateVocabRequest;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.vocab.CreateVocabRequest;
@@ -33,7 +36,13 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+@Slf4j
 @RestController
 @RequestMapping(path = "/api/v1/admin/vocabs")
 @RequiredArgsConstructor
@@ -42,6 +51,7 @@ import lombok.RequiredArgsConstructor;
 @SecurityRequirement(name = "Bearer Authentication")
 public class VocabAdminController {
         private final VocabService vocabService;
+        private final VocabExcelExportService excelExportService;
 
         @GetMapping("/{id}")
         @Operation(summary = "[Admin] Lấy từ vựng theo ID", description = "Lấy thông tin chi tiết của một từ vựng theo ID.\n\n"
@@ -173,5 +183,55 @@ public class VocabAdminController {
                         @Valid @RequestBody UpdateVocabRequest request) {
                 VocabResponse response = vocabService.updateVocabByWord(word, request);
                 return ResponseEntity.ok(ApiResponse.success("Cập nhật từ vựng thành công", response));
+        }
+
+        @GetMapping("/export/excel")
+        @Operation(summary = "Xuất tất cả từ vựng ra file Excel", description = "Xuất toàn bộ từ vựng trong hệ thống ra file Excel (.xlsx) bao gồm tất cả thông tin chi tiết:\n\n"
+                        +
+                        "- STT\n" +
+                        "- Word (Từ vựng)\n" +
+                        "- Transcription (Phiên âm)\n" +
+                        "- Meaning Vietnamese (Nghĩa tiếng Việt)\n" +
+                        "- Interpret (Giải thích)\n" +
+                        "- Example Sentence (Câu ví dụ)\n" +
+                        "- CEFR Level (Mức độ)\n" +
+                        "- Types (Loại từ)\n" +
+                        "- Topic (Chủ đề)\n" +
+                        "- Image URL\n" +
+                        "- Audio URL\n" +
+                        "- Credit (Ghi công)\n\n" +
+                        "**URL**: `GET http://localhost:8080/api/v1/admin/vocabs/export/excel`", security = @SecurityRequirement(name = "Bearer Authentication"))
+        public ResponseEntity<byte[]> exportVocabsToExcel() {
+                try {
+                        log.info("Admin đang xuất danh sách từ vựng ra Excel");
+
+                        // Generate Excel file
+                        byte[] excelBytes = excelExportService.exportAllVocabsToExcel();
+
+                        // Generate filename with timestamp
+                        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+                        String filename = String.format("vocabulary_export_%s.xlsx", timestamp);
+
+                        // Set response headers
+                        HttpHeaders headers = new HttpHeaders();
+                        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+                        headers.setContentDispositionFormData("attachment", filename);
+                        headers.setContentLength(excelBytes.length);
+
+                        log.info("Xuất Excel thành công. File: {}, Size: {} bytes", filename, excelBytes.length);
+
+                        return ResponseEntity.ok()
+                                        .headers(headers)
+                                        .body(excelBytes);
+
+                } catch (IOException e) {
+                        log.error("Lỗi khi xuất Excel: {}", e.getMessage(), e);
+                        return ResponseEntity.internalServerError()
+                                        .body(("Lỗi khi xuất file Excel: " + e.getMessage()).getBytes());
+                } catch (Exception e) {
+                        log.error("Lỗi không xác định khi xuất Excel: {}", e.getMessage(), e);
+                        return ResponseEntity.internalServerError()
+                                        .body(("Lỗi không xác định: " + e.getMessage()).getBytes());
+                }
         }
 }
