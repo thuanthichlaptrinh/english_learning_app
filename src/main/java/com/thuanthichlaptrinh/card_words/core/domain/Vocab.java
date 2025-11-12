@@ -64,8 +64,8 @@ public class Vocab extends BaseEntity {
         private Set<Type> types = new HashSet<>();
 
         @JsonIgnore
-        @OneToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "topic_id", unique = true)
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "topic_id")
         private Topic topic;
 
         @JsonIgnore

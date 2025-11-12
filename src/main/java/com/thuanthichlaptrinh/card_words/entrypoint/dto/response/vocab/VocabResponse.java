@@ -27,7 +27,7 @@ public class VocabResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Set<TypeInfo> types;
-    private Set<TopicInfo> topics;
+    private TopicInfo topic;
 
     @Data
     @Builder

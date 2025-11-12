@@ -547,12 +547,12 @@ public class ImageWordMatchingService {
                                                 .build())
                                 .collect(Collectors.toSet());
 
-                Set<VocabResponse.TopicInfo> topicInfos = vocab.getTopic() != null
-                                ? Collections.singleton(VocabResponse.TopicInfo.builder()
+                VocabResponse.TopicInfo topicInfo = vocab.getTopic() != null
+                                ? VocabResponse.TopicInfo.builder()
                                                 .id(vocab.getTopic().getId())
                                                 .name(vocab.getTopic().getName())
-                                                .build())
-                                : Collections.emptySet();
+                                                .build()
+                                : null;
 
                 return VocabResponse.builder()
                                 .id(vocab.getId())
@@ -568,7 +568,7 @@ public class ImageWordMatchingService {
                                 .createdAt(vocab.getCreatedAt())
                                 .updatedAt(vocab.getUpdatedAt())
                                 .types(typeInfos)
-                                .topics(topicInfos)
+                                .topic(topicInfo)
                                 .build();
         }
 

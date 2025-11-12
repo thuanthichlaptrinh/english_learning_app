@@ -40,7 +40,7 @@ public class VocabService {
     private final TopicRepository topicRepository;
     private final VocabMapper vocabMapper;
 
-    @Transactional
+    // Không dùng @Transactional ở đây để mỗi vocab có transaction riêng
     public BulkImportResponse bulkCreateVocabs(BulkCreateVocabRequest request) {
         log.info("Bắt đầu import hàng loạt {} từ vựng", request.getVocabs().size());
 
@@ -65,7 +65,7 @@ public class VocabService {
                     continue;
                 }
 
-                // Tạo từ vựng mới
+                // Tạo từ vựng mới - mỗi vocab sẽ có transaction riêng thông qua createVocab
                 CreateVocabRequest createRequest = CreateVocabRequest.builder()
                         .word(item.getWord())
                         .transcription(item.getTranscription())
@@ -77,7 +77,7 @@ public class VocabService {
                         .audio(item.getAudio())
                         .credit(item.getCredit())
                         .types(item.getTypes() != null ? new HashSet<>(item.getTypes()) : null)
-                        .topics(item.getTopics() != null ? new HashSet<>(item.getTopics()) : null)
+                        .topic(item.getTopic())
                         .build();
 
                 createVocab(createRequest);
@@ -132,26 +132,20 @@ public class VocabService {
             }
         }
 
-        // Load hoặc tạo topic từ tên (chỉ lấy topic đầu tiên - quan hệ 1-1)
+        // Load hoặc tạo topic từ tên (quan hệ Many-to-One: nhiều vocab có thể cùng một
+        // topic)
         Topic topic = null;
-        if (request.getTopics() != null && !request.getTopics().isEmpty()) {
-            String topicName = request.getTopics().iterator().next(); // Get first topic only
-            String normalizedName = topicName.trim().toLowerCase();
-            topic = topicRepository.findByNameIgnoreCase(normalizedName)
+        if (request.getTopic() != null && !request.getTopic().trim().isEmpty()) {
+            String topicName = request.getTopic().trim().toLowerCase();
+            topic = topicRepository.findByNameIgnoreCase(topicName)
                     .orElseGet(() -> {
-                        log.info("Tạo Topic mới: {}", normalizedName);
+                        log.info("Tạo Topic mới: {}", topicName);
                         Topic newTopic = Topic.builder()
-                                .name(normalizedName)
+                                .name(topicName)
                                 .description("Auto-generated from vocab creation")
                                 .build();
                         return topicRepository.save(newTopic);
                     });
-
-            // Log warning if multiple topics were provided
-            if (request.getTopics().size() > 1) {
-                log.warn("Vocab '{}' có {} topics, chỉ sử dụng topic đầu tiên: {}",
-                        request.getWord(), request.getTopics().size(), topicName);
-            }
         }
 
         Vocab vocab = Vocab.builder()
@@ -169,7 +163,6 @@ public class VocabService {
                 .build();
 
         vocab = vocabRepository.save(vocab);
-
         log.info("Đã tạo từ vựng thành công: {} với ID: {}", vocab.getWord(), vocab.getId());
 
         return vocabMapper.toVocabResponse(vocab);
@@ -295,25 +288,18 @@ public class VocabService {
             vocab.setTypes(types);
         }
 
-        // Update topic nếu có (chỉ lấy topic đầu tiên - quan hệ 1-1)
-        if (request.getTopics() != null && !request.getTopics().isEmpty()) {
-            String topicName = request.getTopics().iterator().next(); // Get first topic only
-            String normalizedName = topicName.trim().toLowerCase();
-            Topic topic = topicRepository.findByNameIgnoreCase(normalizedName)
+        // Update topic nếu có (quan hệ Many-to-One: nhiều vocab có thể cùng một topic)
+        if (request.getTopic() != null && !request.getTopic().trim().isEmpty()) {
+            String topicName = request.getTopic().trim().toLowerCase();
+            Topic topic = topicRepository.findByNameIgnoreCase(topicName)
                     .orElseGet(() -> {
-                        log.info("Tạo topic mới: {}", normalizedName);
+                        log.info("Tạo topic mới: {}", topicName);
                         Topic newTopic = Topic.builder()
-                                .name(normalizedName)
+                                .name(topicName)
                                 .build();
                         return topicRepository.save(newTopic);
                     });
             vocab.setTopic(topic);
-
-            // Log warning if multiple topics were provided
-            if (request.getTopics().size() > 1) {
-                log.warn("Update vocab '{}': Có {} topics, chỉ sử dụng topic đầu tiên: {}",
-                        vocab.getWord(), request.getTopics().size(), topicName);
-            }
         }
 
         Vocab updatedVocab = vocabRepository.save(vocab);
@@ -391,25 +377,18 @@ public class VocabService {
             vocab.setTypes(types);
         }
 
-        // Update topic nếu có (chỉ lấy topic đầu tiên - quan hệ 1-1)
-        if (request.getTopics() != null && !request.getTopics().isEmpty()) {
-            String topicName = request.getTopics().iterator().next(); // Get first topic only
-            String normalizedName = topicName.trim().toLowerCase();
-            Topic topic = topicRepository.findByNameIgnoreCase(normalizedName)
+        // Update topic nếu có (quan hệ Many-to-One: nhiều vocab có thể cùng một topic)
+        if (request.getTopic() != null && !request.getTopic().trim().isEmpty()) {
+            String topicName = request.getTopic().trim().toLowerCase();
+            Topic topic = topicRepository.findByNameIgnoreCase(topicName)
                     .orElseGet(() -> {
-                        log.info("Tạo topic mới: {}", normalizedName);
+                        log.info("Tạo topic mới: {}", topicName);
                         Topic newTopic = Topic.builder()
-                                .name(normalizedName)
+                                .name(topicName)
                                 .build();
                         return topicRepository.save(newTopic);
                     });
             vocab.setTopic(topic);
-
-            // Log warning if multiple topics were provided
-            if (request.getTopics().size() > 1) {
-                log.warn("Update vocab '{}': Có {} topics, chỉ sử dụng topic đầu tiên: {}",
-                        vocab.getWord(), request.getTopics().size(), topicName);
-            }
         }
 
         Vocab updatedVocab = vocabRepository.save(vocab);
@@ -470,6 +449,36 @@ public class VocabService {
                 .orElseThrow(() -> new ErrorException("Không tìm thấy từ vựng: " + word));
 
         return vocabMapper.toVocabMediaUrlResponse(vocab);
+    }
+
+    // Get all audio URLs from database (for cleanup purposes)
+    @Transactional(readOnly = true)
+    public List<String> getAllAudioUrls() {
+        log.info("Lấy tất cả audio URLs từ database");
+
+        List<String> audioUrls = vocabRepository.findAll().stream()
+                .map(Vocab::getAudio)
+                .filter(audio -> audio != null && !audio.trim().isEmpty())
+                .distinct()
+                .toList();
+
+        log.info("Tìm thấy {} audio URLs", audioUrls.size());
+        return audioUrls;
+    }
+
+    // Get all image URLs from database (for cleanup purposes)
+    @Transactional(readOnly = true)
+    public List<String> getAllImageUrls() {
+        log.info("Lấy tất cả image URLs từ database");
+
+        List<String> imageUrls = vocabRepository.findAll().stream()
+                .map(Vocab::getImg)
+                .filter(img -> img != null && !img.trim().isEmpty())
+                .distinct()
+                .toList();
+
+        log.info("Tìm thấy {} image URLs", imageUrls.size());
+        return imageUrls;
     }
 
 }

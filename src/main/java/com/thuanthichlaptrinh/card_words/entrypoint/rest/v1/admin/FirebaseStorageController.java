@@ -166,7 +166,11 @@ public class FirebaseStorageController {
     @PostMapping(value = "/upload/media-and-update-vocab", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Upload media và tự động cập nhật vocab", description = "Upload nhiều file (images + audios) và tự động cập nhật vào từ vựng tương ứng. "
             +
-            "Tên file phải có format: [số].[tên_từ].[extension] (ví dụ: '2.bread.jpg', '3.milk.mp3'). " +
+            "Tên file hỗ trợ 4 format:\n" +
+            "- Format 1: [word].[extension] (ví dụ: 'bread.jpg', 'milk.mp3')\n" +
+            "- Format 2: [số].[word].[extension] (ví dụ: '2.bread.jpg', '3.milk.mp3')\n" +
+            "- Format 3: [số]_[word].[extension] (ví dụ: '500_theater.mp3', '504_park.mp3')\n" +
+            "- Format 4: [word]_[số].[extension] (ví dụ: 'theater_500.mp3', 'park_504.mp3')\n" +
             "Hệ thống sẽ tự động extract tên từ, upload lên Firebase, và cập nhật vào database. " +
             "Hỗ trợ images (jpg, png, gif, webp, max 5MB) và audios (mp3, wav, ogg, max 10MB)", security = @SecurityRequirement(name = "Bearer Authentication"))
     public ResponseEntity<ApiResponse<com.thuanthichlaptrinh.card_words.entrypoint.dto.response.BulkMediaUpdateResponse>> uploadMediaAndUpdateVocab(
@@ -195,6 +199,78 @@ public class FirebaseStorageController {
             log.error("Failed to upload media and update vocab: {}", e.getMessage());
             return ResponseEntity.internalServerError().body(
                     ApiResponse.error("500", "Upload và cập nhật thất bại: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/cleanup/audios")
+    @Operation(summary = "Dọn dẹp audio files không sử dụng trên Firebase", description = "Xóa các file audio trên Firebase Storage không được tham chiếu trong database. "
+            +
+            "Sử dụng dryRun=true để xem trước danh sách file sẽ bị xóa mà không thực sự xóa.", security = @SecurityRequirement(name = "Bearer Authentication"))
+    public ResponseEntity<ApiResponse<FirebaseStorageService.CleanupReport>> cleanupUnusedAudios(
+            @Parameter(description = "Dry run mode - chỉ xem trước, không xóa thật") @RequestParam(defaultValue = "true") boolean dryRun) {
+
+        try {
+            log.info("Starting audio cleanup, dryRun={}", dryRun);
+
+            FirebaseStorageService.CleanupReport report = firebaseStorageService.cleanupUnusedFiles("audios", dryRun);
+
+            double deletedPercentage = report.getTotalFilesScanned() > 0
+                    ? (report.getUnusedFilesDeleted() * 100.0 / report.getTotalFilesScanned())
+                    : 0.0;
+
+            String message = dryRun
+                    ? String.format("DRY RUN: Tìm thấy %d/%d file audio không sử dụng (%.2f%%)",
+                            report.getUnusedFilesDeleted(),
+                            report.getTotalFilesScanned(),
+                            deletedPercentage)
+                    : String.format("Đã xóa %d/%d file audio không sử dụng (%.2f%%)",
+                            report.getUnusedFilesDeleted(),
+                            report.getTotalFilesScanned(),
+                            deletedPercentage);
+
+            log.info("Audio cleanup completed: {}", message);
+            return ResponseEntity.ok(ApiResponse.success(message, report));
+
+        } catch (Exception e) {
+            log.error("Audio cleanup failed: {}", e.getMessage(), e);
+            return ResponseEntity.internalServerError().body(
+                    ApiResponse.error("500", "Cleanup thất bại: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/cleanup/images")
+    @Operation(summary = "Dọn dẹp image files không sử dụng trên Firebase", description = "Xóa các file image trên Firebase Storage không được tham chiếu trong database. "
+            +
+            "Sử dụng dryRun=true để xem trước danh sách file sẽ bị xóa mà không thực sự xóa.", security = @SecurityRequirement(name = "Bearer Authentication"))
+    public ResponseEntity<ApiResponse<FirebaseStorageService.CleanupReport>> cleanupUnusedImages(
+            @Parameter(description = "Dry run mode - chỉ xem trước, không xóa thật") @RequestParam(defaultValue = "true") boolean dryRun) {
+
+        try {
+            log.info("Starting image cleanup, dryRun={}", dryRun);
+
+            FirebaseStorageService.CleanupReport report = firebaseStorageService.cleanupUnusedFiles("images", dryRun);
+
+            double deletedPercentage = report.getTotalFilesScanned() > 0
+                    ? (report.getUnusedFilesDeleted() * 100.0 / report.getTotalFilesScanned())
+                    : 0.0;
+
+            String message = dryRun
+                    ? String.format("DRY RUN: Tìm thấy %d/%d file image không sử dụng (%.2f%%)",
+                            report.getUnusedFilesDeleted(),
+                            report.getTotalFilesScanned(),
+                            deletedPercentage)
+                    : String.format("Đã xóa %d/%d file image không sử dụng (%.2f%%)",
+                            report.getUnusedFilesDeleted(),
+                            report.getTotalFilesScanned(),
+                            deletedPercentage);
+
+            log.info("Image cleanup completed: {}", message);
+            return ResponseEntity.ok(ApiResponse.success(message, report));
+
+        } catch (Exception e) {
+            log.error("Image cleanup failed: {}", e.getMessage(), e);
+            return ResponseEntity.internalServerError().body(
+                    ApiResponse.error("500", "Cleanup thất bại: " + e.getMessage()));
         }
     }
 }

@@ -390,10 +390,14 @@ public class FirebaseStorageService {
     /**
      * Extract word from filename
      * 
-     * Hỗ trợ 2 format:
+     * Hỗ trợ 4 format:
      * - Format 1: [word].[extension] → trả về "word" (e.g., "bread.jpg" → "bread")
      * - Format 2: [number].[word].[extension] → trả về "word" (e.g., "2.bread.jpg"
      * → "bread")
+     * - Format 3: [number]_[word].[extension] → trả về "word" (e.g.,
+     * "500_theater.mp3" → "theater")
+     * - Format 4: [word]_[number].[extension] → trả về "word" (e.g.,
+     * "theater_500.mp3" → "theater")
      * 
      * @param filename Tên file cần extract
      * @return Tên từ vựng (lowercase, trimmed) hoặc null nếu không extract được
@@ -411,12 +415,32 @@ public class FirebaseStorageService {
                 nameWithoutExt = filename.substring(0, lastDotIndex);
             }
 
-            // Check if there's a number prefix (Format 2: [number].[word])
+            // Try dot separator first (Format 2: [number].[word])
             int firstDotIndex = nameWithoutExt.indexOf('.');
             if (firstDotIndex > 0) {
                 // Format 2: Lấy phần sau dấu chấm đầu tiên
                 String word = nameWithoutExt.substring(firstDotIndex + 1);
                 return word.trim().toLowerCase();
+            }
+
+            // Try underscore separator (Format 3 & 4: [number]_[word] or [word]_[number])
+            int firstUnderscoreIndex = nameWithoutExt.indexOf('_');
+            if (firstUnderscoreIndex > 0) {
+                String part1 = nameWithoutExt.substring(0, firstUnderscoreIndex).trim();
+                String part2 = nameWithoutExt.substring(firstUnderscoreIndex + 1).trim();
+
+                // Check if part1 is a number (Format 3: [number]_[word])
+                if (part1.matches("\\d+")) {
+                    return part2.toLowerCase();
+                }
+
+                // Check if part2 is a number (Format 4: [word]_[number])
+                if (part2.matches("\\d+")) {
+                    return part1.toLowerCase();
+                }
+
+                // Neither is a pure number, take part2 as word (prioritize second part)
+                return part2.toLowerCase();
             }
 
             // Format 1: Lấy toàn bộ tên (không có số prefix)
@@ -568,5 +592,115 @@ public class FirebaseStorageService {
                 .results(results)
                 .errors(errors)
                 .build();
+    }
+
+    /**
+     * Clean up unused audio files from Firebase Storage
+     * 
+     * Compare files in Firebase Storage with audio URLs in database
+     * and delete files that are not being used
+     * 
+     * @param folder Folder to cleanup (e.g., "vocab/audios")
+     * @param dryRun If true, only report files to delete without actually deleting
+     * @return Cleanup report with deleted/skipped files
+     */
+    public CleanupReport cleanupUnusedFiles(String folder, boolean dryRun) {
+        if (bucket == null) {
+            throw new IllegalStateException("Firebase storage bucket is not configured");
+        }
+
+        log.info("Starting cleanup for folder: {} (dryRun: {})", folder, dryRun);
+
+        // Get all audio URLs from database
+        List<String> activeUrls = vocabService.getAllAudioUrls();
+        log.info("Found {} active audio URLs in database", activeUrls.size());
+
+        // Extract filenames from URLs for quick lookup
+        java.util.Set<String> activeFilenames = new java.util.HashSet<>();
+        for (String url : activeUrls) {
+            String filename = extractFileNameFromUrl(url);
+            if (filename != null) {
+                activeFilenames.add(filename);
+            }
+        }
+
+        List<String> deletedFiles = new ArrayList<>();
+        List<String> skippedFiles = new ArrayList<>();
+        List<String> errorFiles = new ArrayList<>();
+
+        // List all files in the folder
+        com.google.api.gax.paging.Page<Blob> blobs = bucket.list(
+                com.google.cloud.storage.Storage.BlobListOption.prefix(folder + "/"));
+
+        int totalFiles = 0;
+        for (Blob blob : blobs.iterateAll()) {
+            totalFiles++;
+            String blobName = blob.getName();
+
+            // Skip the folder itself
+            if (blobName.equals(folder + "/")) {
+                continue;
+            }
+
+            // Check if this file is being used
+            if (activeFilenames.contains(blobName)) {
+                skippedFiles.add(blobName);
+                log.debug("Skipping active file: {}", blobName);
+            } else {
+                // File not in use, mark for deletion
+                if (dryRun) {
+                    deletedFiles.add(blobName);
+                    log.info("[DRY RUN] Would delete: {}", blobName);
+                } else {
+                    try {
+                        boolean deleted = blob.delete();
+                        if (deleted) {
+                            deletedFiles.add(blobName);
+                            log.info("Deleted unused file: {}", blobName);
+                        } else {
+                            errorFiles.add(blobName);
+                            log.warn("Failed to delete file: {}", blobName);
+                        }
+                    } catch (Exception e) {
+                        errorFiles.add(blobName);
+                        log.error("Error deleting file {}: {}", blobName, e.getMessage());
+                    }
+                }
+            }
+        }
+
+        CleanupReport report = CleanupReport.builder()
+                .folder(folder)
+                .dryRun(dryRun)
+                .totalFilesScanned(totalFiles)
+                .activeFilesKept(skippedFiles.size())
+                .unusedFilesDeleted(deletedFiles.size())
+                .errorFiles(errorFiles.size())
+                .deletedFiles(deletedFiles)
+                .skippedFiles(skippedFiles)
+                .errorFilesList(errorFiles)
+                .build();
+
+        log.info("Cleanup completed for folder: {}. Total: {}, Active: {}, Deleted: {}, Errors: {}",
+                folder, totalFiles, skippedFiles.size(), deletedFiles.size(), errorFiles.size());
+
+        return report;
+    }
+
+    @lombok.Getter
+    @lombok.Setter
+    @lombok.Builder
+    @lombok.NoArgsConstructor
+    @lombok.AllArgsConstructor
+    public static class CleanupReport {
+        private String folder;
+        private boolean dryRun;
+        private int totalFilesScanned;
+        private int activeFilesKept;
+        private int unusedFilesDeleted;
+        private int errorFiles;
+        private List<String> deletedFiles;
+        private List<String> skippedFiles;
+        private List<String> errorFilesList;
     }
 }

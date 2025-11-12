@@ -23,7 +23,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<Object>> handleValidation(MethodArgumentNotValidException ex) {
         String message = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+        System.out.println("=== VALIDATION ERROR DEBUG ===");
         System.out.println("Validation error: " + message);
+        System.out.println("Target object: " + ex.getBindingResult().getTarget());
+        System.out.println("Target class: "
+                + (ex.getBindingResult().getTarget() != null ? ex.getBindingResult().getTarget().getClass() : "NULL"));
+        System.out.println("Field errors: " + ex.getBindingResult().getFieldErrors());
+        System.out.println("All errors: " + ex.getBindingResult().getAllErrors());
+        System.out.println("==============================");
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error("400", message));

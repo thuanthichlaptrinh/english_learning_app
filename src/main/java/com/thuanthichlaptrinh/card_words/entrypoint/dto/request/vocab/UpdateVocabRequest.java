@@ -24,5 +24,5 @@ public class UpdateVocabRequest {
     private String audio;
     private String credit;
     private Set<String> types;
-    private Set<String> topics;
+    private String topic;
 }

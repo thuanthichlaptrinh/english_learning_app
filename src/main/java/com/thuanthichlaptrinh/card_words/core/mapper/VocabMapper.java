@@ -20,13 +20,13 @@ public class VocabMapper {
                                                 .build())
                                 .collect(Collectors.toSet());
 
-                // Convert single topic to Set for backward compatibility
-                Set<VocabResponse.TopicInfo> topicInfos = vocab.getTopic() != null
-                                ? Set.of(VocabResponse.TopicInfo.builder()
+                // Convert topic to TopicInfo (1-1 relationship)
+                VocabResponse.TopicInfo topicInfo = vocab.getTopic() != null
+                                ? VocabResponse.TopicInfo.builder()
                                                 .id(vocab.getTopic().getId())
                                                 .name(vocab.getTopic().getName())
-                                                .build())
-                                : Set.of();
+                                                .build()
+                                : null;
 
                 return VocabResponse.builder()
                                 .id(vocab.getId())
@@ -42,7 +42,7 @@ public class VocabMapper {
                                 .createdAt(vocab.getCreatedAt())
                                 .updatedAt(vocab.getUpdatedAt())
                                 .types(typeInfos)
-                                .topics(topicInfos)
+                                .topic(topicInfo)
                                 .build();
         }
 
