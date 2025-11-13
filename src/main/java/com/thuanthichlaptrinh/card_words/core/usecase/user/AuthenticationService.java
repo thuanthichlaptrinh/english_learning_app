@@ -169,6 +169,8 @@ public class AuthenticationService {
         return AuthenticationResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .tokenType("Bearer")
+                .expiresIn(jwtService.getExpirationTime())
                 .build();
     }
 
@@ -376,6 +378,8 @@ public class AuthenticationService {
         return AuthenticationResponse.builder()
                 .accessToken(newAccessToken)
                 .refreshToken(newRefreshToken)
+                .tokenType("Bearer")
+                .expiresIn(jwtService.getExpirationTime())
                 .build();
     }
 

@@ -45,6 +45,10 @@ public class JwtService {
                 new HashMap<>(), userDetails, jwtProperties.getRefreshToken().getExpiration());
     }
 
+    public long getExpirationTime() {
+        return jwtProperties.getExpiration() / 1000;
+    }
+
     private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long expiration) {
         return Jwts.builder()
                 .setClaims(extraClaims)
