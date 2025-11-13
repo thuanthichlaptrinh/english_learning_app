@@ -24,6 +24,9 @@ public class Topic extends BaseLongEntity {
     @Column(length = 500)
     private String description;
 
+    @Column(length = 1000)
+    private String img;
+
     @JsonIgnore
     @Builder.Default
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL)
