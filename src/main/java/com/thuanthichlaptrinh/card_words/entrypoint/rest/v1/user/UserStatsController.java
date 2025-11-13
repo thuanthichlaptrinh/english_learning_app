@@ -2,11 +2,9 @@ package com.thuanthichlaptrinh.card_words.entrypoint.rest.v1.user;
 
 import com.thuanthichlaptrinh.card_words.core.domain.User;
 import com.thuanthichlaptrinh.card_words.core.usecase.user.UserStatsService;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.ApiResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.game.UserHighScoresResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -38,19 +36,15 @@ public class UserStatsController {
             "**Games hiện tại:**\n" +
             "- Quick Reflex Quiz\n" +
             "- Image-Word Matching\n" +
-            "- Word-Definition Matching", responses = {
-                    @ApiResponse(responseCode = "200", description = "Lấy điểm cao nhất thành công", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserHighScoresResponse.class))),
-                    @ApiResponse(responseCode = "401", description = "Chưa đăng nhập"),
-                    @ApiResponse(responseCode = "500", description = "Lỗi server")
-            })
-    public ResponseEntity<UserHighScoresResponse> getUserHighScores(
+            "- Word-Definition Matching")
+    public ResponseEntity<ApiResponse<UserHighScoresResponse>> getUserHighScores(
             Authentication authentication) {
         UUID userId = getUserIdFromAuth(authentication);
         log.info("GET /api/v1/user/stats/high-scores - User: {}", userId);
 
         UserHighScoresResponse response = userStatsService.getUserHighScores(userId);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ApiResponse.success("Lấy điểm cao nhất thành công", response));
     }
 
     // Helper method to extract user ID from authentication
