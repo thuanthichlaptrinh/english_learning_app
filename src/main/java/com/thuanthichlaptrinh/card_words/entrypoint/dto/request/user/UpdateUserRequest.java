@@ -27,4 +27,7 @@ public class UpdateUserRequest {
     private LocalDate dateOfBirth;
 
     private CEFRLevel currentLevel;
+
+    @Size(min = 6, max = 100, message = "Mật khẩu phải từ 6-100 ký tự")
+    private String password;
 }

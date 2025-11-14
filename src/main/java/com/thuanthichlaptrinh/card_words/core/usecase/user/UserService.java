@@ -2,6 +2,7 @@ package com.thuanthichlaptrinh.card_words.core.usecase.user;
 
 import java.io.IOException;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,6 +24,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final FirebaseStorageService firebaseStorageService;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public UserProfileResponse updateUserProfile(String userEmail, UpdateUserRequest request,
@@ -57,6 +59,11 @@ public class UserService {
             }
             if (request.getCurrentLevel() != null) {
                 user.setCurrentLevel(request.getCurrentLevel());
+            }
+            if (request.getPassword() != null && !request.getPassword().trim().isEmpty()) {
+                String encodedPassword = passwordEncoder.encode(request.getPassword());
+                user.setPassword(encodedPassword);
+                log.info("Đã cập nhật password cho user: {}", userEmail);
             }
         }
 
