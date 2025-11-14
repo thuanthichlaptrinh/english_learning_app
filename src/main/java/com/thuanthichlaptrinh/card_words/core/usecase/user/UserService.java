@@ -60,11 +60,6 @@ public class UserService {
             if (request.getCurrentLevel() != null) {
                 user.setCurrentLevel(request.getCurrentLevel());
             }
-            if (request.getPassword() != null && !request.getPassword().trim().isEmpty()) {
-                String encodedPassword = passwordEncoder.encode(request.getPassword());
-                user.setPassword(encodedPassword);
-                log.info("Đã cập nhật password cho user: {}", userEmail);
-            }
         }
 
         user = userRepository.save(user);
@@ -93,6 +88,36 @@ public class UserService {
                 .dateOfBirth(user.getDateOfBirth())
                 .currentLevel(user.getCurrentLevel())
                 .build();
+    }
+
+    @Transactional
+    public void changePassword(String userEmail, String currentPassword, String newPassword, String confirmPassword) {
+        log.info("Đổi mật khẩu cho user: {}", userEmail);
+
+        // Validate confirmPassword
+        if (!newPassword.equals(confirmPassword)) {
+            throw new ErrorException("Mật khẩu mới và xác nhận mật khẩu không khớp");
+        }
+
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new ErrorException("User không tồn tại"));
+
+        // Kiểm tra mật khẩu hiện tại
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new ErrorException("Mật khẩu hiện tại không đúng");
+        }
+
+        // Kiểm tra mật khẩu mới không trùng với mật khẩu cũ
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
+            throw new ErrorException("Mật khẩu mới không được trùng với mật khẩu hiện tại");
+        }
+
+        // Cập nhật mật khẩu mới
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        user.setPassword(encodedPassword);
+        userRepository.save(user);
+
+        log.info("Đã đổi mật khẩu thành công cho user: {}", userEmail);
     }
 
 }

@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.thuanthichlaptrinh.card_words.core.usecase.user.GameHistoryService;
 import com.thuanthichlaptrinh.card_words.core.usecase.user.UserService;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.user.ChangePasswordRequest;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.user.UpdateUserRequest;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.ApiResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.game.GameHistoryResponse;
@@ -31,6 +32,7 @@ import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
@@ -104,6 +106,28 @@ public class UserController {
         GameStatsResponse response = gameHistoryService.getUserGameStats(userId);
 
         return ResponseEntity.ok(ApiResponse.success("Lấy thống kê game thành công", response));
+    }
+
+    @PostMapping("/change-password")
+    @Operation(summary = "Đổi mật khẩu", description = "Đổi mật khẩu của user. Yêu cầu nhập mật khẩu hiện tại để xác thực.\n\n"
+            +
+            "**Request Body:**\n" +
+            "```json\n" +
+            "{\n" +
+            "  \"currentPassword\": \"password123\",\n" +
+            "  \"newPassword\": \"newPassword456\",\n" +
+            "  \"confirmPassword\": \"newPassword456\"\n" +
+            "}\n" +
+            "```", security = @SecurityRequirement(name = "Bearer Authentication"))
+    public ResponseEntity<ApiResponse<Void>> changePassword(
+            Principal principal,
+            @Valid @RequestBody ChangePasswordRequest request) {
+        userService.changePassword(
+                principal.getName(),
+                request.getCurrentPassword(),
+                request.getNewPassword(),
+                request.getConfirmPassword());
+        return ResponseEntity.ok(ApiResponse.success("Đổi mật khẩu thành công", null));
     }
 
     // Helper method
