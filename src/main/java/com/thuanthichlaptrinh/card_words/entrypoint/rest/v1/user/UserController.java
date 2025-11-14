@@ -69,8 +69,6 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success("Cập nhật avatar thành công", response));
     }
 
-    // ==================== GAME HISTORY & STATS ====================
-
     @GetMapping("/games/history")
     @Operation(summary = "Lịch sử chơi game", description = "Lấy lịch sử tất cả game sessions của user với phân trang.\n\n"
             +

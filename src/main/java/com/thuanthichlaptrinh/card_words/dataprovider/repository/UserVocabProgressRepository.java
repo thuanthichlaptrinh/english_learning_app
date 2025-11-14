@@ -235,4 +235,27 @@ public interface UserVocabProgressRepository extends JpaRepository<UserVocabProg
         List<UserVocabProgress> findByUserIdAndLastReviewedAtAfter(
                         @Param("userId") UUID userId,
                         @Param("after") LocalDateTime after);
+
+        // === NEW QUERIES FOR LEARNING VOCAB API ===
+        // Lấy từ có status = NEW hoặc UNKNOWN (ưu tiên UNKNOWN trước)
+        @Query("SELECT uvp FROM UserVocabProgress uvp " +
+                        "LEFT JOIN FETCH uvp.vocab v " +
+                        "WHERE uvp.user.id = :userId " +
+                        "AND (uvp.status = 'NEW' OR uvp.status = 'UNKNOWN') " +
+                        "ORDER BY CASE WHEN uvp.status = 'UNKNOWN' THEN 0 ELSE 1 END, uvp.updatedAt ASC")
+        org.springframework.data.domain.Page<UserVocabProgress> findNewOrUnknownVocabsPaged(
+                        @Param("userId") UUID userId,
+                        org.springframework.data.domain.Pageable pageable);
+
+        // Lấy từ có status = NEW hoặc UNKNOWN theo topic (ưu tiên UNKNOWN trước)
+        @Query("SELECT uvp FROM UserVocabProgress uvp " +
+                        "LEFT JOIN FETCH uvp.vocab v " +
+                        "WHERE uvp.user.id = :userId " +
+                        "AND LOWER(v.topic.name) = LOWER(:topicName) " +
+                        "AND (uvp.status = 'NEW' OR uvp.status = 'UNKNOWN') " +
+                        "ORDER BY CASE WHEN uvp.status = 'UNKNOWN' THEN 0 ELSE 1 END, uvp.updatedAt ASC")
+        org.springframework.data.domain.Page<UserVocabProgress> findNewOrUnknownVocabsByTopicPaged(
+                        @Param("userId") UUID userId,
+                        @Param("topicName") String topicName,
+                        org.springframework.data.domain.Pageable pageable);
 }

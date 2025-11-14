@@ -121,18 +121,22 @@ public class LearnVocabService {
         // Tính tổng số trang dựa trên totalElements
         int totalPages = (int) Math.ceil((double) totalElements / request.getSize());
 
-        return PagedReviewVocabResponse.builder()
-                .vocabs(vocabs)
-                .currentPage(request.getPage())
+        PagedReviewVocabResponse.PageMetadata meta = PagedReviewVocabResponse.PageMetadata.builder()
+                .page(request.getPage() + 1) // Convert từ 0-based sang 1-based
                 .pageSize(request.getSize())
+                .totalItems(totalElements)
                 .totalPages(totalPages)
-                .totalElements(totalElements)
-                .hasPrevious(request.getPage() > 0)
                 .hasNext(request.getPage() < totalPages - 1)
+                .hasPrev(request.getPage() > 0)
                 .newVocabs(stats.getNewVocabs())
                 .learningVocabs(stats.getLearningVocabs())
                 .masteredVocabs(stats.getMasteredVocabs())
                 .dueVocabs(stats.getDueVocabs())
+                .build();
+
+        return PagedReviewVocabResponse.builder()
+                .vocabs(vocabs)
+                .meta(meta)
                 .build();
     }
 
@@ -490,5 +494,145 @@ public class LearnVocabService {
         private Integer learningVocabs;
         private Integer masteredVocabs;
         private Integer dueVocabs;
+    }
+
+    // ========== NEW METHODS FOR LEARNING VOCAB API ==========
+
+    /**
+     * Lấy từ vựng để học (không có trong UserVocabProgress hoặc status =
+     * NEW/UNKNOWN)
+     * Thuật toán:
+     * 1. Lấy từ chưa có trong UserVocabProgress (từ mới hoàn toàn)
+     * 2. Lấy từ có status = NEW hoặc UNKNOWN (ưu tiên UNKNOWN trước)
+     * 3. Trộn hai nguồn này để tạo danh sách cuối cùng
+     * 4. Từ NEW có thể hiển thị lại để người dùng học lại
+     */
+    @Transactional(readOnly = true)
+    public PagedReviewVocabResponse getVocabsForLearning(User user, Integer page, Integer size) {
+        log.info("Getting vocabs for learning - user: {}, page: {}, size: {}", user.getId(), page, size);
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        // 1. Lấy từ có status = NEW hoặc UNKNOWN (ưu tiên UNKNOWN trước)
+        Page<UserVocabProgress> progressPage = userVocabProgressRepository.findNewOrUnknownVocabsPaged(
+                user.getId(), pageable);
+
+        // 2. Nếu không đủ, lấy thêm từ chưa học (không có trong user_vocab_progress)
+        Page<Vocab> unlearnedPage = null;
+        if (progressPage.getContent().size() < size) {
+            int remaining = size - progressPage.getContent().size();
+            Pageable newPageable = PageRequest.of(0, remaining);
+            unlearnedPage = userVocabProgressRepository.findAllUnlearnedVocabsPaged(user.getId(), newPageable);
+        }
+
+        // 3. Map to response - ưu tiên từ có progress (NEW/UNKNOWN) trước
+        List<ReviewVocabResponse> vocabs = new ArrayList<>();
+
+        // Thêm từ có status NEW/UNKNOWN
+        progressPage.getContent().stream()
+                .map(this::mapToReviewVocabResponse)
+                .forEach(vocabs::add);
+
+        // Sau đó thêm từ chưa học
+        if (unlearnedPage != null && !unlearnedPage.isEmpty()) {
+            unlearnedPage.getContent().forEach(vocab -> vocabs.add(mapVocabToReviewResponse(vocab)));
+        }
+
+        // Get stats
+        ReviewStatsResponse stats = getReviewStats(user, null);
+
+        // Tính tổng số elements
+        long totalElements = progressPage.getTotalElements();
+        if (unlearnedPage != null) {
+            totalElements += unlearnedPage.getTotalElements();
+        }
+
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+
+        PagedReviewVocabResponse.PageMetadata meta = PagedReviewVocabResponse.PageMetadata.builder()
+                .page(page + 1) // Convert từ 0-based sang 1-based
+                .pageSize(size)
+                .totalItems(totalElements)
+                .totalPages(totalPages)
+                .hasNext(page < totalPages - 1)
+                .hasPrev(page > 0)
+                .newVocabs(stats.getNewVocabs())
+                .learningVocabs(stats.getLearningVocabs())
+                .masteredVocabs(stats.getMasteredVocabs())
+                .dueVocabs(0)
+                .build();
+
+        return PagedReviewVocabResponse.builder()
+                .vocabs(vocabs)
+                .meta(meta)
+                .build();
+    }
+
+    /**
+     * Lấy từ vựng để học theo topic cụ thể
+     * Thuật toán tương tự như getVocabsForLearning nhưng filter theo topic
+     */
+    @Transactional(readOnly = true)
+    public PagedReviewVocabResponse getVocabsForLearningByTopic(User user, String topicName, Integer page,
+            Integer size) {
+        log.info("Getting vocabs for learning by topic - user: {}, topic: {}, page: {}, size: {}",
+                user.getId(), topicName, page, size);
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        // 1. Lấy từ có status = NEW hoặc UNKNOWN theo topic (ưu tiên UNKNOWN trước)
+        Page<UserVocabProgress> progressPage = userVocabProgressRepository.findNewOrUnknownVocabsByTopicPaged(
+                user.getId(), topicName, pageable);
+
+        // 2. Nếu không đủ, lấy thêm từ chưa học trong topic
+        Page<Vocab> unlearnedPage = null;
+        if (progressPage.getContent().size() < size) {
+            int remaining = size - progressPage.getContent().size();
+            Pageable newPageable = PageRequest.of(0, remaining);
+            unlearnedPage = userVocabProgressRepository.findUnlearnedVocabsByTopicPaged(
+                    user.getId(), topicName, newPageable);
+        }
+
+        // 3. Map to response
+        List<ReviewVocabResponse> vocabs = new ArrayList<>();
+
+        // Thêm từ có status NEW/UNKNOWN
+        progressPage.getContent().stream()
+                .map(this::mapToReviewVocabResponse)
+                .forEach(vocabs::add);
+
+        // Sau đó thêm từ chưa học
+        if (unlearnedPage != null && !unlearnedPage.isEmpty()) {
+            unlearnedPage.getContent().forEach(vocab -> vocabs.add(mapVocabToReviewResponse(vocab)));
+        }
+
+        // Get stats
+        ReviewStatsResponse stats = getReviewStats(user, topicName);
+
+        // Tính tổng số elements
+        long totalElements = progressPage.getTotalElements();
+        if (unlearnedPage != null) {
+            totalElements += unlearnedPage.getTotalElements();
+        }
+
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+
+        PagedReviewVocabResponse.PageMetadata meta = PagedReviewVocabResponse.PageMetadata.builder()
+                .page(page + 1) // Convert từ 0-based sang 1-based
+                .pageSize(size)
+                .totalItems(totalElements)
+                .totalPages(totalPages)
+                .hasNext(page < totalPages - 1)
+                .hasPrev(page > 0)
+                .newVocabs(stats.getNewVocabs())
+                .learningVocabs(stats.getLearningVocabs())
+                .masteredVocabs(stats.getMasteredVocabs())
+                .dueVocabs(0)
+                .build();
+
+        return PagedReviewVocabResponse.builder()
+                .vocabs(vocabs)
+                .meta(meta)
+                .build();
     }
 }
