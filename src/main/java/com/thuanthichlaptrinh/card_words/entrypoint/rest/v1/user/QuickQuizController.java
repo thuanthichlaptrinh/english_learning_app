@@ -2,6 +2,7 @@ package com.thuanthichlaptrinh.card_words.entrypoint.rest.v1.user;
 
 import com.thuanthichlaptrinh.card_words.core.usecase.user.GameHistoryService;
 import com.thuanthichlaptrinh.card_words.core.usecase.user.QuickQuizService;
+import com.thuanthichlaptrinh.card_words.core.usecase.user.UserGameSettingService;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.game.QuickQuizAnswerRequest;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.game.QuickQuizStartRequest;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.ApiResponse;
@@ -33,6 +34,7 @@ public class QuickQuizController {
 
         private final QuickQuizService quickQuizService;
         private final GameHistoryService gameHistoryService;
+        private final UserGameSettingService userGameSettingService;
 
         @PostMapping("/start")
         @Operation(summary = "Bắt đầu game Quick Quiz", description = "Tạo phiên chơi mới với câu hỏi Multiple Choice (4 đáp án). Mỗi câu có 3 giây để trả lời.\n\n"
@@ -51,6 +53,42 @@ public class QuickQuizController {
 
                 return ResponseEntity.status(HttpStatus.CREATED)
                                 .body(ApiResponse.success("Bắt đầu game thành công!", response));
+        }
+
+        @PostMapping("/start-auto")
+        @Operation(summary = "Bắt đầu game Quick Quiz tự động", description = "Tạo phiên chơi mới tự động dựa trên game settings và CEFR level của user. Không cần request body.\n\n"
+                        +
+                        "**Tính điểm:**\n" +
+                        "- Base Points: 10 điểm/câu đúng\n" +
+                        "- Streak Bonus: +5 điểm cho mỗi 3 câu đúng liên tiếp\n" +
+                        "- Speed Bonus: +5 điểm nếu trả lời < 1.5 giây\n" +
+                        "- Max Points/Question: 20 điểm (base + speed + streak)\n\n" +
+                        "**Auto Settings:**\n" +
+                        "- Số câu hỏi: Từ game settings (mặc định: 10)\n" +
+                        "- Thời gian/câu: Từ game settings (mặc định: 3 giây)\n" +
+                        "- CEFR level: Từ user profile hiện tại", security = @SecurityRequirement(name = "Bearer Authentication"))
+        public ResponseEntity<ApiResponse<QuickQuizSessionResponse>> startGameAuto(
+                        Authentication authentication) {
+
+                UUID userId = getUserIdFromAuth(authentication);
+
+                // Lấy settings từ database hoặc dùng defaults
+                Integer totalQuestions = userGameSettingService.getQuickQuizTotalQuestions(userId);
+                Integer timePerQuestion = userGameSettingService.getQuickQuizTimePerQuestion(userId);
+                String cefrLevel = userGameSettingService.getUserCEFR(userId);
+
+                // Tạo request từ settings
+                QuickQuizStartRequest request = new QuickQuizStartRequest();
+                request.setTotalQuestions(totalQuestions);
+                request.setTimePerQuestion(timePerQuestion);
+                request.setCefr(cefrLevel);
+
+                QuickQuizSessionResponse response = quickQuizService.startGame(request, userId);
+
+                return ResponseEntity.status(HttpStatus.CREATED)
+                                .body(ApiResponse.success("Bắt đầu game tự động thành công! (Câu hỏi: "
+                                                + totalQuestions + ", Thời gian: " + timePerQuestion + "s, CEFR: "
+                                                + (cefrLevel != null ? cefrLevel : "ALL") + ")", response));
         }
 
         @PostMapping("/answer")

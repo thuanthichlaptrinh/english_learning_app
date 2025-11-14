@@ -2,6 +2,7 @@ package com.thuanthichlaptrinh.card_words.entrypoint.rest.v1.user;
 
 import com.thuanthichlaptrinh.card_words.core.usecase.user.GameHistoryService;
 import com.thuanthichlaptrinh.card_words.core.usecase.user.WordDefinitionMatchingService;
+import com.thuanthichlaptrinh.card_words.core.usecase.user.UserGameSettingService;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.game.WordDefinitionMatchingAnswerRequest;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.game.WordDefinitionMatchingStartRequest;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.LeaderboardEntryResponse;
@@ -32,6 +33,7 @@ public class WordDefinitionMatchingController {
 
     private final WordDefinitionMatchingService wordDefinitionMatchingService;
     private final GameHistoryService gameHistoryService;
+    private final UserGameSettingService userGameSettingService;
 
     @GetMapping("/instructions")
     @Operation(summary = "Hướng dẫn chơi", description = "Lấy thông tin chi tiết về cách chơi và cách tính điểm")
@@ -61,6 +63,36 @@ public class WordDefinitionMatchingController {
             @RequestBody WordDefinitionMatchingStartRequest request) {
         log.info("API: Start Word-Definition Matching game - pairs: {}, cefr: {}",
                 request.getTotalPairs(), request.getCefr());
+
+        WordDefinitionMatchingSessionResponse response = wordDefinitionMatchingService.startGame(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/start-auto")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Bắt đầu game ghép thẻ tự động", description = "Khởi tạo phiên chơi mới tự động dựa trên game settings và CEFR level của user. Không cần request body.\n\n"
+            + "**Auto Settings:**\n"
+            + "- Số cặp thẻ: Từ game settings (mặc định: 5)\n"
+            + "- CEFR level: Từ user profile hiện tại\n\n"
+            + "**Tính điểm:**\n"
+            + "- Điểm CEFR: A1=1, A2=2, B1=3, B2=4, C1=5, C2=6\n"
+            + "- Time Bonus: <10s +50%, <20s +30%, <30s +20%, <60s +10%")
+    public ResponseEntity<WordDefinitionMatchingSessionResponse> startGameAuto(
+            Authentication authentication) {
+        UUID userId = getUserIdFromAuth(authentication);
+
+        // Lấy settings từ database hoặc dùng defaults
+        Integer totalPairs = userGameSettingService.getWordDefinitionTotalPairs(userId);
+        String cefrLevel = userGameSettingService.getUserCEFR(userId);
+
+        // Tạo request từ settings
+        WordDefinitionMatchingStartRequest request = WordDefinitionMatchingStartRequest.builder()
+                .totalPairs(totalPairs)
+                .cefr(cefrLevel)
+                .build();
+
+        log.info("API: Start Word-Definition Matching game AUTO - userId: {}, pairs: {}, cefr: {}",
+                userId, totalPairs, cefrLevel);
 
         WordDefinitionMatchingSessionResponse response = wordDefinitionMatchingService.startGame(request);
         return ResponseEntity.ok(response);
