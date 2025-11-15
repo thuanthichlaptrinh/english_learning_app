@@ -43,4 +43,8 @@ public interface VocabRepository extends JpaRepository<Vocab, UUID> {
     @Query("SELECT DISTINCT v FROM Vocab v WHERE LOWER(v.topic.name) = LOWER(:topicName) AND v.cefr = :cefr")
     List<Vocab> findByTopicNameAndCefr(@Param("topicName") String topicName, @Param("cefr") String cefr);
 
+    // Đếm tổng số từ vựng trong một topic
+    @Query("SELECT COUNT(v) FROM Vocab v WHERE v.topic.id = :topicId")
+    long countByTopicId(@Param("topicId") Long topicId);
+
 }

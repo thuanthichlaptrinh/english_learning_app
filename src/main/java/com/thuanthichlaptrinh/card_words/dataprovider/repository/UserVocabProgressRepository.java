@@ -280,4 +280,13 @@ public interface UserVocabProgressRepository extends JpaRepository<UserVocabProg
                         "WHERE LOWER(v.topic.name) = LOWER(:topicName) " +
                         "AND v.id NOT IN (SELECT uvp.vocab.id FROM UserVocabProgress uvp WHERE uvp.user.id = :userId)")
         long countUnlearnedVocabsByTopic(@Param("userId") UUID userId, @Param("topicName") String topicName);
+
+        // === QUERIES FOR TOPIC PROGRESS CALCULATION ===
+        // Đếm số từ vựng có trong bảng user_vocab_progress của user theo topic
+        // (Tất cả records trong user_vocab_progress, không phân biệt status)
+        @Query("SELECT COUNT(uvp) FROM UserVocabProgress uvp " +
+                        "JOIN uvp.vocab v " +
+                        "WHERE uvp.user.id = :userId " +
+                        "AND v.topic.id = :topicId")
+        long countLearnedVocabsByUserAndTopic(@Param("userId") UUID userId, @Param("topicId") Long topicId);
 }
