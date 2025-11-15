@@ -258,4 +258,26 @@ public interface UserVocabProgressRepository extends JpaRepository<UserVocabProg
                         @Param("userId") UUID userId,
                         @Param("topicName") String topicName,
                         org.springframework.data.domain.Pageable pageable);
+
+        // Count queries for pagination validation
+        @Query("SELECT COUNT(uvp) FROM UserVocabProgress uvp " +
+                        "WHERE uvp.user.id = :userId " +
+                        "AND (uvp.status = 'NEW' OR uvp.status = 'UNKNOWN')")
+        long countNewOrUnknownVocabs(@Param("userId") UUID userId);
+
+        @Query("SELECT COUNT(v) FROM Vocab v " +
+                        "WHERE v.id NOT IN (SELECT uvp.vocab.id FROM UserVocabProgress uvp WHERE uvp.user.id = :userId)")
+        long countAllUnlearnedVocabs(@Param("userId") UUID userId);
+
+        @Query("SELECT COUNT(uvp) FROM UserVocabProgress uvp " +
+                        "JOIN uvp.vocab v " +
+                        "WHERE uvp.user.id = :userId " +
+                        "AND LOWER(v.topic.name) = LOWER(:topicName) " +
+                        "AND (uvp.status = 'NEW' OR uvp.status = 'UNKNOWN')")
+        long countNewOrUnknownVocabsByTopic(@Param("userId") UUID userId, @Param("topicName") String topicName);
+
+        @Query("SELECT COUNT(v) FROM Vocab v " +
+                        "WHERE LOWER(v.topic.name) = LOWER(:topicName) " +
+                        "AND v.id NOT IN (SELECT uvp.vocab.id FROM UserVocabProgress uvp WHERE uvp.user.id = :userId)")
+        long countUnlearnedVocabsByTopic(@Param("userId") UUID userId, @Param("topicName") String topicName);
 }
