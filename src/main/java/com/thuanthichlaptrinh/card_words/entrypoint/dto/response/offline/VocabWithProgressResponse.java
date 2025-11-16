@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 // import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -26,7 +26,8 @@ public class VocabWithProgressResponse {
     private String exampleSentence;
     private String cefr;
     private String interpret;
-    private List<String> wordTypes;
+    private Set<TypeInfo> types;
+    private TopicInfo topic;
     private String credit;
 
     // User progress (if exists)
@@ -36,4 +37,22 @@ public class VocabWithProgressResponse {
     // private Double easeFactor;
     // private Integer repetitions;
     // private Integer interval;
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TypeInfo {
+        private Long id;
+        private String name;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TopicInfo {
+        private Long id;
+        private String name;
+    }
 }

@@ -46,7 +46,9 @@ public class LearnVocabService {
     public PagedReviewVocabResponse getReviewVocabsPaged(User user, GetReviewVocabsRequest request) {
         log.info("Getting paged review vocabs for user: {}, request: {}", user.getId(), request);
 
-        Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
+        // Convert 1-based page to 0-based for PageRequest
+        int zeroBasedPage = Math.max(0, request.getPage() - 1);
+        Pageable pageable = PageRequest.of(zeroBasedPage, request.getSize());
 
         Page<UserVocabProgress> progressPage;
         Page<Vocab> unlearnedPage = null;
@@ -122,7 +124,7 @@ public class LearnVocabService {
         int totalPages = (int) Math.ceil((double) totalElements / request.getSize());
 
         PagedReviewVocabResponse.PageMetadata meta = PagedReviewVocabResponse.PageMetadata.builder()
-                .page(request.getPage() + 1) // Convert từ 0-based sang 1-based
+                .page(request.getPage())
                 .pageSize(request.getSize())
                 .totalItems(totalElements)
                 .totalPages(totalPages)
@@ -447,10 +449,16 @@ public class LearnVocabService {
                 .cefr(vocab.getCefr())
                 .img(vocab.getImg())
                 .audio(vocab.getAudio())
-                .topics(vocab.getTopic() != null ? List.of(vocab.getTopic().getName()) : List.of())
+                .topic(vocab.getTopic() != null ? ReviewVocabResponse.TopicInfo.builder()
+                        .id(vocab.getTopic().getId())
+                        .name(vocab.getTopic().getName())
+                        .build() : null)
                 .types(vocab.getTypes().stream()
-                        .map(type -> type.getName())
-                        .collect(Collectors.toList()))
+                        .map(type -> ReviewVocabResponse.TypeInfo.builder()
+                                .id(type.getId())
+                                .name(type.getName())
+                                .build())
+                        .collect(Collectors.toSet()))
                 .status(progress.getStatus())
                 .timesCorrect(progress.getTimesCorrect())
                 .timesWrong(progress.getTimesWrong())
@@ -471,10 +479,16 @@ public class LearnVocabService {
                 .cefr(vocab.getCefr())
                 .img(vocab.getImg())
                 .audio(vocab.getAudio())
-                .topics(vocab.getTopic() != null ? List.of(vocab.getTopic().getName()) : List.of())
+                .topic(vocab.getTopic() != null ? ReviewVocabResponse.TopicInfo.builder()
+                        .id(vocab.getTopic().getId())
+                        .name(vocab.getTopic().getName())
+                        .build() : null)
                 .types(vocab.getTypes().stream()
-                        .map(type -> type.getName())
-                        .collect(Collectors.toList()))
+                        .map(type -> ReviewVocabResponse.TypeInfo.builder()
+                                .id(type.getId())
+                                .name(type.getName())
+                                .build())
+                        .collect(Collectors.toSet()))
                 .status(VocabStatus.NEW) // Từ mới chưa có trong user_vocab_progress
                 .timesCorrect(0)
                 .timesWrong(0)
@@ -511,6 +525,9 @@ public class LearnVocabService {
     public PagedReviewVocabResponse getVocabsForLearning(User user, Integer page, Integer size) {
         log.info("Getting vocabs for learning - user: {}, page: {}, size: {}", user.getId(), page, size);
 
+        // Convert 1-based page to 0-based for PageRequest
+        int zeroBasedPage = Math.max(0, page - 1);
+
         // Đếm tổng số từ trước để validate page
         long totalProgressElements = userVocabProgressRepository.countNewOrUnknownVocabs(user.getId());
         long totalUnlearnedElements = userVocabProgressRepository.countAllUnlearnedVocabs(user.getId());
@@ -518,12 +535,12 @@ public class LearnVocabService {
         int totalPages = (int) Math.ceil((double) totalElements / size);
 
         // Nếu page vượt quá totalPages, trả về trang rỗng
-        if (page >= totalPages && totalPages > 0) {
+        if (zeroBasedPage >= totalPages && totalPages > 0) {
             log.warn("Page {} exceeds total pages {}. Returning empty page.", page, totalPages);
             ReviewStatsResponse stats = getReviewStats(user, null);
 
             PagedReviewVocabResponse.PageMetadata meta = PagedReviewVocabResponse.PageMetadata.builder()
-                    .page(page + 1)
+                    .page(page)
                     .pageSize(size)
                     .totalItems(totalElements)
                     .totalPages(totalPages)
@@ -541,7 +558,7 @@ public class LearnVocabService {
                     .build();
         }
 
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(zeroBasedPage, size);
 
         // 1. Lấy từ có status = NEW hoặc UNKNOWN (ưu tiên UNKNOWN trước)
         Page<UserVocabProgress> progressPage = userVocabProgressRepository.findNewOrUnknownVocabsPaged(
@@ -572,12 +589,12 @@ public class LearnVocabService {
         ReviewStatsResponse stats = getReviewStats(user, null);
 
         PagedReviewVocabResponse.PageMetadata meta = PagedReviewVocabResponse.PageMetadata.builder()
-                .page(page + 1) // Convert từ 0-based sang 1-based
+                .page(page)
                 .pageSize(size)
                 .totalItems(totalElements)
                 .totalPages(totalPages)
-                .hasNext(page < totalPages - 1)
-                .hasPrev(page > 0)
+                .hasNext(zeroBasedPage < totalPages - 1)
+                .hasPrev(page > 1)
                 .newVocabs(stats.getNewVocabs())
                 .learningVocabs(stats.getLearningVocabs())
                 .masteredVocabs(stats.getMasteredVocabs())
@@ -600,6 +617,9 @@ public class LearnVocabService {
         log.info("Getting vocabs for learning by topic - user: {}, topic: {}, page: {}, size: {}",
                 user.getId(), topicName, page, size);
 
+        // Convert 1-based page to 0-based for PageRequest
+        int zeroBasedPage = Math.max(0, page - 1);
+
         // Đếm tổng số từ trước để validate page
         long totalProgressElements = userVocabProgressRepository.countNewOrUnknownVocabsByTopic(user.getId(),
                 topicName);
@@ -608,17 +628,17 @@ public class LearnVocabService {
         int totalPages = (int) Math.ceil((double) totalElements / size);
 
         // Nếu page vượt quá totalPages, trả về trang rỗng
-        if (page >= totalPages && totalPages > 0) {
+        if (zeroBasedPage >= totalPages && totalPages > 0) {
             log.warn("Page {} exceeds total pages {} for topic {}. Returning empty page.", page, totalPages, topicName);
             ReviewStatsResponse stats = getReviewStats(user, topicName);
 
             PagedReviewVocabResponse.PageMetadata meta = PagedReviewVocabResponse.PageMetadata.builder()
-                    .page(page + 1)
+                    .page(page)
                     .pageSize(size)
                     .totalItems(totalElements)
                     .totalPages(totalPages)
                     .hasNext(false)
-                    .hasPrev(page > 0)
+                    .hasPrev(page > 1)
                     .newVocabs(stats.getNewVocabs())
                     .learningVocabs(stats.getLearningVocabs())
                     .masteredVocabs(stats.getMasteredVocabs())
@@ -631,7 +651,7 @@ public class LearnVocabService {
                     .build();
         }
 
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(zeroBasedPage, size);
 
         // 1. Lấy từ có status = NEW hoặc UNKNOWN theo topic (ưu tiên UNKNOWN trước)
         Page<UserVocabProgress> progressPage = userVocabProgressRepository.findNewOrUnknownVocabsByTopicPaged(
@@ -663,12 +683,12 @@ public class LearnVocabService {
         ReviewStatsResponse stats = getReviewStats(user, topicName);
 
         PagedReviewVocabResponse.PageMetadata meta = PagedReviewVocabResponse.PageMetadata.builder()
-                .page(page + 1) // Convert từ 0-based sang 1-based
+                .page(page)
                 .pageSize(size)
                 .totalItems(totalElements)
                 .totalPages(totalPages)
-                .hasNext(page < totalPages - 1)
-                .hasPrev(page > 0)
+                .hasNext(zeroBasedPage < totalPages - 1)
+                .hasPrev(page > 1)
                 .newVocabs(stats.getNewVocabs())
                 .learningVocabs(stats.getLearningVocabs())
                 .masteredVocabs(stats.getMasteredVocabs())

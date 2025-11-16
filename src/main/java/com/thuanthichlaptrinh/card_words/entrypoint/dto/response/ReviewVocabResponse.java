@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -45,11 +45,11 @@ public class ReviewVocabResponse {
     @Schema(description = "URL file audio phát âm")
     private String audio;
 
-    @Schema(description = "Danh sách chủ đề của từ vựng")
-    private List<String> topics;
+    @Schema(description = "Thông tin chủ đề của từ vựng")
+    private TopicInfo topic;
 
     @Schema(description = "Danh sách loại từ (noun, verb, adjective...)")
-    private List<String> types;
+    private Set<TypeInfo> types;
 
     @Schema(description = "Trạng thái học tập (NEW, KNOWN, UNKNOWN, MASTERED)")
     private VocabStatus status;
@@ -68,4 +68,30 @@ public class ReviewVocabResponse {
 
     @Schema(description = "Số ngày đến lần ôn tập tiếp theo")
     private Integer intervalDays;
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Schema(description = "Thông tin loại từ")
+    public static class TypeInfo {
+        @Schema(description = "ID của loại từ")
+        private Long id;
+
+        @Schema(description = "Tên loại từ")
+        private String name;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Schema(description = "Thông tin chủ đề")
+    public static class TopicInfo {
+        @Schema(description = "ID của chủ đề")
+        private Long id;
+
+        @Schema(description = "Tên chủ đề")
+        private String name;
+    }
 }

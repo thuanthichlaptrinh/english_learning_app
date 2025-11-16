@@ -24,8 +24,7 @@ public class TopicProgressCalculator {
 
     /**
      * Tính % tiến độ học từ vựng của user trong một topic
-     * Progress = (Số từ có trong user_vocab_progress / Tổng số từ trong topic) ×
-     * 100
+     * Progress = (Số từ đã thuộc (KNOWN/MASTERED) / Tổng số từ trong topic) × 100
      * 
      * @param userId  ID của user
      * @param topicId ID của topic
@@ -41,28 +40,26 @@ public class TopicProgressCalculator {
             return 0.0;
         }
 
-        // Đếm số từ vựng có trong bảng user_vocab_progress của user trong topic này
-        // (tất cả từ đã xuất hiện trong progress, không phân biệt status)
-        long vocabsInProgress = userVocabProgressRepository.countLearnedVocabsByUserAndTopic(userId, topicId);
+        // Đếm số từ vựng đã thuộc (status = KNOWN hoặc MASTERED)
+        long learnedVocabs = userVocabProgressRepository.countLearnedVocabsByUserAndTopic(userId, topicId);
 
         // Tính phần trăm
-        double progress = (vocabsInProgress * 100.0) / totalVocabs;
+        double progress = (learnedVocabs * 100.0) / totalVocabs;
 
         log.debug("Topic {} progress cho user {}: {}/{} = {}%",
-                topicId, userId, vocabsInProgress, totalVocabs, String.format("%.2f", progress));
+                topicId, userId, learnedVocabs, totalVocabs, String.format("%.2f", progress));
 
         return Math.round(progress * 100.0) / 100.0; // Làm tròn đến 2 chữ số thập phân
     }
 
     /**
      * Kiểm tra xem user có hoàn thành topic hay chưa
-     * Topic được coi là hoàn thành khi tất cả từ vựng đã có trong
-     * user_vocab_progress
+     * Topic được coi là hoàn thành khi tất cả từ vựng đã thuộc (KNOWN hoặc
+     * MASTERED)
      * 
      * @param userId  ID của user
      * @param topicId ID của topic
-     * @return true nếu tất cả từ vựng trong topic đã xuất hiện trong
-     *         user_vocab_progress
+     * @return true nếu tất cả từ vựng trong topic đã thuộc
      */
     public boolean isTopicCompleted(UUID userId, Long topicId) {
         long totalVocabs = vocabRepository.countByTopicId(topicId);
@@ -70,21 +67,21 @@ public class TopicProgressCalculator {
             return false;
         }
 
-        long vocabsInProgress = userVocabProgressRepository.countLearnedVocabsByUserAndTopic(userId, topicId);
-        return vocabsInProgress >= totalVocabs;
+        long learnedVocabs = userVocabProgressRepository.countLearnedVocabsByUserAndTopic(userId, topicId);
+        return learnedVocabs >= totalVocabs;
     }
 
     /**
-     * Lấy số lượng từ vựng trong user_vocab_progress và tổng số từ vựng trong topic
+     * Lấy số lượng từ vựng đã thuộc và tổng số từ vựng trong topic
      * 
      * @param userId  ID của user
      * @param topicId ID của topic
-     * @return Mảng [vocabsInProgress, totalVocabs]
+     * @return Mảng [learnedVocabs, totalVocabs]
      */
     public long[] getTopicProgressCounts(UUID userId, Long topicId) {
         long totalVocabs = vocabRepository.countByTopicId(topicId);
-        long vocabsInProgress = userVocabProgressRepository.countLearnedVocabsByUserAndTopic(userId, topicId);
+        long learnedVocabs = userVocabProgressRepository.countLearnedVocabsByUserAndTopic(userId, topicId);
 
-        return new long[] { vocabsInProgress, totalVocabs };
+        return new long[] { learnedVocabs, totalVocabs };
     }
 }

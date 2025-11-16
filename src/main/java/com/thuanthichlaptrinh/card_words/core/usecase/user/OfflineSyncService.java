@@ -49,7 +49,7 @@ public class OfflineSyncService {
                 continue;
             }
 
-            // Count learned vocabs (status = LEARNED or REVIEWING)
+            // Count learned vocabs (chỉ tính KNOWN và MASTERED)
             int learnedCount = 0;
             for (Vocab vocab : vocabs) {
                 Optional<UserVocabProgress> progress = userVocabProgressRepository.findByUserIdAndVocabId(userId,
@@ -57,9 +57,8 @@ public class OfflineSyncService {
 
                 if (progress.isPresent()) {
                     VocabStatus status = progress.get().getStatus();
-                    // Consider KNOWN and MASTERED as "learned"
-                    if (status == VocabStatus.NEW || status == VocabStatus.UNKNOWN || status == VocabStatus.KNOWN
-                            || status == VocabStatus.MASTERED) {
+                    // Chỉ tính KNOWN và MASTERED là đã thuộc
+                    if (status == VocabStatus.KNOWN || status == VocabStatus.MASTERED) {
                         learnedCount++;
                     }
                 }
@@ -291,6 +290,16 @@ public class OfflineSyncService {
                 .transcription(vocab.getTranscription())
                 .interpret(vocab.getInterpret())
                 .exampleSentence(vocab.getExampleSentence())
+                .types(vocab.getTypes().stream()
+                        .map(type -> VocabWithProgressResponse.TypeInfo.builder()
+                                .id(type.getId())
+                                .name(type.getName())
+                                .build())
+                        .collect(java.util.stream.Collectors.toSet()))
+                .topic(vocab.getTopic() != null ? VocabWithProgressResponse.TopicInfo.builder()
+                        .id(vocab.getTopic().getId())
+                        .name(vocab.getTopic().getName())
+                        .build() : null)
                 .credit(vocab.getCredit());
 
         // // Add user progress if exists

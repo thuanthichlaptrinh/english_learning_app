@@ -16,6 +16,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -53,9 +56,9 @@ public class LearnVocabController {
               - Ôn lại các từ chưa thuộc
       - Mở rộng vốn từ vựng
       """, security = @SecurityRequirement(name = "Bearer Authentication"))
-  public ResponseEntity<ApiResponse2<java.util.List<ReviewVocabResponse>>> getLearnVocabs(
+  public ResponseEntity<ApiResponse2<List<ReviewVocabResponse>>> getLearnVocabs(
       @AuthenticationPrincipal User user,
-      @Parameter(description = "Số trang (bắt đầu từ 0)", example = "0") @RequestParam(defaultValue = "0") Integer page,
+      @Parameter(description = "Số trang (bắt đầu từ 1)", example = "1") @RequestParam(defaultValue = "1") Integer page,
       @Parameter(description = "Số lượng từ trên mỗi trang", example = "20") @RequestParam(defaultValue = "20") Integer size) {
 
     PagedReviewVocabResponse response = learnVocabService.getVocabsForLearning(user, page, size);
@@ -113,10 +116,10 @@ public class LearnVocabController {
               - Chuẩn bị cho các tình huống cụ thể (du lịch, công việc...)
       - Tập trung ôn tập một lĩnh vực
       """, security = @SecurityRequirement(name = "Bearer Authentication"))
-  public ResponseEntity<ApiResponse2<java.util.List<ReviewVocabResponse>>> getLearnVocabsByTopic(
+  public ResponseEntity<ApiResponse2<List<ReviewVocabResponse>>> getLearnVocabsByTopic(
       @AuthenticationPrincipal User user,
       @Parameter(description = "Tên của topic", example = "Animals") @PathVariable String topicName,
-      @Parameter(description = "Số trang (bắt đầu từ 0)", example = "0") @RequestParam(defaultValue = "0") Integer page,
+      @Parameter(description = "Số trang (bắt đầu từ 1)", example = "1") @RequestParam(defaultValue = "1") Integer page,
       @Parameter(description = "Số lượng từ trên mỗi trang", example = "20") @RequestParam(defaultValue = "20") Integer size) {
 
     PagedReviewVocabResponse response = learnVocabService.getVocabsForLearningByTopic(user, topicName,
@@ -160,7 +163,7 @@ public class LearnVocabController {
   public ResponseEntity<ApiResponse<PagedReviewVocabResponse>> getNewVocabs(
       @AuthenticationPrincipal User user,
       @Parameter(description = "Tên của topic (tùy chọn)", example = "Animals") @RequestParam(required = false) String topicName,
-      @Parameter(description = "Số trang (bắt đầu từ 0)", example = "0") @RequestParam(defaultValue = "0") Integer page,
+      @Parameter(description = "Số trang (bắt đầu từ 1)", example = "1") @RequestParam(defaultValue = "1") Integer page,
       @Parameter(description = "Số lượng từ trên mỗi trang", example = "10") @RequestParam(defaultValue = "10") Integer size) {
 
     GetReviewVocabsRequest request = GetReviewVocabsRequest.builder()
@@ -211,7 +214,7 @@ public class LearnVocabController {
   public ResponseEntity<ApiResponse<PagedReviewVocabResponse>> getVocabsByTopic(
       @AuthenticationPrincipal User user,
       @Parameter(description = "Tên của topic", example = "Animals") @PathVariable String topicName,
-      @Parameter(description = "Số trang (bắt đầu từ 0)", example = "0") @RequestParam(defaultValue = "0") Integer page,
+      @Parameter(description = "Số trang (bắt đầu từ 1)", example = "1") @RequestParam(defaultValue = "1") Integer page,
       @Parameter(description = "Số lượng từ trên mỗi trang", example = "20") @RequestParam(defaultValue = "20") Integer size) {
 
     GetReviewVocabsRequest request = GetReviewVocabsRequest.builder()
