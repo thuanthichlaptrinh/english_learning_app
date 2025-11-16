@@ -11,6 +11,10 @@ import com.thuanthichlaptrinh.card_words.core.usecase.admin.UserAdminService;
 import com.thuanthichlaptrinh.card_words.common.constants.PredefinedRole;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.user.UpdateRolesRequest;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.ApiResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.admin.AdminDashboardResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.admin.GameStatsSummary;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.admin.ResetPasswordResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.admin.SystemOverviewResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.user.UserAdminResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.user.UserStatisticsResponse;
 
@@ -44,15 +48,52 @@ public class UserAdminController {
                 return ResponseEntity.ok(ApiResponse.success("Lấy danh sách người dùng thành công", response));
         }
 
-        @GetMapping("/{id}")
-        @Operation(summary = "[Admin] Lấy thông tin người dùng theo ID", description = "Lấy thông tin chi tiết của một người dùng theo UUID\n\n"
+        @GetMapping("/statistics")
+        @Operation(summary = "[Admin] Thống kê người dùng", description = "Lấy thống kê tổng quan về người dùng trong hệ thống\n\n"
                         +
-                        "**URL**: `GET http://localhost:8080/api/v1/admin/users/{id}`\n\n" +
-                        "**Example**: `GET http://localhost:8080/api/v1/admin/users/123e4567-e89b-12d3-a456-426614174000`")
-        public ResponseEntity<ApiResponse<UserAdminResponse>> getUserById(
-                        @Parameter(description = "ID của người dùng (UUID)") @PathVariable UUID id) {
-                UserAdminResponse response = userAdminService.getUserById(id);
-                return ResponseEntity.ok(ApiResponse.success("Lấy thông tin người dùng thành công", response));
+                        "**URL**: `GET http://localhost:8080/api/v1/admin/users/statistics`")
+        public ResponseEntity<ApiResponse<UserStatisticsResponse>> getUserStatistics() {
+                UserStatisticsResponse stats = userAdminService.getUserStatistics();
+                return ResponseEntity.ok(ApiResponse.success("Lấy thống kê thành công", stats));
+        }
+
+        @GetMapping("/registration-chart")
+        @Operation(summary = "[Admin] Biểu đồ đăng ký người dùng theo ngày", description = "Lấy thống kê số người dùng đăng ký theo từng ngày và top học viên:\n"
+                        +
+                        "- Tổng số người dùng, từ vựng, thông báo, phiên học\n" +
+                        "- Biểu đồ số người đăng ký theo ngày\n" +
+                        "- Top 10 học viên giỏi nhất\n\n" +
+                        "**URL**: `GET http://localhost:8080/api/v1/admin/users/registration-chart?days=30`")
+        public ResponseEntity<ApiResponse<AdminDashboardResponse>> getUserRegistrationChart(
+                        @Parameter(description = "Số ngày thống kê (mặc định 30 ngày)") @RequestParam(defaultValue = "30") int days) {
+                AdminDashboardResponse response = userAdminService
+                                .getUserRegistrationChartWithTopLearners(days);
+                return ResponseEntity.ok(ApiResponse.success("Lấy biểu đồ đăng ký thành công", response));
+        }
+
+        @GetMapping("/system-overview")
+        @Operation(summary = "[Admin] Tổng quan hệ thống", description = "Lấy thống kê tổng quan toàn bộ hệ thống:\n" +
+                        "- Tổng số người dùng, người dùng hoạt động hôm nay\n" +
+                        "- Tổng số từ vựng, chủ đề\n" +
+                        "- Tổng số phiên chơi game, điểm trung bình, điểm cao nhất\n" +
+                        "- Tổng số từ đã học\n\n" +
+                        "**URL**: `GET http://localhost:8080/api/v1/admin/users/system-overview`")
+        public ResponseEntity<ApiResponse<SystemOverviewResponse>> getSystemOverview() {
+                SystemOverviewResponse overview = userAdminService
+                                .getSystemOverview();
+                return ResponseEntity.ok(ApiResponse.success("Lấy tổng quan hệ thống thành công", overview));
+        }
+
+        @GetMapping("/game-stats")
+        @Operation(summary = "[Admin] Thống kê các game", description = "Lấy thống kê tổng hợp của tất cả các game:\n" +
+                        "- Tổng số phiên chơi, phiên hoàn thành\n" +
+                        "- Điểm trung bình, điểm cao nhất\n" +
+                        "- Độ chính xác trung bình\n\n" +
+                        "**URL**: `GET http://localhost:8080/api/v1/admin/users/game-stats`")
+        public ResponseEntity<ApiResponse<java.util.List<GameStatsSummary>>> getGameStats() {
+                java.util.List<GameStatsSummary> gameStats = userAdminService
+                                .getGameStatsSummary();
+                return ResponseEntity.ok(ApiResponse.success("Lấy thống kê game thành công", gameStats));
         }
 
         @GetMapping("/email/{email}")
@@ -121,6 +162,18 @@ public class UserAdminController {
                 return ResponseEntity.ok(ApiResponse.success("Cập nhật role thành công", response));
         }
 
+        @PostMapping("/{id}/reset-password")
+        @Operation(summary = "[Admin] Reset mật khẩu người dùng", description = "Reset mật khẩu của người dùng - tạo mật khẩu mới và gửi về email\n\n"
+                        +
+                        "**URL**: `POST http://localhost:8080/api/v1/admin/users/{id}/reset-password`\n\n" +
+                        "**Example**: `POST http://localhost:8080/api/v1/admin/users/123e4567-e89b-12d3-a456-426614174000/reset-password`")
+        public ResponseEntity<ApiResponse<ResetPasswordResponse>> resetUserPassword(
+                        @Parameter(description = "ID người dùng") @PathVariable UUID id) {
+                ResetPasswordResponse response = userAdminService
+                                .resetUserPassword(id);
+                return ResponseEntity.ok(ApiResponse.success("Reset mật khẩu thành công", response));
+        }
+
         @DeleteMapping("/{id}")
         @Operation(summary = "[Admin] Xóa người dùng", description = "Xóa vĩnh viễn người dùng khỏi hệ thống\n\n" +
                         "**URL**: `DELETE http://localhost:8080/api/v1/admin/users/{id}`\n\n" +
@@ -131,13 +184,15 @@ public class UserAdminController {
                 return ResponseEntity.ok(ApiResponse.success("Xóa người dùng thành công", null));
         }
 
-        @GetMapping("/statistics")
-        @Operation(summary = "[Admin] Thống kê người dùng", description = "Lấy thống kê tổng quan về người dùng trong hệ thống\n\n"
+        @GetMapping("/{id}")
+        @Operation(summary = "[Admin] Lấy thông tin người dùng theo ID", description = "Lấy thông tin chi tiết của một người dùng theo UUID\n\n"
                         +
-                        "**URL**: `GET http://localhost:8080/api/v1/admin/users/statistics`")
-        public ResponseEntity<ApiResponse<UserStatisticsResponse>> getUserStatistics() {
-                UserStatisticsResponse stats = userAdminService.getUserStatistics();
-                return ResponseEntity.ok(ApiResponse.success("Lấy thống kê thành công", stats));
+                        "**URL**: `GET http://localhost:8080/api/v1/admin/users/{id}`\n\n" +
+                        "**Example**: `GET http://localhost:8080/api/v1/admin/users/123e4567-e89b-12d3-a456-426614174000`")
+        public ResponseEntity<ApiResponse<UserAdminResponse>> getUserById(
+                        @Parameter(description = "ID của người dùng (UUID)") @PathVariable UUID id) {
+                UserAdminResponse response = userAdminService.getUserById(id);
+                return ResponseEntity.ok(ApiResponse.success("Lấy thông tin người dùng thành công", response));
         }
 
 }
