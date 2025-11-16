@@ -47,7 +47,7 @@ import java.time.format.DateTimeFormatter;
 @RequestMapping(path = "/api/v1/admin/vocabs")
 @RequiredArgsConstructor
 @Tag(name = "Vocab Admin", description = "API quản lý từ vựng cho admin")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 @SecurityRequirement(name = "Bearer Authentication")
 public class VocabAdminController {
         private final VocabService vocabService;

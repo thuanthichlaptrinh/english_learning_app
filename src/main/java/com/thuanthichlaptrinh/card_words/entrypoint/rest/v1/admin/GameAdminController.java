@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping(path = "/api/v1/admin/games")
 @RequiredArgsConstructor
 @Tag(name = "Game Admin", description = "API quản lý game cho admin")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 @SecurityRequirement(name = "Bearer Authentication")
 public class GameAdminController {
 

@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping(path = "/api/v1/admin/types")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 @SecurityRequirement(name = "Bearer Authentication")
 @Tag(name = "Type Admin", description = "API quản lý loại từ cho admin")
 public class TypeAdminController {

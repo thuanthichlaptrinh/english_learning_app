@@ -96,7 +96,7 @@ public class User extends BaseUUIDEntity implements UserDetails {
     private Integer totalStudyDays = 0;
 
     @Builder.Default
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"), indexes = {
             @Index(name = "idx_user_roles_user_id", columnList = "user_id"),
             @Index(name = "idx_user_roles_role_id", columnList = "role_id")
