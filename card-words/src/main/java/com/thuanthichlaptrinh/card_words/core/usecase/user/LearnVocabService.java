@@ -262,7 +262,7 @@ public class LearnVocabService {
         String message = generateMessage(request.getIsCorrect(), progress.getStatus());
 
         return ReviewResultResponse.builder()
-                .vocabId(progress.getVocab().getId())
+                .id(progress.getVocab().getId())
                 .word(progress.getVocab().getWord())
                 .status(progress.getStatus())
                 .timesCorrect(progress.getTimesCorrect())
@@ -440,7 +440,7 @@ public class LearnVocabService {
         Vocab vocab = progress.getVocab();
 
         return ReviewVocabResponse.builder()
-                .vocabId(vocab.getId())
+                .id(vocab.getId())
                 .word(vocab.getWord())
                 .transcription(vocab.getTranscription())
                 .meaningVi(vocab.getMeaningVi())
@@ -470,7 +470,7 @@ public class LearnVocabService {
 
     private ReviewVocabResponse mapVocabToReviewResponse(Vocab vocab) {
         return ReviewVocabResponse.builder()
-                .vocabId(vocab.getId())
+                .id(vocab.getId())
                 .word(vocab.getWord())
                 .transcription(vocab.getTranscription())
                 .meaningVi(vocab.getMeaningVi())

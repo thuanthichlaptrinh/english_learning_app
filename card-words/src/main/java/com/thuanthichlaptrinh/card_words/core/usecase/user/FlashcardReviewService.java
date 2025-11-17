@@ -133,7 +133,7 @@ public class FlashcardReviewService {
         String message = generateReviewMessage(request.getQuality(), progress.getIntervalDays());
 
         return ReviewResultResponse.builder()
-                .vocabId(progress.getVocab().getId())
+                .id(progress.getVocab().getId())
                 .word(progress.getVocab().getWord())
                 .quality(request.getQuality())
                 .timesCorrect(progress.getTimesCorrect())
@@ -247,7 +247,7 @@ public class FlashcardReviewService {
     private FlashcardResponse mapToFlashcardResponse(UserVocabProgress progress) {
         Vocab vocab = progress.getVocab();
         return FlashcardResponse.builder()
-                .vocabId(vocab.getId())
+                .id(vocab.getId())
                 .word(vocab.getWord())
                 .transcription(vocab.getTranscription())
                 .meaningVi(vocab.getMeaningVi())

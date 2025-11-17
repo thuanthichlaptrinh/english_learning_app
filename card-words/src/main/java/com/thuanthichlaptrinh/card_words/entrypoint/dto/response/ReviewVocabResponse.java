@@ -19,7 +19,7 @@ import java.util.UUID;
 public class ReviewVocabResponse {
 
     @Schema(description = "ID của từ vựng")
-    private UUID vocabId;
+    private UUID id;
 
     @Schema(description = "Từ vựng (tiếng Anh)")
     private String word;

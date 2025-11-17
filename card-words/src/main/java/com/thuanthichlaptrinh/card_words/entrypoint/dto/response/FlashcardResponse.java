@@ -16,7 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FlashcardResponse {
-    private UUID vocabId;
+    private UUID id;
     private String word;
     private String transcription;
     private String meaningVi;

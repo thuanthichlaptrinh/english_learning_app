@@ -15,7 +15,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ReviewResultResponse {
 
-    private UUID vocabId;
+    private UUID id;
     private String word;
     private Integer quality;
 
