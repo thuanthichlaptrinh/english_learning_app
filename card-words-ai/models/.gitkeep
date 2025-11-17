@@ -1,0 +1,4 @@
+# Models directory
+# Place your trained ML models here:
+# - lightgbm_vocab_predictor.txt
+# - feature_names.json

@@ -1,0 +1,222 @@
+# docker-compose.yml for card-words-services monorepo
+# Combines card-words (Spring Boot) and card-words-ai (Python FastAPI)
+
+services:
+    # ============================================
+    # DATABASE SERVICES
+    # ============================================
+
+    # PostgreSQL Database
+    postgres:
+        container_name: card-words-postgres
+        image: postgres:16-alpine
+        environment:
+            - POSTGRES_USER=${POSTGRES_USER}
+            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+            - POSTGRES_DB=${POSTGRES_DB}
+        ports:
+            - '${POSTGRES_EXTERNAL_PORT}:5432' # External:Internal (avoid conflict with local postgres)
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        networks:
+            - card-words-network
+        healthcheck:
+            test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
+            interval: 10s
+            timeout: 5s
+            retries: 5
+        restart: unless-stopped
+
+    # PgAdmin - PostgreSQL GUI
+    pgadmin:
+        container_name: card-words-pgadmin
+        image: dpage/pgadmin4:latest
+        environment:
+            - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+            - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+        ports:
+            - '${PGADMIN_PORT}:80'
+        volumes:
+            - pgadmin_data:/root/.pgadmin
+        depends_on:
+            postgres:
+                condition: service_healthy
+        networks:
+            - card-words-network
+        restart: unless-stopped
+
+    # ============================================
+    # CACHE SERVICES
+    # ============================================
+
+    # Redis Cache
+    redis:
+        image: redis:7-alpine
+        container_name: card-words-redis
+        ports:
+            - '${REDIS_EXTERNAL_PORT}:6379'
+        volumes:
+            - redis_data:/data
+        networks:
+            - card-words-network
+        healthcheck:
+            test: ['CMD', 'redis-cli', 'ping']
+            interval: 10s
+            timeout: 3s
+            retries: 5
+        command: redis-server --appendonly yes
+        restart: unless-stopped
+
+    # Redis Insight - Redis GUI
+    redisinsight:
+        image: redis/redisinsight:latest
+        container_name: card-words-redisinsight
+        ports:
+            - '${REDISINSIGHT_PORT}:5540'
+        volumes:
+            - redisinsight_data:/data
+        depends_on:
+            - redis
+        networks:
+            - card-words-network
+        restart: unless-stopped
+
+    # ============================================
+    # APPLICATION SERVICES
+    # ============================================
+
+    # Spring Boot Backend API
+    card-words-api:
+        build:
+            context: ./card-words
+            dockerfile: Dockerfile
+        container_name: card-words-api
+        environment:
+            # Server
+            - SERVER_PORT=${SERVER_SPRING_PORT}
+
+            # Database
+            - POSTGRES_HOST=${POSTGRES_HOST}
+            - POSTGRES_PORT=${POSTGRES_PORT}
+            - POSTGRES_DB=${POSTGRES_DB}
+            - POSTGRES_USER=${POSTGRES_USER}
+            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+            # Redis
+            - REDIS_HOST=${REDIS_HOST}
+            - REDIS_PORT=${REDIS_PORT}
+            - REDIS_DB=${REDIS_DB}
+            - REDIS_PASSWORD=${REDIS_PASSWORD}
+            - REDIS_TIMEOUT=${REDIS_TIMEOUT}
+
+            # JWT
+            - JWT_SECRET=${JWT_SECRET}
+            - JWT_EXPIRATION_TIME=${JWT_EXPIRATION_TIME}
+            - JWT_REFRESH_TOKEN_EXPIRATION=${JWT_REFRESH_TOKEN_EXPIRATION}
+
+            # Email
+            - MAIL_HOST=${MAIL_HOST}
+            - MAIL_PORT=${MAIL_PORT}
+            - MAIL_USERNAME=${MAIL_USERNAME}
+            - MAIL_PASSWORD=${MAIL_PASSWORD}
+
+            # Google OAuth2
+            - GOOGLE_OAUTH_CLIENT_ID=${GOOGLE_OAUTH_CLIENT_ID}
+            - GOOGLE_OAUTH_CLIENT_SECRET=${GOOGLE_OAUTH_CLIENT_SECRET}
+            - GOOGLE_OAUTH_REDIRECT_URI=${GOOGLE_OAUTH_REDIRECT_URI}
+
+            # Activation
+            - ACTIVATION_EXPIRED_TIME=${ACTIVATION_EXPIRED_TIME}
+            - ACTIVATION_RESEND_INTERVAL=${ACTIVATION_RESEND_INTERVAL}
+
+            # Firebase
+            - FIREBASE_STORAGE_BUCKET=${FIREBASE_STORAGE_BUCKET}
+            - FIREBASE_SERVICE_ACCOUNT_PATH=${FIREBASE_SERVICE_ACCOUNT_PATH}
+
+            # AI Service URL (for integration)
+            - AI_SERVICE_URL=${AI_SERVICE_URL}
+
+        ports:
+            - '${SERVER_SPRING_PORT}:${SERVER_SPRING_PORT}'
+        depends_on:
+            postgres:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+        networks:
+            - card-words-network
+        restart: unless-stopped
+        healthcheck:
+            test: ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://localhost:8080/actuator/health']
+            interval: 30s
+            timeout: 10s
+            retries: 3
+            start_period: 60s
+
+    # Python AI Service (LightGBM)
+    card-words-ai:
+        build:
+            context: ./card-words-ai
+            dockerfile: Dockerfile
+        container_name: card-words-ai
+        environment:
+            # Database (read-only access for ML)
+            - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+
+            # Redis (for caching predictions)
+            - REDIS_URL=redis://${REDIS_HOST}:${REDIS_PORT}/${REDIS_AI_DB}
+
+            # Model Configuration
+            - MODEL_PATH=${MODEL_PATH}
+            - FEATURE_NAMES_PATH=${FEATURE_NAMES_PATH}
+
+            # API Configuration
+            - API_HOST=${API_HOST}
+            - API_PORT=${SERVER_FLASH_PORT}
+            - LOG_LEVEL=${LOG_LEVEL}
+
+            # JWT Secret (for authentication with Spring Boot)
+            - JWT_SECRET=${JWT_SECRET}
+        ports:
+            - '${SERVER_FLASH_PORT}:${SERVER_FLASH_PORT}'
+        volumes:
+            # Mount models directory (for model updates without rebuild)
+            - ./card-words-ai/models:/app/models
+        depends_on:
+            postgres:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+        networks:
+            - card-words-network
+        restart: unless-stopped
+        healthcheck:
+            test: ['CMD', 'curl', '-f', 'http://localhost:8001/health']
+            interval: 30s
+            timeout: 10s
+            retries: 3
+            start_period: 40s
+
+# ============================================
+# VOLUMES
+# ============================================
+volumes:
+    postgres_data:
+        external: true
+        name: ${POSTGRES_VOLUME_NAME}
+    pgadmin_data:
+        external: true
+        name: ${PGADMIN_VOLUME_NAME}
+    redis_data:
+        external: true
+        name: ${REDIS_VOLUME_NAME}
+    redisinsight_data:
+        external: true
+        name: ${REDISINSIGHT_VOLUME_NAME}
+
+# ============================================
+# NETWORKS
+# ============================================
+networks:
+    card-words-network:
+        driver: bridge

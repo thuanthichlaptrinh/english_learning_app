@@ -1,0 +1,130 @@
+# ============================================
+# GENERAL
+# ============================================
+.DS_Store
+.vscode/
+.idea/
+*.log
+*.tmp
+
+# ============================================
+# ENVIRONMENT VARIABLES (NEVER COMMIT!)
+# ============================================
+.env
+.env.docker
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+
+# ============================================
+# JAVA / SPRING BOOT (card-words)
+# ============================================
+card-words/target/
+card-words/.mvn/
+card-words/mvnw
+card-words/mvnw.cmd
+card-words/*.iml
+card-words/.project
+card-words/.classpath
+card-words/.settings/
+card-words/bin/
+
+# ============================================
+# PYTHON / FASTAPI (card-words-ai)
+# ============================================
+card-words-ai/__pycache__/
+card-words-ai/*.py[cod]
+card-words-ai/*.class
+card-words-ai/.Python
+card-words-ai/venv/
+card-words-ai/.venv/
+card-words-ai/env/
+card-words-ai/.env
+card-words-ai/poetry.lock
+
+# ============================================
+# DOCKER
+# ============================================
+.env.local
+.env.*.local
+docker-compose.override.yml
+
+# ============================================
+# SENSITIVE DATA
+# ============================================
+*.pem
+*.key
+*-service-account.json
+firebase-service-account.json
+card-words/src/main/resources/firebase-service-account.json
+
+# ============================================
+# DATABASE BACKUPS
+# ============================================
+card-words/database-backups/*.sql
+!card-words/database-backups/README.md
+
+# ============================================
+# NODE MODULES (if any)
+# ============================================
+node_modules/
+package-lock.json
+yarn.lock
+
+
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### Environment Variables ###
+.env
+.env.docker
+.env.local
+.env.example
+.env.development.local
+.env.test.local
+.env.production.local
+
+### Sensitive Configuration Files ###
+application-secrets.yml
+application-local.yml
+
+### Firebase ###
+firebase-service-account.json
+src/main/resources/firebase-service-account.json
+
+### Documentation (Local only) ###
+# docs/
+# *.md

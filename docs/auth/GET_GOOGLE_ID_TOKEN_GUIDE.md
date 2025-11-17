@@ -11,8 +11,8 @@
 1. Click vào icon ⚙️ (Settings) ở góc trên bên phải
 2. Tích vào checkbox **"Use your own OAuth credentials"**
 3. Nhập thông tin Client:
-    - **OAuth Client ID**: `157814544933-v1gn4l8k6jkvn20j45ps885s28slsg66.apps.googleusercontent.com`
-    - **OAuth Client secret**: `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`
+    - **OAuth Client ID**: `YOUR_GOOGLE_CLIENT_ID` (Lấy từ file .env)
+    - **OAuth Client secret**: `YOUR_GOOGLE_CLIENT_SECRET` (Lấy từ file .env)
 4. Click **Close**
 
 ### Bước 3: Chọn Scopes
@@ -73,7 +73,7 @@
     - **Grant Type**: Implicit
     - **Callback URL**: `http://localhost:8080/api/v1/auth/google/callback`
     - **Auth URL**: `https://accounts.google.com/o/oauth2/v2/auth`
-    - **Client ID**: `157814544933-v1gn4l8k6jkvn20j45ps885s28slsg66.apps.googleusercontent.com`
+    - **Client ID**: `YOUR_GOOGLE_CLIENT_ID` (Lấy từ file .env)
     - **Scope**: `openid email profile`
     - **State**: `random_string`
 5. Click **Request Token**
