@@ -35,6 +35,7 @@ public class QuickQuizService {
     private final UserVocabProgressRepository userVocabProgressRepository;
     private final StreakService streakService;
     private final LeaderboardService leaderboardService;
+    private final NotificationService notificationService;
 
     // Redis services for distributed caching
     private final GameSessionCacheService gameSessionCacheService;
@@ -758,6 +759,63 @@ public class QuickQuizService {
             log.info("📊 Leaderboard updated for user: {}, score: {}", session.getUser().getId(), session.getScore());
         } catch (Exception e) {
             log.error("❌ Failed to update leaderboard: {}", e.getMessage(), e);
+        }
+
+        // 🔔 CREATE ACHIEVEMENT NOTIFICATIONS
+        createGameAchievementNotifications(session, accuracy);
+    }
+
+    // Create achievement notifications based on game performance
+    private void createGameAchievementNotifications(GameSession session, double accuracy) {
+        try {
+            User user = session.getUser();
+            int score = session.getScore();
+            int correctCount = session.getCorrectCount();
+            int totalQuestions = session.getTotalQuestions();
+
+            // 🏆 High Score Achievement (score >= 80)
+            if (score >= 80) {
+                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest
+                        .builder()
+                        .userId(user.getId())
+                        .title("🏆 High Score Achievement!")
+                        .content(String.format(
+                                "Congratulations! You scored %d points in Quick Quiz. Keep up the excellent work!",
+                                score))
+                        .type("achievement")
+                        .build();
+                notificationService.createNotification(request);
+            }
+
+            // 🎯 Perfect Accuracy (100%)
+            if (accuracy >= 100.0) {
+                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest
+                        .builder()
+                        .userId(user.getId())
+                        .title("🎯 Perfect Score!")
+                        .content(String.format("Amazing! You answered all %d questions correctly with 100%% accuracy!",
+                                totalQuestions))
+                        .type("achievement")
+                        .build();
+                notificationService.createNotification(request);
+            }
+            // 📈 Excellent Accuracy (90-99%)
+            else if (accuracy >= 90.0) {
+                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest
+                        .builder()
+                        .userId(user.getId())
+                        .title("📈 Excellent Performance!")
+                        .content(String.format(
+                                "Great job! You achieved %.1f%% accuracy with %d out of %d correct answers!",
+                                accuracy, correctCount, totalQuestions))
+                        .type("achievement")
+                        .build();
+                notificationService.createNotification(request);
+            }
+
+            log.info("✅ Achievement notifications created for user: {}", user.getId());
+        } catch (Exception e) {
+            log.error("❌ Failed to create achievement notifications: {}", e.getMessage(), e);
         }
     }
 

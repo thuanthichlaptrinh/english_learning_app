@@ -1,4 +1,4 @@
-# 🎴 Card Words Services - Monorepo
+# 🎴 Card Words Services
 
 > Monorepo chứa tất cả services của Card Words Platform: Backend API (Spring Boot) và AI Service (Python FastAPI)
 
@@ -364,26 +364,10 @@ chore: maintenance tasks
 
 ---
 
-## 📄 License
-
-[Add your license here]
-
----
-
 ## 👥 Team
 
--   **Backend Developer**: [Your Name]
--   **AI/ML Engineer**: [Your Name]
-
----
-
-## 📞 Support
-
-Nếu gặp vấn đề, vui lòng:
-
-1. Kiểm tra [Troubleshooting](#-troubleshooting)
-2. Xem [Documentation](docs/)
-3. Tạo [GitHub Issue](https://github.com/thuanthichlaptrinh/card_words_services/issues)
+-   **Backend Developer**: Ngô Minh Thuận
+-   **AI/ML Engineer**: Ngô Minh Thuận
 
 ---
 

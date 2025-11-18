@@ -23,6 +23,7 @@ public class StreakService {
 
     private final UserRepository userRepository;
     private final UserVocabProgressRepository userVocabProgressRepository;
+    private final NotificationService notificationService;
 
     /**
      * Lấy thông tin streak của user
@@ -144,6 +145,9 @@ public class StreakService {
             // Sync và lưu vào User entity
             syncUserStreakData(user, calculation);
             userRepository.save(user);
+
+            // 🔔 Create streak milestone notifications
+            createStreakNotifications(user, calculation.currentStreak, calculation.longestStreak, isNewRecord);
 
             log.info("Activity recorded successfully for user: {}", user.getId());
         } else {
@@ -284,6 +288,59 @@ public class StreakService {
         activityLog.values().forEach(yearMap -> yearMap.values().forEach(Collections::sort));
 
         return activityLog;
+    }
+
+    /**
+     * Create streak milestone notifications
+     */
+    private void createStreakNotifications(User user, int currentStreak, int longestStreak, boolean isNewRecord) {
+        try {
+            // Milestone notifications for significant streaks
+            if (currentStreak == 7) {
+                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = 
+                    com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest.builder()
+                        .userId(user.getId())
+                        .title("🔥 7-Day Streak Milestone!")
+                        .content("Congratulations! You've maintained a 7-day learning streak. Keep up the momentum!")
+                        .type("study_progress")
+                        .build();
+                notificationService.createNotification(request);
+            } else if (currentStreak == 30) {
+                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = 
+                    com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest.builder()
+                        .userId(user.getId())
+                        .title("🌟 30-Day Streak Champion!")
+                        .content("Amazing! You've achieved a 30-day learning streak! You're building great habits!")
+                        .type("study_progress")
+                        .build();
+                notificationService.createNotification(request);
+            } else if (currentStreak == 100) {
+                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = 
+                    com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest.builder()
+                        .userId(user.getId())
+                        .title("👑 100-Day Streak Legend!")
+                        .content("Incredible! You've reached a 100-day streak! You're a true learning champion!")
+                        .type("achievement")
+                        .build();
+                notificationService.createNotification(request);
+            }
+
+            // New personal record notification
+            if (isNewRecord && longestStreak > 7) {
+                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = 
+                    com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest.builder()
+                        .userId(user.getId())
+                        .title("🎉 New Personal Record!")
+                        .content(String.format("You've set a new personal record with a %d-day streak! Keep pushing forward!", longestStreak))
+                        .type("achievement")
+                        .build();
+                notificationService.createNotification(request);
+            }
+
+            log.info("✅ Streak notifications created for user: {}", user.getId());
+        } catch (Exception e) {
+            log.error("❌ Failed to create streak notifications: {}", e.getMessage(), e);
+        }
     }
 
     /**
