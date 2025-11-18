@@ -13,6 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.UUID;
+
 @RestController
 @RequestMapping(path = "/api/v1/admin/notifications")
 @RequiredArgsConstructor
@@ -62,5 +65,32 @@ public class NotificationAdminController {
 
         notificationService.createNotificationForAll(request);
         return ResponseEntity.ok(ApiResponse.success("Tạo thông báo cho tất cả users thành công", null));
+    }
+
+    @DeleteMapping("/{userId}/{notificationId}")
+    @Operation(summary = "[Admin] Xóa thông báo của user", description = "Xóa một thông báo cụ thể của user\n\n"
+            +
+            "**URL**: `DELETE http://localhost:8080/api/v1/admin/notifications/{userId}/{notificationId}`\n\n" +
+            "**Ví dụ:** `DELETE http://localhost:8080/api/v1/admin/notifications/550e8400-e29b-41d4-a716-446655440000/123`")
+    public ResponseEntity<ApiResponse<Void>> deleteNotification(
+            @PathVariable UUID userId,
+            @PathVariable Long notificationId) {
+
+        notificationService.deleteNotification(userId, notificationId);
+        return ResponseEntity.ok(ApiResponse.success("Xóa thông báo thành công", null));
+    }
+
+    @DeleteMapping("/{userId}/batch")
+    @Operation(summary = "[Admin] Xóa nhiều thông báo của user", description = "Xóa nhiều thông báo cùng lúc của một user\n\n"
+            +
+            "**URL**: `DELETE http://localhost:8080/api/v1/admin/notifications/{userId}/batch`\n\n" +
+            "**Request Params:** `ids=123,456,789`\n\n" +
+            "**Ví dụ:** `DELETE http://localhost:8080/api/v1/admin/notifications/550e8400-e29b-41d4-a716-446655440000/batch?ids=123,456,789`")
+    public ResponseEntity<ApiResponse<Void>> deleteNotifications(
+            @PathVariable UUID userId,
+            @RequestParam List<Long> ids) {
+
+        notificationService.deleteNotifications(userId, ids);
+        return ResponseEntity.ok(ApiResponse.success("Xóa " + ids.size() + " thông báo thành công", null));
     }
 }

@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>🔔 WebSocket Notification Test</title>
+        <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+        <style>
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                max-width: 900px;
+                margin: 50px auto;
+                padding: 20px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: #333;
+            }
+            .container {
+                background: white;
+                border-radius: 15px;
+                padding: 30px;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            }
+            h1 {
+                color: #667eea;
+                margin-bottom: 10px;
+            }
+            .status {
+                padding: 15px;
+                border-radius: 8px;
+                margin: 20px 0;
+                font-weight: bold;
+                text-align: center;
+            }
+            .status.connected {
+                background: #d4edda;
+                color: #155724;
+                border: 2px solid #c3e6cb;
+            }
+            .status.disconnected {
+                background: #f8d7da;
+                color: #721c24;
+                border: 2px solid #f5c6cb;
+            }
+            .status.connecting {
+                background: #fff3cd;
+                color: #856404;
+                border: 2px solid #ffeeba;
+            }
+            input,
+            button {
+                width: 100%;
+                padding: 12px;
+                margin: 8px 0;
+                border: 2px solid #ddd;
+                border-radius: 6px;
+                font-size: 14px;
+                box-sizing: border-box;
+            }
+            button {
+                background: #667eea;
+                color: white;
+                border: none;
+                cursor: pointer;
+                font-weight: bold;
+                transition: all 0.3s;
+            }
+            button:hover {
+                background: #764ba2;
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            }
+            button:disabled {
+                background: #ccc;
+                cursor: not-allowed;
+                transform: none;
+            }
+            .notifications {
+                margin-top: 30px;
+                max-height: 400px;
+                overflow-y: auto;
+            }
+            .notification {
+                padding: 15px;
+                margin: 10px 0;
+                border-radius: 8px;
+                border-left: 5px solid #667eea;
+                background: #f8f9fa;
+                animation: slideIn 0.3s ease-out;
+            }
+            @keyframes slideIn {
+                from {
+                    opacity: 0;
+                    transform: translateX(-20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+            .notification-title {
+                font-weight: bold;
+                color: #667eea;
+                margin-bottom: 5px;
+            }
+            .notification-content {
+                color: #555;
+                margin-bottom: 5px;
+            }
+            .notification-time {
+                font-size: 12px;
+                color: #999;
+            }
+            .log {
+                background: #f8f9fa;
+                padding: 15px;
+                border-radius: 8px;
+                font-family: 'Courier New', monospace;
+                font-size: 12px;
+                max-height: 200px;
+                overflow-y: auto;
+                margin-top: 20px;
+            }
+            .log-entry {
+                margin: 5px 0;
+                padding: 5px;
+            }
+            .log-entry.error {
+                color: #dc3545;
+            }
+            .log-entry.success {
+                color: #28a745;
+            }
+            .log-entry.info {
+                color: #17a2b8;
+            }
+            .badge {
+                display: inline-block;
+                padding: 3px 8px;
+                border-radius: 12px;
+                font-size: 11px;
+                font-weight: bold;
+                margin-left: 10px;
+            }
+            .badge.success {
+                background: #28a745;
+                color: white;
+            }
+            .badge.danger {
+                background: #dc3545;
+                color: white;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>🔔 Card Words - WebSocket Real-time Notifications</h1>
+            <p>Test real-time notifications với WebSocket + STOMP + SockJS</p>
+
+            <div id="status" class="status disconnected">❌ Disconnected</div>
+
+            <div>
+                <label for="token"><strong>JWT Token:</strong></label>
+                <input type="password" id="token" placeholder="Paste your JWT token here..." />
+                <small style="color: #666">Get token from: POST /api/v1/auth/signin</small>
+            </div>
+
+            <button id="connectBtn" onclick="connect()">🔌 Connect WebSocket</button>
+            <button id="disconnectBtn" onclick="disconnect()" disabled>🔌 Disconnect</button>
+            <button id="clearBtn" onclick="clearNotifications()">🗑️ Clear Notifications</button>
+
+            <div class="notifications">
+                <h3>📬 Received Notifications: <span id="count" class="badge success">0</span></h3>
+                <div id="notificationList"></div>
+            </div>
+
+            <div class="log">
+                <h4>📋 Connection Log:</h4>
+                <div id="logContainer"></div>
+            </div>
+        </div>
+
+        <script>
+            let stompClient = null;
+            let notificationCount = 0;
+
+            function log(message, type = 'info') {
+                const logContainer = document.getElementById('logContainer');
+                const timestamp = new Date().toLocaleTimeString();
+                const entry = document.createElement('div');
+                entry.className = `log-entry ${type}`;
+                entry.textContent = `[${timestamp}] ${message}`;
+                logContainer.appendChild(entry);
+                logContainer.scrollTop = logContainer.scrollHeight;
+            }
+
+            function updateStatus(status, message) {
+                const statusDiv = document.getElementById('status');
+                statusDiv.className = `status ${status}`;
+
+                const icons = {
+                    connected: '✅',
+                    disconnected: '❌',
+                    connecting: '⏳',
+                };
+
+                statusDiv.textContent = `${icons[status]} ${message}`;
+            }
+
+            function connect() {
+                const token = document.getElementById('token').value.trim();
+
+                if (!token) {
+                    alert('❌ Please enter your JWT token!');
+                    log('Connection failed: No JWT token provided', 'error');
+                    return;
+                }
+
+                updateStatus('connecting', 'Connecting...');
+                log('Attempting to connect to ws://localhost:8080/ws', 'info');
+
+                const socket = new SockJS('http://localhost:8080/ws');
+                stompClient = Stomp.over(socket);
+
+                // Disable debug output
+                stompClient.debug = null;
+
+                const headers = {
+                    Authorization: `Bearer ${token}`,
+                };
+
+                stompClient.connect(
+                    headers,
+                    function (frame) {
+                        updateStatus('connected', 'Connected Successfully!');
+                        log('✅ WebSocket connection established', 'success');
+                        log(`Frame: ${frame}`, 'info');
+
+                        document.getElementById('connectBtn').disabled = true;
+                        document.getElementById('disconnectBtn').disabled = false;
+
+                        // Subscribe to user-specific queue
+                        stompClient.subscribe('/user/queue/notifications', function (message) {
+                            log('📬 Received notification message', 'success');
+
+                            try {
+                                const notification = JSON.parse(message.body);
+                                displayNotification(notification);
+
+                                // Browser notification
+                                if (Notification.permission === 'granted') {
+                                    new Notification(notification.title, {
+                                        body: notification.content,
+                                        icon: '🔔',
+                                    });
+                                }
+                            } catch (error) {
+                                log(`Error parsing notification: ${error.message}`, 'error');
+                            }
+                        });
+
+                        log('✅ Subscribed to /user/queue/notifications', 'success');
+
+                        // Request browser notification permission
+                        if (Notification.permission === 'default') {
+                            Notification.requestPermission();
+                        }
+                    },
+                    function (error) {
+                        updateStatus('disconnected', 'Connection Failed!');
+                        log(`❌ Connection error: ${error}`, 'error');
+
+                        document.getElementById('connectBtn').disabled = false;
+                        document.getElementById('disconnectBtn').disabled = true;
+                    },
+                );
+            }
+
+            function disconnect() {
+                if (stompClient !== null) {
+                    stompClient.disconnect();
+                    log('Disconnected from WebSocket', 'info');
+                }
+
+                updateStatus('disconnected', 'Disconnected');
+                document.getElementById('connectBtn').disabled = false;
+                document.getElementById('disconnectBtn').disabled = true;
+            }
+
+            function displayNotification(notification) {
+                notificationCount++;
+                document.getElementById('count').textContent = notificationCount;
+
+                const notificationList = document.getElementById('notificationList');
+                const notifDiv = document.createElement('div');
+                notifDiv.className = 'notification';
+
+                const typeIcons = {
+                    streak_reminder: '🔥',
+                    game_achievement: '🏆',
+                    streak_milestone: '⭐',
+                    new_feature: '🚀',
+                    system_alert: '⚠️',
+                };
+
+                const icon = typeIcons[notification.type] || '📬';
+
+                notifDiv.innerHTML = `
+                <div class="notification-title">${icon} ${notification.title}</div>
+                <div class="notification-content">${notification.content}</div>
+                <div class="notification-time">
+                    ${new Date().toLocaleString()} | Type: ${notification.type} | Read: ${
+                    notification.isRead ? '✅' : '❌'
+                }
+                </div>
+            `;
+
+                notificationList.insertBefore(notifDiv, notificationList.firstChild);
+
+                log(`Notification displayed: ${notification.title}`, 'success');
+            }
+
+            function clearNotifications() {
+                document.getElementById('notificationList').innerHTML = '';
+                notificationCount = 0;
+                document.getElementById('count').textContent = '0';
+                log('Notifications cleared', 'info');
+            }
+
+            // Auto-connect on page load if token exists
+            window.onload = function () {
+                log('Page loaded - Ready to connect', 'info');
+
+                // Check if token is in localStorage
+                const savedToken = localStorage.getItem('jwt_token');
+                if (savedToken) {
+                    document.getElementById('token').value = savedToken;
+                    log('Token loaded from localStorage', 'info');
+                }
+            };
+
+            // Save token to localStorage on input
+            document.getElementById('token').addEventListener('input', function (e) {
+                localStorage.setItem('jwt_token', e.target.value);
+            });
+
+            // Cleanup on page unload
+            window.onbeforeunload = function () {
+                disconnect();
+            };
+        </script>
+    </body>
+</html>

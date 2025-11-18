@@ -33,6 +33,10 @@ public class SecurityConfiguration {
                         "/api/v1/auth/google",
                         "/api/v1/auth/forgot-password",
                         "/api/v1/auth/refresh-token",
+                        "/ws/**", // WebSocket endpoint
+                        "/app/**", // WebSocket application prefix
+                        "/topic/**", // WebSocket topic (broadcast)
+                        "/queue/**", // WebSocket queue (point-to-point)
                         "/favicon.ico",
                         "/static/**",
                         "/css/**",

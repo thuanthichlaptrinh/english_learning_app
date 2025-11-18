@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,7 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     /**
      * Get notifications for a user with filters
@@ -73,6 +75,13 @@ public class NotificationService {
         if (updated == 0) {
             throw new ErrorException("Không tìm thấy notification hoặc không có quyền truy cập");
         }
+
+        // Push real-time update via WebSocket
+        messagingTemplate.convertAndSendToUser(
+                userId.toString(),
+                "/queue/notifications/read",
+                notificationId);
+        log.info("✅ Sent mark-as-read notification to user {} via WebSocket", userId);
     }
 
     /**
@@ -82,7 +91,16 @@ public class NotificationService {
     public int markAllAsRead(UUID userId) {
         log.info("Đánh dấu tất cả notifications đã đọc cho user: {}", userId);
 
-        return notificationRepository.markAllAsRead(userId);
+        int count = notificationRepository.markAllAsRead(userId);
+
+        // Push real-time update via WebSocket
+        messagingTemplate.convertAndSendToUser(
+                userId.toString(),
+                "/queue/notifications/read-all",
+                count);
+        log.info("✅ Sent mark-all-as-read notification to user {} via WebSocket ({} notifications)", userId, count);
+
+        return count;
     }
 
     /**
@@ -100,6 +118,13 @@ public class NotificationService {
         }
 
         notificationRepository.delete(notification);
+
+        // Push real-time deletion via WebSocket
+        messagingTemplate.convertAndSendToUser(
+                userId.toString(),
+                "/queue/notifications/deleted",
+                notificationId);
+        log.info("✅ Sent delete notification to user {} via WebSocket", userId);
     }
 
     /**
@@ -112,6 +137,14 @@ public class NotificationService {
         for (Long id : notificationIds) {
             deleteNotification(userId, id);
         }
+
+        // Push batch deletion via WebSocket (after all deletions complete)
+        messagingTemplate.convertAndSendToUser(
+                userId.toString(),
+                "/queue/notifications/batch-deleted",
+                notificationIds);
+        log.info("✅ Sent batch-delete notification to user {} via WebSocket ({} notifications)", userId,
+                notificationIds.size());
     }
 
     /**
@@ -133,7 +166,16 @@ public class NotificationService {
                 .build();
 
         notification = notificationRepository.save(notification);
-        return toResponse(notification);
+        NotificationResponse response = toResponse(notification);
+
+        // Push real-time notification via WebSocket
+        messagingTemplate.convertAndSendToUser(
+                request.getUserId().toString(),
+                "/queue/notifications",
+                response);
+        log.info("✅ Sent real-time notification to user {} via WebSocket", request.getUserId());
+
+        return response;
     }
 
     /**
@@ -154,10 +196,17 @@ public class NotificationService {
                     .isRead(false)
                     .build();
 
-            notificationRepository.save(notification);
+            notification = notificationRepository.save(notification);
+            NotificationResponse response = toResponse(notification);
+
+            // Push real-time notification via WebSocket
+            messagingTemplate.convertAndSendToUser(
+                    user.getId().toString(),
+                    "/queue/notifications",
+                    response);
         }
 
-        log.info("Đã tạo notification cho {} users", users.size());
+        log.info("✅ Sent real-time notifications to {} users via WebSocket", users.size());
     }
 
     private NotificationResponse toResponse(Notification notification) {
