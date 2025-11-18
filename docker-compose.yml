@@ -153,7 +153,7 @@ services:
             retries: 3
             start_period: 60s
 
-    # Python AI Service (LightGBM)
+    # Python AI Service (XGBoost)
     card-words-ai:
         build:
             context: ./card-words-ai
@@ -161,14 +161,15 @@ services:
         container_name: card-words-ai
         environment:
             # Database (read-only access for ML)
-            - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+            - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
 
             # Redis (for caching predictions)
             - REDIS_URL=redis://${REDIS_HOST}:${REDIS_PORT}/${REDIS_AI_DB}
 
             # Model Configuration
-            - MODEL_PATH=${MODEL_PATH}
-            - FEATURE_NAMES_PATH=${FEATURE_NAMES_PATH}
+            - MODEL_PATH=/app/models/xgboost_model_v1.pkl
+            - SCALER_PATH=/app/models/scaler_v1.pkl
+            - MODEL_VERSION=v1.0.0
 
             # API Configuration
             - API_HOST=${API_HOST}
@@ -177,6 +178,22 @@ services:
 
             # JWT Secret (for authentication with Spring Boot)
             - JWT_SECRET=${JWT_SECRET}
+            - JWT_ALGORITHM=HS256
+
+            # Admin & Internal API Keys
+            - ADMIN_API_KEY=${ADMIN_API_KEY:-your-admin-api-key}
+            - INTERNAL_API_KEY=${INTERNAL_API_KEY:-your-internal-api-key}
+
+            # Cache Settings
+            - CACHE_TTL=300
+
+            # Rate Limiting
+            - RATE_LIMIT_PER_MINUTE=60
+
+            # Performance
+            - MAX_CONCURRENT_REQUESTS=50
+            - INFERENCE_WARNING_THRESHOLD_MS=2000
+
         ports:
             - '${SERVER_FLASH_PORT}:${SERVER_FLASH_PORT}'
         volumes:

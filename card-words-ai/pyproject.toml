@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "card-words-ai"
 version = "0.1.0"
-description = "AI-powered vocabulary review system using LightGBM"
+description = "AI-powered vocabulary review system using XGBoost"
 authors = ["Card Words Team"]
 readme = "README.md"
 
@@ -11,7 +11,7 @@ fastapi = "^0.104.0"
 uvicorn = {extras = ["standard"], version = "^0.24.0"}
 pydantic = "^2.4.0"
 pydantic-settings = "^2.0.0"
-lightgbm = "^4.1.0"
+xgboost = "^2.0.0"
 scikit-learn = "^1.3.0"
 numpy = "^1.24.0"
 pandas = "^2.0.0"
@@ -22,6 +22,8 @@ redis = "^5.0.0"
 python-dotenv = "^1.0.0"
 joblib = "^1.3.0"
 structlog = "^23.2.0"
+pyjwt = "^2.8.0"
+python-multipart = "^0.0.6"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"

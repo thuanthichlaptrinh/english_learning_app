@@ -63,7 +63,7 @@ card-words/src/main/resources/firebase-service-account.json
 # ============================================
 # DATABASE BACKUPS
 # ============================================
-card-words/database-backups/*.sql
+# card-words/database-backups/*.sql
 !card-words/database-backups/README.md
 
 # ============================================

@@ -26,7 +26,7 @@ fi
 echo "🔄 Starting database restore..."
 
 # Stop app to avoid conflicts
-docker stop card-words-app
+docker stop card-words-api 2>/dev/null || true
 
 # Restore database
 cat $BACKUP_FILE | docker exec -i card-words-postgres psql -U postgres -d card_words
@@ -35,10 +35,10 @@ if [ $? -eq 0 ]; then
     echo "✅ Restore successful!"
     
     # Restart app
-    docker start card-words-app
+    docker start card-words-api 2>/dev/null || true
     echo "🚀 App restarted"
 else
     echo "❌ Restore failed!"
-    docker start card-words-app
+    docker start card-words-api 2>/dev/null || true
     exit 1
 fi
