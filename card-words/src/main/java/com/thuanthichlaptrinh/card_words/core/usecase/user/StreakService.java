@@ -297,8 +297,8 @@ public class StreakService {
         try {
             // Milestone notifications for significant streaks
             if (currentStreak == 7) {
-                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = 
-                    com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest.builder()
+                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest
+                        .builder()
                         .userId(user.getId())
                         .title("🔥 7-Day Streak Milestone!")
                         .content("Congratulations! You've maintained a 7-day learning streak. Keep up the momentum!")
@@ -306,8 +306,8 @@ public class StreakService {
                         .build();
                 notificationService.createNotification(request);
             } else if (currentStreak == 30) {
-                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = 
-                    com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest.builder()
+                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest
+                        .builder()
                         .userId(user.getId())
                         .title("🌟 30-Day Streak Champion!")
                         .content("Amazing! You've achieved a 30-day learning streak! You're building great habits!")
@@ -315,8 +315,8 @@ public class StreakService {
                         .build();
                 notificationService.createNotification(request);
             } else if (currentStreak == 100) {
-                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = 
-                    com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest.builder()
+                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest
+                        .builder()
                         .userId(user.getId())
                         .title("👑 100-Day Streak Legend!")
                         .content("Incredible! You've reached a 100-day streak! You're a true learning champion!")
@@ -327,11 +327,13 @@ public class StreakService {
 
             // New personal record notification
             if (isNewRecord && longestStreak > 7) {
-                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = 
-                    com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest.builder()
+                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest
+                        .builder()
                         .userId(user.getId())
                         .title("🎉 New Personal Record!")
-                        .content(String.format("You've set a new personal record with a %d-day streak! Keep pushing forward!", longestStreak))
+                        .content(String.format(
+                                "You've set a new personal record with a %d-day streak! Keep pushing forward!",
+                                longestStreak))
                         .type("achievement")
                         .build();
                 notificationService.createNotification(request);

@@ -24,7 +24,8 @@ public class NotificationAdminController {
     private final NotificationService notificationService;
 
     @PostMapping
-    @Operation(summary = "[Admin] Tạo thông báo cho một user", description = "Tạo thông báo mới cho một user cụ thể\n\n" +
+    @Operation(summary = "[Admin] Tạo thông báo cho một user", description = "Tạo thông báo mới cho một user cụ thể\n\n"
+            +
             "**URL**: `POST http://localhost:8080/api/v1/admin/notifications`\n\n" +
             "**Request Body:**\n" +
             "```json\n" +
@@ -44,7 +45,8 @@ public class NotificationAdminController {
     }
 
     @PostMapping("/broadcast")
-    @Operation(summary = "[Admin] Tạo thông báo cho tất cả users", description = "Tạo thông báo cho tất cả users trong hệ thống\n\n" +
+    @Operation(summary = "[Admin] Tạo thông báo cho tất cả users", description = "Tạo thông báo cho tất cả users trong hệ thống\n\n"
+            +
             "**URL**: `POST http://localhost:8080/api/v1/admin/notifications/broadcast`\n\n" +
             "**Request Body:**\n" +
             "```json\n" +
