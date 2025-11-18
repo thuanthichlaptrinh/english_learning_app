@@ -54,24 +54,65 @@ card-words-services/
 # 1. Di chuyển vào thư mục root
 cd card-words-services
 
-# 2. Start tất cả services
+# 2. Tạo file .env từ template
+cp .env.example .env
+# Sau đó chỉnh sửa .env với thông tin của bạn
+
+# 3. Start tất cả services
 docker-compose up -d
 
-# 3. Xem logs
+# 4. Xem logs
 docker-compose logs -f
 
-# 4. Kiểm tra status
+# 5. Kiểm tra status
 docker-compose ps
 ```
 
 **Services sẽ chạy trên:**
 
 -   🌐 **Spring Boot API**: http://localhost:8080
+    -   Swagger UI: http://localhost:8080/swagger-ui.html
+    -   API Docs: http://localhost:8080/v3/api-docs
 -   🤖 **AI Service**: http://localhost:8001
+    -   API Docs: http://localhost:8001/docs
 -   🗄️ **PostgreSQL**: localhost:5433
+    -   Database: `card_words`
+    -   User: `postgres`
 -   🔴 **Redis**: localhost:6379
+    -   DB 0: Spring Boot cache
+    -   DB 1: AI Service cache
 -   🔧 **PgAdmin**: http://localhost:5050
+    -   Email: admin@cardwords.com
+    -   Password: admin
 -   📊 **Redis Insight**: http://localhost:5540
+
+### 🎯 Test APIs
+
+**1. Health Check:**
+
+```bash
+curl http://localhost:8080/actuator/health
+curl http://localhost:8001/health
+```
+
+**2. Register User:**
+
+```bash
+curl -X POST http://localhost:8080/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Test User",
+    "email": "test@example.com",
+    "password": "password123"
+  }'
+```
+
+**3. Access Swagger UI:**
+
+-   Open http://localhost:8080/swagger-ui.html
+-   Click "Authorize" button
+-   Enter token: `Bearer <your-jwt-token>`
+-   Try out APIs
 
 ---
 
@@ -88,16 +129,32 @@ docker-compose ps
 -   Spring Security + JWT
 -   Google OAuth2
 -   Firebase Storage
+-   Flyway Migration
 
 **Ports:**
 
 -   Application: `8080`
 -   Database: `5433` (external)
 
+**Core Features:**
+
+-   🔐 Authentication (JWT + Google OAuth2)
+-   📚 Vocabulary Management (CRUD, Search, Filters)
+-   🎮 Games (Quick Quiz, Image-Word Matching, Word Definition Matching)
+-   📊 Leaderboard & Statistics
+-   🔥 Streak System (Daily learning tracking)
+-   🔔 **Notifications System** (Auto-triggered achievements & manual admin broadcasts)
+-   📝 **Action Logs** (Admin monitoring of user activities)
+-   💾 Offline Sync Support
+-   🌐 Multi-language Support
+
 **Documentation:**
 
 -   API Docs: http://localhost:8080/swagger-ui.html
 -   Actuator: http://localhost:8080/actuator
+-   Admin Dashboard APIs: [docs/admin/ADMIN_DASHBOARD_API.md](docs/admin/ADMIN_DASHBOARD_API.md)
+-   Notifications: [docs/admin/NOTIFICATIONS_API.md](docs/admin/NOTIFICATIONS_API.md)
+-   Action Logs: [docs/admin/ACTION_LOGS_API.md](docs/admin/ACTION_LOGS_API.md)
 
 ### 2️⃣ card-words-ai (Python AI Service)
 
@@ -214,6 +271,17 @@ Database schema được quản lý bởi **Flyway**:
 
 -   Location: `card-words/src/main/resources/db/migration/`
 -   Auto-run khi start application
+-   Naming: `V{version}__{description}.sql`
+
+**Current Migrations:**
+
+-   V1: Initial schema (users, roles, topics, vocabs)
+-   V2: Game sessions and details
+-   V3: User vocabulary progress (spaced repetition)
+-   V4: Streak system
+-   V5: Leaderboard tables
+-   V6: Notifications table
+-   V7: Action logs table + missing columns
 
 ### Backup & Restore
 
@@ -230,6 +298,32 @@ cd card-words
 ```
 
 Backups được lưu trong: `card-words/database-backups/`
+
+### Database Schema Highlights
+
+**Core Tables:**
+
+-   `users` - User accounts (UUID primary key)
+-   `roles` - User roles (ADMIN, USER)
+-   `topics` - Vocabulary topics/categories
+-   `vocabs` - Vocabulary words with definitions, examples, images
+
+**Game Tables:**
+
+-   `games` - Game definitions (Quick Quiz, Image Matching, etc.)
+-   `game_sessions` - User game sessions with scores
+-   `game_session_details` - Individual questions/answers
+
+**Progress Tables:**
+
+-   `user_vocab_progress` - Spaced repetition tracking
+-   `streak_records` - Daily learning streaks
+-   `leaderboards` - Global & game-specific rankings
+
+**Admin Tables:**
+
+-   `notifications` - User notifications (achievements, reminders)
+-   `action_logs` - Admin audit logs of user actions
 
 ---
 
@@ -324,12 +418,39 @@ docker-compose exec postgres psql -U postgres -d card_words -c '\dt'
 
 Chi tiết documentation cho từng module:
 
--   **Authentication**: [docs/auth/](docs/auth/)
--   **Docker Setup**: [docs/docker/](docs/docker/)
--   **AI/ML**: [docs/AI/](docs/AI/)
--   **API Guides**: [docs/](docs/)
+### Core Features
 
-**Migration Guide**: [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md)
+-   **Authentication**: [docs/auth/](docs/auth/)
+-   **Vocabulary Management**: [docs/vocab/](docs/vocab/)
+-   **Flash Cards**: [docs/flash_card/](docs/flash_card/)
+-   **Topics**: [docs/topic/](docs/topic/)
+
+### Games
+
+-   **Quick Quiz**: [docs/quick_quiz/](docs/quick_quiz/)
+-   **Image-Word Matching**: [docs/image_word/](docs/image_word/)
+-   **Word Definition Matching**: [docs/game/](docs/game/)
+-   **Game Algorithms**: [docs/game/GAME_ALGORITHMS_DESIGN.md](docs/game/GAME_ALGORITHMS_DESIGN.md)
+
+### Admin Features
+
+-   **Admin Dashboard**: [docs/admin/ADMIN_DASHBOARD_API.md](docs/admin/ADMIN_DASHBOARD_API.md)
+-   **Notifications API**: [docs/admin/NOTIFICATIONS_API.md](docs/admin/NOTIFICATIONS_API.md)
+-   **Action Logs API**: [docs/admin/ACTION_LOGS_API.md](docs/admin/ACTION_LOGS_API.md)
+-   **Notification Auto-Triggers**: [docs/admin/NOTIFICATION_AUTO_TRIGGERS.md](docs/admin/NOTIFICATION_AUTO_TRIGGERS.md)
+
+### Advanced Features
+
+-   **AI/ML Smart Review**: [docs/AI/](docs/AI/)
+-   **Streak System**: [docs/streak/](docs/streak/)
+-   **Leaderboard**: [docs/game/](docs/game/)
+-   **Redis Caching**: [docs/redis/](docs/redis/)
+
+### DevOps
+
+-   **Docker Setup**: [docs/docker/](docs/docker/)
+-   **Migration Guide**: [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md)
+-   **Implementation Guide**: [docs/IMPLEMENTATION_GUIDE.md](docs/IMPLEMENTATION_GUIDE.md)
 
 ---
 
@@ -354,13 +475,69 @@ git push origin feature/your-feature-name
 ### Commit Message Convention
 
 ```
-feat: thêm tính năng mới
-fix: sửa bug
+feat: thêm tính năng mới (new feature)
+fix: sửa bug (bug fix)
 docs: cập nhật documentation
-refactor: refactor code
+refactor: refactor code (no functional changes)
 test: thêm tests
-chore: maintenance tasks
+chore: maintenance tasks (dependencies, configs)
+perf: performance improvements
+style: code formatting (no logic changes)
 ```
+
+**Examples:**
+
+```
+feat: Add auto notification triggers for game achievements
+fix: Fix UUID extraction in NotificationController
+docs: Update README with new features
+refactor: Simplify streak calculation logic
+```
+
+---
+
+## 🎯 Key Features Highlights
+
+### 🔔 Notifications System
+
+-   **Auto-triggered notifications** for game achievements (high scores, perfect accuracy)
+-   **Streak milestone notifications** (7-day, 30-day, 100-day streaks)
+-   **Admin broadcast** to all users
+-   Real-time unread count & filtering
+-   5 notification types: `vocab_reminder`, `new_feature`, `achievement`, `system_alert`, `study_progress`
+
+### 📝 Action Logs
+
+-   **Admin monitoring** of all user actions
+-   Track: login, logout, game completion, vocabulary learning
+-   Advanced filtering by user, action type, status, date range
+-   Export capabilities for audit reports
+-   Statistics dashboard (total actions, success rate, unique users)
+
+### 🎮 Games
+
+-   **Quick Quiz**: True/False lightning rounds with streak bonuses
+-   **Image-Word Matching**: Memory-style image pairing game
+-   **Word Definition Matching**: Match words to definitions
+-   Smart scoring system with time bonuses
+-   Leaderboard rankings (global & per-game)
+
+### 🔥 Streak System
+
+-   Track daily learning consistency
+-   Auto-update on game completion
+-   Milestone achievements (7, 30, 100 days)
+-   Visual activity calendar
+-   Personal record tracking
+
+### 🤖 AI Smart Review
+
+-   **LightGBM ML model** for personalized review scheduling
+-   Predicts optimal review timing based on:
+    -   Correctness history
+    -   Time since last review
+    -   User performance patterns
+-   Redis caching for fast predictions
 
 ---
 
