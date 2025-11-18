@@ -338,4 +338,121 @@ public class EmailService {
                         """,
                 name, email, newPassword, email, newPassword);
     }
+
+    // Gửi email nhắc nhở streak
+    public void sendStreakReminderEmail(String toEmail, String name, int streak) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(fromEmail);
+            helper.setTo(toEmail);
+            helper.setSubject("🔥 Don't Break Your " + streak + "-Day Streak!");
+
+            String htmlContent = buildStreakReminderEmailContent(name, streak);
+            helper.setText(htmlContent, true);
+
+            mailSender.send(message);
+            log.info("✅ Streak reminder email sent to: {}", toEmail);
+
+        } catch (Exception e) {
+            log.error("❌ Failed to send streak reminder email to {}: {}", toEmail, e.getMessage());
+            throw new RuntimeException("Cannot send streak reminder email", e);
+        }
+    }
+
+    // Tạo nội dung HTML cho email nhắc nhở streak
+    private String buildStreakReminderEmailContent(String name, int streak) {
+        return String.format(
+                """
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <title>Streak Reminder - Card Words</title>
+                            <style>
+                                body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background: linear-gradient(135deg, #667eea 0%%, #764ba2 100%%); }
+                                .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); overflow: hidden; }
+                                .header { background: linear-gradient(135deg, #ff6b6b 0%%, #ee5a6f 100%%); color: white; padding: 40px 30px; text-align: center; }
+                                .header h1 { margin: 0; font-size: 32px; }
+                                .header .streak-icon { font-size: 64px; margin: 20px 0; }
+                                .content { padding: 40px 30px; }
+                                .streak-box { background: linear-gradient(135deg, #f093fb 0%%, #f5576c 100%%); color: white; padding: 30px; border-radius: 12px; text-align: center; margin: 30px 0; }
+                                .streak-number { font-size: 72px; font-weight: bold; line-height: 1; margin: 10px 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+                                .streak-text { font-size: 24px; font-weight: 600; margin-top: 10px; }
+                                .warning { background: #fff3cd; border-left: 4px solid #ffc107; padding: 20px; border-radius: 8px; margin: 25px 0; color: #856404; }
+                                .warning strong { display: block; font-size: 18px; margin-bottom: 10px; }
+                                .cta-button { display: inline-block; background: linear-gradient(135deg, #667eea 0%%, #764ba2 100%%); color: white; padding: 16px 40px; text-decoration: none; border-radius: 50px; font-size: 18px; font-weight: bold; margin: 20px 0; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); transition: transform 0.2s; }
+                                .cta-button:hover { transform: translateY(-2px); }
+                                .benefits { background: #f8f9fa; padding: 25px; border-radius: 12px; margin: 25px 0; }
+                                .benefits h3 { color: #667eea; margin-top: 0; }
+                                .benefits ul { margin: 15px 0; padding-left: 25px; }
+                                .benefits li { margin: 10px 0; line-height: 1.6; }
+                                .footer { background: #f8f9fa; padding: 25px; text-align: center; color: #6c757d; font-size: 14px; }
+                                .emoji { font-size: 1.2em; }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="container">
+                                <div class="header">
+                                    <div class="streak-icon">🔥</div>
+                                    <h1>Don't Break Your Streak!</h1>
+                                    <p style="font-size: 18px; margin: 10px 0 0 0;">Card Words - Keep Learning Every Day</p>
+                                </div>
+
+                                <div class="content">
+                                    <h2 style="color: #333; font-size: 26px;">Hi %s! 👋</h2>
+
+                                    <div class="streak-box">
+                                        <div class="streak-number">%d</div>
+                                        <div class="streak-text">DAY STREAK</div>
+                                    </div>
+
+                                    <p style="font-size: 16px; line-height: 1.8; color: #555;">
+                                        You're doing amazing! You've maintained a <strong>%d-day learning streak</strong> – that's incredible dedication! 🎉
+                                    </p>
+
+                                    <div class="warning">
+                                        <strong>⚠️ Don't lose your progress!</strong>
+                                        You haven't practiced today yet. Take just 5 minutes to keep your streak alive and maintain your learning momentum!
+                                    </div>
+
+                                    <div style="text-align: center; margin: 30px 0;">
+                                        <a href="http://localhost:3000" class="cta-button">
+                                            <span class="emoji">🚀</span> Start Learning Now
+                                        </a>
+                                    </div>
+
+                                    <div class="benefits">
+                                        <h3><span class="emoji">✨</span> Why Keep Your Streak?</h3>
+                                        <ul>
+                                            <li><strong>Build lasting habits:</strong> Consistency is key to language learning success</li>
+                                            <li><strong>Better retention:</strong> Daily practice improves memory and vocabulary recall</li>
+                                            <li><strong>Unlock achievements:</strong> Reach milestone streaks (7, 30, 100 days) for special rewards</li>
+                                            <li><strong>Stay motivated:</strong> See your progress grow day by day</li>
+                                        </ul>
+                                    </div>
+
+                                    <p style="font-size: 16px; color: #555; margin-top: 30px;">
+                                        Remember: Even just <strong>5-10 minutes</strong> of practice today can make all the difference! 💪
+                                    </p>
+
+                                    <p style="font-size: 14px; color: #888; font-style: italic; margin-top: 25px; border-top: 1px solid #eee; padding-top: 20px;">
+                                        <span class="emoji">💡</span> <strong>Quick tip:</strong> Try playing a Quick Quiz or reviewing flashcards – it's fun and only takes a few minutes!
+                                    </p>
+                                </div>
+
+                                <div class="footer">
+                                    <p style="margin: 5px 0;"><strong>Card Words</strong></p>
+                                    <p style="margin: 5px 0;">Learn English Vocabulary Through Fun Games</p>
+                                    <p style="margin: 15px 0 5px 0;">© 2025 Card Words. All rights reserved.</p>
+                                    <p style="margin: 5px 0; font-size: 12px;">This is an automated reminder email. Please do not reply.</p>
+                                </div>
+                            </div>
+                        </body>
+                        </html>
+                        """,
+                name, streak, streak);
+    }
 }

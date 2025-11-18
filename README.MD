@@ -95,7 +95,39 @@ curl http://localhost:8080/actuator/health
 curl http://localhost:8001/health
 ```
 
-**2. Register User:**
+**2. Test Email System:**
+
+```bash
+# Register a new user (triggers welcome email)
+curl -X POST http://localhost:8080/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Test User",
+    "email": "test@example.com",
+    "password": "password123"
+  }'
+
+# Check your email inbox for welcome email
+```
+
+**3. Test Streak Reminder (Manual Trigger):**
+
+Tạm thời thay đổi cron schedule trong `StreakReminderScheduler.java`:
+
+```java
+// Chạy ngay sau 10 giây (để test)
+@Scheduled(fixedDelay = 10000, initialDelay = 5000)
+```
+
+Rebuild và check logs:
+
+```bash
+docker-compose build card-words-api
+docker-compose up -d
+docker-compose logs -f card-words-api | grep "streak"
+```
+
+**4. Register User:**
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/auth/register \
@@ -142,9 +174,11 @@ curl -X POST http://localhost:8080/api/v1/auth/register \
 -   📚 Vocabulary Management (CRUD, Search, Filters)
 -   🎮 Games (Quick Quiz, Image-Word Matching, Word Definition Matching)
 -   📊 Leaderboard & Statistics
--   🔥 Streak System (Daily learning tracking)
--   🔔 **Notifications System** (Auto-triggered achievements & manual admin broadcasts)
+-   🔥 Streak System (Daily learning tracking + automated email reminders)
+-   🔔 **Notifications System** (Auto-triggered achievements, streak milestones, admin broadcasts)
 -   📝 **Action Logs** (Admin monitoring of user activities)
+-   📧 **Email Service** (Welcome, activation, password reset, streak reminders)
+-   ⏰ **Scheduled Jobs** (Daily streak reminders at 9:00 AM)
 -   💾 Offline Sync Support
 -   🌐 Multi-language Support
 
@@ -200,9 +234,9 @@ REDIS_AI_DB=1
 # JWT
 JWT_SECRET=your_jwt_secret
 
-# Email
+# Email (For welcome, activation, password reset, streak reminders)
 MAIL_USERNAME=your_email@gmail.com
-MAIL_PASSWORD=your_app_password
+MAIL_PASSWORD=your_app_password  # Gmail App Password
 
 # Google OAuth2
 GOOGLE_OAUTH_CLIENT_ID=your_client_id
@@ -502,9 +536,22 @@ refactor: Simplify streak calculation logic
 
 -   **Auto-triggered notifications** for game achievements (high scores, perfect accuracy)
 -   **Streak milestone notifications** (7-day, 30-day, 100-day streaks)
+-   **Automated streak reminders** (daily at 9 AM via email + in-app notification)
 -   **Admin broadcast** to all users
 -   Real-time unread count & filtering
 -   5 notification types: `vocab_reminder`, `new_feature`, `achievement`, `system_alert`, `study_progress`
+
+### 📧 Email System
+
+-   **Welcome emails** with temporary password for new users
+-   **Account activation** links
+-   **Password reset** emails with secure tokens
+-   **Streak reminders** (HTML template with beautiful design)
+    -   Sent daily at 9:00 AM to users who:
+        -   Studied yesterday ✓
+        -   Haven't studied today ✗
+        -   Have streak >= 3 days 🔥
+    -   Dual channel: Email + In-app notification
 
 ### 📝 Action Logs
 
