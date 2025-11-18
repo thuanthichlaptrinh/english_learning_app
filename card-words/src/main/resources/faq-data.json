@@ -1,0 +1,984 @@
+{
+    "faqs": [
+        {
+            "id": 1,
+            "category": "learning",
+            "question": "Làm sao để học từ vựng hiệu quả?",
+            "answer": "Để học từ vựng hiệu quả, bạn nên:\n1. Học 10-15 từ mới mỗi ngày\n2. Sử dụng Flashcard để ôn tập định kỳ\n3. Luyện tập với Quick Quiz hàng ngày\n4. Chơi game Word Matching để ghi nhớ lâu hơn\n5. Duy trì streak học liên tục để tạo thói quen",
+            "keywords": ["học", "hiệu quả", "cách học", "phương pháp"]
+        },
+        {
+            "id": 2,
+            "category": "streak",
+            "question": "Hệ thống streak hoạt động như thế nào?",
+            "answer": "Streak là chuỗi ngày học liên tục:\n- Streak tăng khi bạn học ít nhất 1 flashcard mỗi ngày\n- Nếu bỏ lỡ 1 ngày, streak sẽ bị reset về 0\n- Streak càng cao, bạn sẽ nhận được badge đặc biệt\n- Hệ thống sẽ gửi reminder để giúp bạn duy trì streak",
+            "keywords": ["streak", "chuỗi ngày", "duy trì", "liên tục"]
+        },
+        {
+            "id": 3,
+            "category": "topic",
+            "question": "Làm sao để tạo topic mới?",
+            "answer": "Để tạo topic mới:\n1. Vào menu Topics\n2. Nhấn nút 'Create New Topic'\n3. Nhập tên topic và mô tả\n4. Upload ảnh đại diện (optional)\n5. Thêm từ vựng vào topic\n6. Nhấn Save để hoàn tất",
+            "keywords": ["tạo topic", "topic mới", "chủ đề mới"]
+        },
+        {
+            "id": 4,
+            "category": "vocab",
+            "question": "Từ vựng CEFR là gì?",
+            "answer": "CEFR (Common European Framework of Reference) là khung đánh giá trình độ ngôn ngữ:\n- A1, A2: Beginner (Sơ cấp)\n- B1, B2: Intermediate (Trung cấp)\n- C1, C2: Advanced (Nâng cao)\nHệ thống phân loại từ theo CEFR để bạn học đúng trình độ.",
+            "keywords": ["cefr", "trình độ", "level", "phân loại"]
+        },
+        {
+            "id": 5,
+            "category": "flashcard",
+            "question": "Flashcard hoạt động như thế nào?",
+            "answer": "Flashcard sử dụng phương pháp lặp lại ngắt quãng:\n1. Mặt trước hiển thị từ tiếng Anh\n2. Lật thẻ để xem nghĩa tiếng Việt\n3. Đánh giá mức độ nhớ: Easy/Medium/Hard\n4. Hệ thống tự động lên lịch ôn tập dựa trên đánh giá\n5. Từ càng khó càng xuất hiện thường xuyên",
+            "keywords": ["flashcard", "thẻ học", "ôn tập", "lật thẻ"]
+        },
+        {
+            "id": 6,
+            "category": "quiz",
+            "question": "Quick Quiz là gì?",
+            "answer": "Quick Quiz là bài kiểm tra nhanh:\n- 10 câu hỏi trắc nghiệm\n- Giới hạn thời gian 5 phút\n- Kiểm tra từ đã học trong topic\n- Điểm số được lưu lại để theo dõi tiến độ\n- Có thể làm lại nhiều lần để cải thiện điểm",
+            "keywords": ["quiz", "kiểm tra", "trắc nghiệm", "bài tập"]
+        },
+        {
+            "id": 7,
+            "category": "game",
+            "question": "Có những game nào để học từ vựng?",
+            "answer": "Hiện tại có các game:\n1. Image Word Matching: Ghép từ với nghĩa\n2. Word Definition Matching: Chọn định nghĩa đúng\nĐang phát triển thêm:\n- Spelling Game\n- Listening Challenge\n- Speaking Practice",
+            "keywords": ["game", "trò chơi", "word matching", "ghép từ"]
+        },
+        {
+            "id": 8,
+            "category": "progress",
+            "question": "Làm sao để xem tiến độ học tập?",
+            "answer": "Xem tiến độ học tập tại:\n1. Dashboard: Tổng quan số từ đã học, streak hiện tại\n2. Statistics: Biểu đồ chi tiết theo ngày/tuần/tháng\n3. Topic Progress: Tiến độ từng topic\n4. Vocab Progress: Chi tiết từng từ vựng\nHệ thống tracking real-time tất cả hoạt động học.",
+            "keywords": ["tiến độ", "progress", "thống kê", "theo dõi"]
+        },
+        {
+            "id": 9,
+            "category": "account",
+            "question": "Làm sao để đổi mật khẩu?",
+            "answer": "Để đổi mật khẩu:\n1. Vào Settings → Account\n2. Chọn 'Change Password'\n3. Nhập mật khẩu cũ\n4. Nhập mật khẩu mới (tối thiểu 8 ký tự)\n5. Xác nhận mật khẩu mới\n6. Nhấn Save\nHệ thống sẽ gửi email xác nhận sau khi đổi.",
+            "keywords": ["đổi mật khẩu", "password", "change password", "bảo mật"]
+        },
+        {
+            "id": 10,
+            "category": "general",
+            "question": "App có miễn phí không?",
+            "answer": "Card Words hoàn toàn miễn phí:\n- Không giới hạn số từ vựng\n- Không giới hạn số topic\n- Tất cả tính năng đều free\n- Không có quảng cáo\n- Không cần thanh toán",
+            "keywords": ["miễn phí", "free", "giá", "phí"]
+        },
+        {
+            "id": 11,
+            "category": "topic",
+            "question": "Ứng dụng có bao nhiêu chủ đề?",
+            "answer": "QUAN TRỌNG: Hãy kiểm tra dữ liệu database context bên dưới để biết SỐ LƯỢNG CHÍNH XÁC các chủ đề.\n\nỨng dụng Card Words có nhiều chủ đề đa dạng về:\n- Food & Drink (Thức ăn & Đồ uống)\n- Animals (Động vật)\n- Sports & Exercise (Thể thao)\n- Technology (Công nghệ)\n- Travel & Transportation (Du lịch)\n- Business & Work (Kinh doanh & Công việc)\n- Health & Medicine (Sức khỏe)\n- Education (Giáo dục)\n- Family & Relationships (Gia đình)\n- Weather & Nature (Thời tiết & Thiên nhiên)\n- Art & Literature (Nghệ thuật)\n- Music & Entertainment (Âm nhạc)\n\nVà còn nhiều chủ đề khác. Xem danh sách đầy đủ trong menu Topics.",
+            "keywords": ["bao nhiêu", "số lượng", "chủ đề", "topic", "có", "mấy", "topics", "danh sách"]
+        },
+        {
+            "id": 12,
+            "category": "vocab",
+            "question": "Mỗi chủ đề có bao nhiêu từ?",
+            "answer": "QUAN TRỌNG: Kiểm tra database context bên dưới để biết SỐ TỪ CHÍNH XÁC của từng topic.\n\nSố lượng từ vựng trong mỗi chủ đề khác nhau tùy thuộc vào độ rộng của chủ đề:\n- Topic phổ biến (Food, Animals): Thường có 50-100 từ\n- Topic chuyên ngành (Technology, Medical): 30-80 từ\n- Topic cơ bản (Colors, Numbers): 15-30 từ\n\nCách xem chi tiết:\n1. Vào menu Topics → Số từ hiển thị bên cạnh tên topic\n2. Hỏi chatbot: \"Chủ đề [tên topic] có bao nhiêu từ?\"\n3. Click vào topic để xem danh sách đầy đủ",
+            "keywords": ["bao nhiêu từ", "số từ", "từ vựng", "topic", "vocabulary count", "word count"]
+        },
+        {
+            "id": 13,
+            "category": "learning",
+            "question": "Từ nào khó nhất?",
+            "answer": "Độ khó của từ được đánh giá theo CEFR:\n- C2: Khó nhất (Proficient)\n- C1: Rất khó (Advanced)\n- B2: Khá khó (Upper Intermediate)\n- B1: Trung bình (Intermediate)\n- A2: Dễ (Elementary)\n- A1: Rất dễ (Beginner)\nBạn có thể lọc từ theo level CEFR trong ứng dụng.",
+            "keywords": ["khó", "dễ", "level", "cefr", "độ khó", "trình độ"]
+        },
+        {
+            "id": 14,
+            "category": "vocab",
+            "question": "Tìm từ vựng như thế nào?",
+            "answer": "Để tìm từ vựng:\n1. Sử dụng thanh Search trong app\n2. Nhập từ tiếng Anh hoặc nghĩa tiếng Việt\n3. Lọc theo Topic hoặc CEFR level\n4. Hoặc hỏi chatbot trực tiếp về từ cụ thể",
+            "keywords": ["tìm", "search", "từ vựng", "vocabulary", "tra"]
+        },
+        {
+            "id": 15,
+            "category": "topic",
+            "question": "Làm sao biết chủ đề nào phù hợp với trình độ của tôi?",
+            "answer": "Mỗi chủ đề có từ vựng với nhiều level CEFR khác nhau:\n- Người mới bắt đầu: Chọn topic có nhiều từ A1-A2\n- Trung cấp: Chọn topic có từ B1-B2\n- Nâng cao: Chọn topic có từ C1-C2\nBạn có thể xem thống kê CEFR trong mỗi topic để chọn topic phù hợp.",
+            "keywords": ["phù hợp", "trình độ", "level", "topic", "chọn", "suitable"]
+        },
+        {
+            "id": 16,
+            "category": "vocab",
+            "question": "Tổng cộng có bao nhiêu từ vựng?",
+            "answer": "QUAN TRỌNG: Kiểm tra database context bên dưới để lấy SỐ LƯỢNG TỪ VỰNG CHÍNH XÁC.\n\nỨng dụng Card Words có hàng trăm từ vựng được phân loại theo:\n- Các chủ đề khác nhau (Food, Animals, Technology...)\n- Các cấp độ CEFR (A1 đến C2)\n- Độ khó và tần suất sử dụng\n\nSố từ vựng được cập nhật liên tục khi có topic mới.",
+            "keywords": ["tổng", "bao nhiêu", "từ vựng", "vocabulary", "total", "số lượng từ", "có bao nhiêu từ"]
+        },
+        {
+            "id": 17,
+            "category": "topic",
+            "question": "Chủ đề nào có nhiều từ nhất?",
+            "answer": "QUAN TRỌNG: Kiểm tra database context để biết CHÍNH XÁC số từ của từng topic.\n\nThông thường các chủ đề có nhiều từ nhất là:\n- Food & Drink: Từ vựng về thức ăn, đồ uống, nấu ăn\n- Travel & Transportation: Du lịch, phương tiện\n- Business & Work: Kinh doanh, công việc\n- Health & Medicine: Sức khỏe, y tế\n\nSố từ cụ thể có thể xem trong danh sách Topics.",
+            "keywords": ["nhiều từ nhất", "topic lớn nhất", "chủ đề lớn", "nhiều", "most words"]
+        },
+        {
+            "id": 18,
+            "category": "learning",
+            "question": "Nên học bao nhiêu từ mỗi ngày?",
+            "answer": "Gợi ý số từ học mỗi ngày:\n- **Người mới bắt đầu:** 5-10 từ/ngày\n- **Trung cấp:** 10-15 từ/ngày\n- **Nâng cao:** 15-20 từ/ngày\n\nLưu ý:\n- Chất lượng quan trọng hơn số lượng\n- Ôn tập từ cũ thường xuyên\n- Sử dụng Flashcard và Quiz để ghi nhớ lâu hơn\n- Duy trì streak để tạo thói quen học đều đặn",
+            "keywords": ["bao nhiêu từ", "mỗi ngày", "học", "số từ", "per day", "daily"]
+        },
+        {
+            "id": 19,
+            "category": "flashcard",
+            "question": "Làm sao để ôn tập từ đã học?",
+            "answer": "Các cách ôn tập từ vựng hiệu quả:\n1. **Flashcard:** Xem lại từ theo lịch ôn tập tự động\n2. **Quick Quiz:** Làm bài kiểm tra nhanh\n3. **Game:** Chơi Word Matching để ghi nhớ tự nhiên\n4. **Xem lại danh sách:** Trong mỗi topic, xem từ đã học\n5. **Statistics:** Theo dõi tiến độ và từ cần ôn thêm\n\nHệ thống sẽ tự động đề xuất từ nào cần ôn tập dựa trên độ khó và thời gian học.",
+            "keywords": ["ôn tập", "review", "học lại", "xem lại", "revision"]
+        },
+        {
+            "id": 20,
+            "category": "progress",
+            "question": "Tôi đã học được bao nhiêu từ?",
+            "answer": "QUAN TRỌNG: Kiểm tra database context để biết TIẾN ĐỘ HỌC TẬP CHÍNH XÁC của người dùng này.\n\nCách xem tiến độ học tập:\n1. **Dashboard:** Hiển thị tổng số từ đã học, mastered, đang học\n2. **Statistics:** Biểu đồ chi tiết theo thời gian\n3. **Topic Progress:** Tiến độ từng chủ đề\n4. **Hỏi chatbot:** \"Tôi đã học được bao nhiêu từ?\"\n\nThông tin bao gồm:\n- Tổng số từ đã học\n- Số từ thành thạo (Mastered)\n- Số từ đang học (Learning)\n- Độ chính xác trả lời\n- Streak hiện tại",
+            "keywords": ["đã học", "tiến độ", "bao nhiêu", "progress", "learned", "số từ đã học"]
+        },
+        {
+            "id": 21,
+            "category": "topic",
+            "question": "Các chủ đề có những gì?",
+            "answer": "QUAN TRỌNG: Kiểm tra database context để lấy DANH SÁCH CHÍNH XÁC các chủ đề.\n\nỨng dụng Card Words có nhiều chủ đề đa dạng:\n\n**Chủ đề đời sống:**\n- Food & Drink, Animals, Family, Weather, Nature\n\n**Chủ đề công việc & học tập:**\n- Business, Work, Education, Technology\n\n**Chủ đề sức khỏe & giải trí:**\n- Health, Medicine, Sports, Music, Entertainment, Art\n\n**Chủ đề du lịch & giao tiếp:**\n- Travel, Transportation, Communication\n\nVà còn nhiều chủ đề khác. Xem danh sách đầy đủ trong menu Topics với số từ vựng cụ thể của từng topic.",
+            "keywords": ["chủ đề", "topic", "có gì", "danh sách", "list", "categories", "các topic"]
+        },
+        {
+            "id": 22,
+            "category": "vocab",
+            "question": "Làm sao để thêm từ vựng mới?",
+            "answer": "Để thêm từ vựng mới vào học:\n1. **Tìm từ:** Dùng Search hoặc duyệt qua Topics\n2. **Thêm vào học:** Click vào từ và chọn 'Add to Learning'\n3. **Hoặc học cả topic:** Vào topic và chọn 'Start Learning'\n4. **Từ tự động thêm:** Khi làm Quiz hoặc chơi Game\n\nGợi ý:\n- Thêm từ theo chủ đề để học có hệ thống\n- Chọn từ phù hợp với trình độ CEFR\n- Không thêm quá nhiều từ cùng lúc",
+            "keywords": ["thêm từ", "add", "từ mới", "new word", "vocabulary"]
+        },
+        {
+            "id": 23,
+            "category": "game",
+            "question": "Game học từ vựng có gì hay?",
+            "answer": "Game giúp học từ vui vẻ và hiệu quả:\n\n**Image Word Matching:**\n- Ghép từ với hình ảnh tương ứng\n- Học từ qua hình ảnh trực quan\n- Phù hợp với người học bằng thị giác\n\n**Word Definition Matching:**\n- Ghép từ với nghĩa đúng\n- Rèn luyện khả năng nhớ nghĩa\n- Tăng tốc độ phản xạ\n\n**Lợi ích:**\n- Học không nhàm chán\n- Ghi nhớ lâu hơn qua trải nghiệm\n- Cạnh tranh với bạn bè\n- Kiếm điểm và thành tích",
+            "keywords": ["game", "trò chơi", "vui", "matching", "ghép từ"]
+        },
+        {
+            "id": 24,
+            "category": "streak",
+            "question": "Làm sao để tăng streak?",
+            "answer": "Cách tăng và duy trì streak:\n\n**Để tăng streak:**\n- Học ít nhất 1 flashcard mỗi ngày\n- Hoặc làm 1 quiz bất kỳ\n- Hoặc chơi 1 game\n\n**Tips duy trì streak:**\n- Đặt reminder hàng ngày\n- Học vào thời gian cố định\n- Dùng tính năng Quick Practice (5 phút)\n- Không bỏ lỡ ngày nào\n\n**Lưu ý:**\n- Streak reset về 0 nếu bỏ lỡ 1 ngày\n- Streak càng cao, nhận badge càng giá trị\n- Hệ thống gửi reminder trước khi streak bị mất",
+            "keywords": ["streak", "tăng", "duy trì", "maintain", "increase", "chuỗi ngày"]
+        },
+        {
+            "id": 25,
+            "category": "general",
+            "question": "App này dùng để làm gì?",
+            "answer": "Card Words là ứng dụng học từ vựng tiếng Anh toàn diện:\n\n**Chức năng chính:**\n- Học từ vựng theo chủ đề\n- Flashcard với lịch ôn tập thông minh\n- Quick Quiz kiểm tra nhanh\n- Game học vui vẻ\n- Theo dõi tiến độ chi tiết\n- AI Chatbot hỗ trợ 24/7\n\n**Phù hợp với:**\n- Học sinh, sinh viên\n- Người đi làm cần tiếng Anh\n- Người tự học\n- Mọi trình độ từ A1 đến C2\n\n**Ưu điểm:**\n- Hoàn toàn miễn phí\n- Giao diện thân thiện\n- Học mọi lúc mọi nơi",
+            "keywords": ["app", "ứng dụng", "làm gì", "chức năng", "features", "về app"]
+        },
+        {
+            "id": 26,
+            "category": "topic",
+            "question": "Chủ đề Food & Drink có những từ gì?",
+            "answer": "QUAN TRỌNG: Kiểm tra database context để lấy danh sách TỪ VỰNG CHÍNH XÁC.\n\nChủ đề Food & Drink thường bao gồm:\n**Đồ ăn:** apple, bread, rice, chicken, beef, fish, egg, cheese, pizza, burger\n**Đồ uống:** water, coffee, tea, juice, milk, beer, wine, soda\n**Nấu ăn:** cook, bake, fry, boil, steam, grill, roast\n**Nhà hàng:** menu, order, waiter, chef, restaurant, cafe\n\nHỏi chatbot \"Liệt kê từ vựng chủ đề Food & Drink\" để xem danh sách đầy đủ!",
+            "keywords": ["food", "drink", "thức ăn", "đồ uống", "food and drink", "ăn uống"]
+        },
+        {
+            "id": 27,
+            "category": "topic",
+            "question": "Chủ đề Animals có những từ gì?",
+            "answer": "QUAN TRỌNG: Kiểm tra database context để lấy danh sách TỪ VỰNG CHÍNH XÁC.\n\nChủ đề Animals bao gồm:\n**Động vật nhà:** dog, cat, rabbit, chicken, duck, pig, cow, horse\n**Động vật hoang dã:** lion, tiger, elephant, monkey, bear, wolf, fox\n**Chim:** bird, eagle, parrot, penguin, owl, peacock\n**Động vật biển:** fish, shark, whale, dolphin, octopus, crab\n**Côn trùng:** bee, butterfly, ant, spider, mosquito\n\nVào topic Animals để xem chi tiết!",
+            "keywords": ["animals", "động vật", "con vật", "animal"]
+        },
+        {
+            "id": 28,
+            "category": "topic",
+            "question": "Có chủ đề về công việc không?",
+            "answer": "QUAN TRỌNG: Kiểm tra database context để xem các chủ đề về công việc.\n\nCó! Các chủ đề về công việc:\n**Business & Work:** meeting, presentation, deadline, project, teamwork\n**Office:** computer, desk, chair, printer, email, document\n**Career:** job, career, salary, promotion, interview, resume\n**Professional Skills:** communication, leadership, management\n\nRất hữu ích cho người đi làm!",
+            "keywords": ["công việc", "work", "business", "làm việc", "office", "văn phòng"]
+        },
+        {
+            "id": 29,
+            "category": "topic",
+            "question": "Có chủ đề về du lịch không?",
+            "answer": "QUAN TRỌNG: Kiểm tra database context.\n\nCó chủ đề Travel & Transportation:\n**Du lịch:** travel, tourist, hotel, airport, passport, visa, ticket\n**Phương tiện:** car, bus, train, plane, boat, bicycle, motorcycle\n**Địa điểm:** beach, mountain, city, museum, park, temple\n**Hoạt động:** sightseeing, camping, hiking, swimming\n\nPhù hợp cho người chuẩn bị đi du lịch!",
+            "keywords": ["du lịch", "travel", "transportation", "phương tiện", "đi du lịch"]
+        },
+        {
+            "id": 30,
+            "category": "topic",
+            "question": "Có chủ đề về sức khỏe không?",
+            "answer": "QUAN TRỌNG: Kiểm tra database context.\n\nCó chủ đề Health & Medicine:\n**Sức khỏe:** health, fitness, exercise, diet, nutrition, sleep\n**Bệnh tật:** sick, disease, fever, cold, flu, headache, pain\n**Y tế:** hospital, doctor, nurse, medicine, pill, injection\n**Cơ thể:** body parts, heart, lung, stomach, brain\n\nRất quan trọng cho giao tiếp y tế!",
+            "keywords": ["sức khỏe", "health", "medicine", "y tế", "bệnh", "doctor"]
+        },
+        {
+            "id": 31,
+            "category": "vocab",
+            "question": "Từ A1 là gì?",
+            "answer": "Từ A1 là từ vựng cơ bản nhất dành cho người mới bắt đầu học tiếng Anh.\n\n**Đặc điểm:**\n- Từ thông dụng hàng ngày\n- Dễ nhớ, dễ phát âm\n- Thường chỉ 1-2 âm tiết\n- Ví dụ: hello, yes, no, I, you, he, she, water, food\n\n**Nên học A1 nếu:**\n- Mới bắt đầu học tiếng Anh\n- Chưa có vốn từ vựng cơ bản\n- Cần nền tảng vững chắc",
+            "keywords": ["a1", "beginner", "sơ cấp", "cơ bản", "mới bắt đầu"]
+        },
+        {
+            "id": 32,
+            "category": "vocab",
+            "question": "Từ B1 là gì?",
+            "answer": "Từ B1 là từ vựng trung cấp cho người đã có nền tảng tiếng Anh.\n\n**Đặc điểm:**\n- Từ thông dụng trong giao tiếp\n- Dùng trong công việc, học tập\n- Có thể phức tạp hơn A2\n- Ví dụ: achieve, develop, environment, organize, significant\n\n**Phù hợp với:**\n- Đã học xong A1, A2\n- Cần tiếng Anh cho công việc\n- Chuẩn bị thi IELTS 5.0-6.0",
+            "keywords": ["b1", "intermediate", "trung cấp", "b1 level"]
+        },
+        {
+            "id": 33,
+            "category": "vocab",
+            "question": "Từ C1 khó không?",
+            "answer": "Từ C1 khá khó, dành cho người có trình độ cao.\n\n**Đặc điểm:**\n- Từ vựng chuyên sâu\n- Dùng trong văn viết, học thuật\n- Nhiều từ đồng nghĩa, trái nghĩa\n- Ví dụ: sophisticated, unprecedented, paramount, coherent\n\n**Cần C1 nếu:**\n- Làm việc môi trường quốc tế\n- Đọc tài liệu chuyên môn\n- Thi IELTS 7.5+\n\nNên học A1-B2 trước khi học C1!",
+            "keywords": ["c1", "advanced", "nâng cao", "khó", "c1 level"]
+        },
+        {
+            "id": 34,
+            "category": "learning",
+            "question": "Học từ A1 trước hay B1 trước?",
+            "answer": "Phải học theo thứ tự từ dễ đến khó:\n\n**Lộ trình đúng:**\n1. A1 (Beginner) → 2-3 tháng\n2. A2 (Elementary) → 2-3 tháng\n3. B1 (Intermediate) → 3-4 tháng\n4. B2 (Upper Intermediate) → 4-6 tháng\n5. C1 (Advanced) → 6+ tháng\n6. C2 (Proficient) → 1-2 năm\n\n**Tại sao?**\n- Nền tảng vững chắc\n- Từ B1 dùng kiến thức A1-A2\n- Tránh nản chí vì quá khó\n\nHọc đúng level = hiệu quả cao!",
+            "keywords": ["học trước", "thứ tự", "lộ trình", "bắt đầu", "order", "sequence"]
+        },
+        {
+            "id": 35,
+            "category": "learning",
+            "question": "Học bao lâu thì thuộc từ?",
+            "answer": "Thời gian thuộc từ phụ thuộc vào nhiều yếu tố:\n\n**Giai đoạn nhớ:**\n- Ngày 1: Nhớ tạm thời\n- Ngày 3: Cần ôn lại\n- Tuần 1: Nhớ ngắn hạn\n- Tháng 1: Nhớ trung hạn\n- 3-6 tháng: Nhớ lâu dài\n\n**Bí quyết thuộc nhanh:**\n- Ôn tập đều đặn (spaced repetition)\n- Dùng flashcard mỗi ngày\n- Áp dụng vào câu thực tế\n- Học qua hình ảnh, game\n- Không học quá nhiều từ/ngày\n\nFlashcard của app dùng thuật toán ôn tập tối ưu!",
+            "keywords": ["bao lâu", "thuộc", "nhớ", "ghi nhớ", "how long", "memorize"]
+        },
+        {
+            "id": 36,
+            "category": "learning",
+            "question": "Tại sao cứ quên từ vựng?",
+            "answer": "Quên từ vựng là bình thường! Nguyên nhân:\n\n**Lý do chính:**\n1. Không ôn tập đều đặn\n2. Học quá nhiều từ cùng lúc\n3. Chỉ nhìn, không thực hành\n4. Không dùng từ trong câu\n5. Học không có ngữ cảnh\n\n**Giải pháp:**\n- Dùng Flashcard ôn tập theo lịch\n- Học 10-15 từ/ngày thôi\n- Làm Quiz kiểm tra thường xuyên\n- Viết câu với từ mới\n- Chơi game để ghi nhớ tự nhiên\n- Duy trì streak học liên tục\n\nNão bộ cần 7 lần gặp lại từ mới nhớ lâu!",
+            "keywords": ["quên", "forget", "không nhớ", "mất nhớ", "tại sao quên"]
+        },
+        {
+            "id": 37,
+            "category": "learning",
+            "question": "Có cần học phát âm không?",
+            "answer": "CÓ! Phát âm rất quan trọng:\n\n**Lợi ích khi học phát âm:**\n- Nói rõ ràng, tự tin hơn\n- Người nghe hiểu dễ dàng\n- Nghe tiếng Anh tốt hơn\n- Tránh nhầm lẫn ý nghĩa\n\n**Cách học phát âm:**\n- Nghe từ trong app (nếu có)\n- Dùng Google Translate nghe phát âm\n- Luyện IPA (ký hiệu phiên âm)\n- Bắt chước người bản xứ\n- Ghi âm lại so sánh\n\n**Mẹo:**\nHọc từ mới = học cả nghĩa + phát âm cùng lúc!",
+            "keywords": ["phát âm", "pronunciation", "nói", "speak", "âm"]
+        },
+        {
+            "id": 38,
+            "category": "learning",
+            "question": "Học từ qua phim có tốt không?",
+            "answer": "Rất tốt! Học qua phim có nhiều lợi ích:\n\n**Ưu điểm:**\n- Nghe phát âm chuẩn\n- Học ngữ cảnh thực tế\n- Học slang, idioms\n- Vui vẻ, không nhàm chán\n- Nhớ lâu qua hình ảnh\n\n**Cách học hiệu quả:**\n1. Xem có phụ đề tiếng Anh\n2. Ghi chú từ mới\n3. Thêm từ vào app học\n4. Ôn tập bằng Flashcard\n5. Xem lại cảnh có từ đó\n\n**Phim phù hợp:**\n- Friends (sitcom, dễ hiểu)\n- Harry Potter (fantasy)\n- The Crown (lịch sử)\n\nKết hợp phim + app = hiệu quả x2!",
+            "keywords": ["phim", "movie", "film", "học qua phim", "watch"]
+        },
+        {
+            "id": 39,
+            "category": "flashcard",
+            "question": "Flashcard là gì?",
+            "answer": "Flashcard là thẻ học từ vựng 2 mặt:\n\n**Cấu trúc:**\n- Mặt trước: Từ tiếng Anh\n- Mặt sau: Nghĩa tiếng Việt, ví dụ, hình ảnh\n\n**Cách hoạt động:**\n1. Xem từ tiếng Anh\n2. Nghĩ nghĩa trong đầu\n3. Lật thẻ kiểm tra\n4. Đánh giá: Easy/Medium/Hard\n5. App tự động lên lịch ôn lại\n\n**Tại sao hiệu quả?**\n- Học chủ động (active recall)\n- Lặp lại ngắt quãng (spaced repetition)\n- Tập trung cao độ\n- Nhớ lâu gấp 3 lần học thụ động\n\nFlashcard là phương pháp #1 học từ vựng!",
+            "keywords": ["flashcard", "thẻ học", "flash card", "là gì"]
+        },
+        {
+            "id": 40,
+            "category": "flashcard",
+            "question": "Làm flashcard mỗi ngày bao lâu?",
+            "answer": "Gợi ý thời gian học flashcard:\n\n**Người mới bắt đầu:**\n- 10-15 phút/ngày\n- 10-20 thẻ\n\n**Trung cấp:**\n- 20-30 phút/ngày\n- 30-50 thẻ\n\n**Nâng cao:**\n- 30-45 phút/ngày\n- 50-100 thẻ\n\n**Mẹo:**\n- Chia nhỏ: 2 lần 15 phút tốt hơn 1 lần 30 phút\n- Học buổi sáng: não tỉnh táo\n- Học trước ngủ: ghi nhớ tốt hơn\n- Dùng thời gian chờ (xe bus, hàng...)\n\n**Quan trọng:**\nĐều đặn > Học nhiều!\n10 phút mỗi ngày tốt hơn 2 giờ 1 tuần!",
+            "keywords": ["bao lâu", "thời gian", "mỗi ngày", "flashcard", "how long"]
+        },
+        {
+            "id": 41,
+            "category": "flashcard",
+            "question": "Easy Medium Hard nghĩa là gì?",
+            "answer": "Đây là đánh giá mức độ nhớ từ trong Flashcard:\n\n**Easy (Dễ):** ✅\n- Nhớ ngay lập tức\n- Không cần suy nghĩ\n- → Ôn lại sau 7-10 ngày\n\n**Medium (Vừa):** ⚠️\n- Nghĩ 2-3 giây mới nhớ\n- Nhớ nhưng chưa chắc chắn\n- → Ôn lại sau 3-5 ngày\n\n**Hard (Khó):** ❌\n- Nghĩ lâu hoặc quên\n- Cần xem đáp án\n- → Ôn lại sau 1 ngày\n\n**Lưu ý:**\nĐánh giá trung thực để app lên lịch ôn tập hiệu quả!\nỨng dụng dùng thuật toán Spaced Repetition thông minh.",
+            "keywords": ["easy", "medium", "hard", "dễ", "khó", "vừa", "đánh giá"]
+        },
+        {
+            "id": 42,
+            "category": "quiz",
+            "question": "Quiz khác gì Flashcard?",
+            "answer": "Quiz và Flashcard khác nhau về mục đích:\n\n**Flashcard:** 📚\n- Học từ mới\n- Ôn tập thụ động\n- Tự đánh giá\n- Không giới hạn thời gian\n- Học mọi lúc\n\n**Quiz:** ✍️\n- Kiểm tra kiến thức\n- Trắc nghiệm 4 đáp án\n- Tính điểm chính xác\n- Có giới hạn thời gian\n- Áp lực nhẹ → nhớ tốt hơn\n\n**Nên dùng cả 2:**\n1. Flashcard học từ mới\n2. Quiz kiểm tra xem nhớ chưa\n3. Flashcard ôn lại từ sai\n\nKết hợp = hiệu quả tối đa!",
+            "keywords": ["quiz", "flashcard", "khác nhau", "difference", "so sánh"]
+        },
+        {
+            "id": 43,
+            "category": "quiz",
+            "question": "Điểm quiz thấp phải làm sao?",
+            "answer": "Đừng lo! Điểm thấp là bình thường khi mới học:\n\n**Nguyên nhân:**\n- Chưa học kỹ từ vựng\n- Học quá nhanh\n- Chưa ôn tập đủ\n- Chọn topic khó quá trình độ\n\n**Giải pháp:**\n1. **Học lại từ cơ bản:**\n   - Dùng Flashcard trước\n   - Học 5-10 từ/ngày thôi\n   \n2. **Ôn tập nhiều hơn:**\n   - Flashcard mỗi ngày\n   - Làm quiz lại nhiều lần\n   \n3. **Chọn level phù hợp:**\n   - Bắt đầu từ A1\n   - Chỉ lên B1 khi A2 đạt 80%+\n   \n4. **Kiên nhẫn:**\n   - Tiến bộ cần thời gian\n   - Duy trì streak\n\nĐiểm tăng dần là dấu hiệu tốt!",
+            "keywords": ["điểm thấp", "low score", "kém", "sai nhiều", "không đạt"]
+        },
+        {
+            "id": 44,
+            "category": "quiz",
+            "question": "Làm quiz bao nhiêu lần?",
+            "answer": "Không giới hạn! Làm lại nhiều lần để cải thiện:\n\n**Gợi ý:**\n- **Lần 1:** Làm bình thường\n- **Lần 2:** Học lại từ sai, làm lại sau 1 ngày\n- **Lần 3:** Kiểm tra tiến bộ sau 1 tuần\n\n**Mục tiêu:**\n- Đạt 80%+ mới chuyển topic khác\n- Làm lại định kỳ mỗi tháng\n\n**Lợi ích làm lại:**\n- Củng cố kiến thức\n- Tăng độ tự tin\n- Phát hiện từ còn yếu\n- Cải thiện điểm số\n\n**Lưu ý:**\nLàm quiz sau khi học Flashcard = hiệu quả cao hơn!",
+            "keywords": ["bao nhiêu lần", "làm lại", "retry", "repeat", "how many times"]
+        },
+        {
+            "id": 45,
+            "category": "game",
+            "question": "Chơi game có học được không?",
+            "answer": "Có! Game học từ vựng rất hiệu quả:\n\n**Nghiên cứu khoa học:**\n- Ghi nhớ tăng 40% khi học qua game\n- Não tiết dopamine → vui vẻ học tốt hơn\n- Học không căng thẳng = nhớ lâu hơn\n\n**Tại sao game hiệu quả:**\n- Học tự nhiên, không ép buộc\n- Tương tác nhiều hơn đọc sách\n- Phản hồi ngay lập tức\n- Tạo động lực cạnh tranh\n- Luyện phản xạ nhận từ\n\n**Cách dùng game đúng:**\n1. Học Flashcard trước\n2. Chơi game để củng cố\n3. Không chỉ chơi game mà bỏ Flashcard\n\nGame = bổ trợ, không thay thế Flashcard!",
+            "keywords": ["game", "chơi", "học qua game", "gamification", "hiệu quả"]
+        },
+        {
+            "id": 46,
+            "category": "game",
+            "question": "Game nào dễ nhất?",
+            "answer": "Image Word Matching dễ nhất:\n\n**Tại sao dễ:**\n- Có hình ảnh gợi ý\n- Nhớ qua thị giác\n- Phù hợp người mới\n- Không cần đọc định nghĩa dài\n\n**Cách chơi:**\n1. Xem hình ảnh\n2. Ghép với từ đúng\n3. Chọn nhanh càng tốt\n\n**Độ khó tăng dần:**\n1. Image Matching (dễ nhất) ⭐\n2. Word Definition (trung bình) ⭐⭐\n3. Spelling Game (khó) ⭐⭐⭐\n\n**Mẹo:**\nBắt đầu từ game dễ để tự tin, sau đó thử game khó hơn!",
+            "keywords": ["dễ nhất", "easiest", "game dễ", "beginner game"]
+        },
+        {
+            "id": 47,
+            "category": "game",
+            "question": "Chơi game được điểm không?",
+            "answer": "Có! Game có hệ thống điểm và xếp hạng:\n\n**Cách tính điểm:**\n- Mỗi câu đúng: +10 điểm\n- Trả lời nhanh: Bonus thêm 5 điểm\n- Combo streak: x2, x3 điểm\n- Hoàn thành game: +50 điểm\n\n**Lợi ích có điểm:**\n- Theo dõi tiến bộ\n- Cạnh tranh với bạn bè\n- Mở khóa thành tích (achievements)\n- Động lực chơi tiếp\n\n**Mục tiêu:**\n- Phá kỷ lục cá nhân\n- Lên top bảng xếp hạng\n- Thu thập badges\n\nChơi game vừa học vừa vui!",
+            "keywords": ["điểm", "score", "point", "xếp hạng", "ranking"]
+        },
+        {
+            "id": 48,
+            "category": "streak",
+            "question": "Streak có quan trọng không?",
+            "answer": "Rất quan trọng! Streak giúp tạo thói quen học:\n\n**Lợi ích của Streak:**\n- **Tạo thói quen:** Học đều đặn mỗi ngày\n- **Động lực:** Không muốn mất streak\n- **Kỷ luật:** Ép buộc tích cực\n- **Kết quả:** Tiến bộ nhanh hơn\n\n**Nghiên cứu:**\n- Người có streak 30+ ngày nhớ từ tốt hơn 300%\n- Học 10 phút/ngày tốt hơn 2h/tuần\n- Streak cao = thành công cao\n\n**Ưu tiên:**\nStreak > Số từ học!\nHọc 5 từ nhưng đều đặn tốt hơn học 50 từ rồi nghỉ.\n\n**Mẹo:**\nĐặt reminder mỗi ngày để không quên!",
+            "keywords": ["streak", "quan trọng", "important", "lợi ích", "benefit"]
+        },
+        {
+            "id": 49,
+            "category": "streak",
+            "question": "Mất streak phải làm sao?",
+            "answer": "Đừng nản lòng! Mất streak là bình thường:\n\n**Khi mất streak:**\n❌ Đừng: Bỏ cuộc, nghĩ mình thất bại\n✅ Nên: Bắt đầu lại ngay hôm sau\n\n**Cách phục hồi:**\n1. Chấp nhận và học từ sai lầm\n2. Tìm nguyên nhân: Quên? Bận? Lười?\n3. Đặt nhiều reminder hơn\n4. Học vào giờ cố định\n5. Bắt đầu streak mới\n\n**Động lực:**\n- Streak mới sẽ cao hơn!\n- Bạn đã biết mình có thể làm được\n- Lần này sẽ cẩn thận hơn\n\n**Mẹo phòng tránh:**\n- Học buổi sáng (tránh quên)\n- Backup plan: Học 5 phút trước ngủ\n- Dùng tính năng \"Streak Freeze\" (nếu có)",
+            "keywords": ["mất streak", "lost streak", "reset", "streak bị mất", "0 streak"]
+        },
+        {
+            "id": 50,
+            "category": "streak",
+            "question": "Streak cao nhất là bao nhiêu?",
+            "answer": "QUAN TRỌNG: Kiểm tra database để biết kỷ lục streak trong hệ thống.\n\n**Mục tiêu streak:**\n- 7 ngày: Bắt đầu tốt! 🔥\n- 30 ngày: Thói quen đã hình thành! 🏆\n- 100 ngày: Siêu ấn tượng! 💎\n- 365 ngày: Huyền thoại! 👑\n\n**Kỷ lục thế giới:**\nMột số người duy trì 1000+ ngày!\n\n**Phần thưởng:**\n- Streak 7: Bronze badge\n- Streak 30: Silver badge  \n- Streak 100: Gold badge\n- Streak 365: Diamond badge\n\n**Thử thách:**\nBạn có thể đạt streak 30 ngày không?",
+            "keywords": ["cao nhất", "highest", "kỷ lục", "record", "max streak"]
+        },
+        {
+            "id": 51,
+            "category": "progress",
+            "question": "Xem thống kê ở đâu?",
+            "answer": "Xem thống kê chi tiết trong app:\n\n**Dashboard:**\n- Tổng số từ đã học\n- Streak hiện tại\n- Điểm quiz trung bình\n- Chủ đề đang học\n\n**Statistics Page:**\n- Biểu đồ học theo ngày/tuần/tháng\n- Số từ học mỗi ngày\n- Độ chính xác trả lời\n- Thời gian học trung bình\n- Topic yêu thích\n\n**Topic Progress:**\n- Tiến độ từng chủ đề\n- Từ đã mastered\n- Từ đang học\n- Từ cần ôn lại\n\n**Vocab Progress:**\n- Chi tiết từng từ\n- Lần cuối ôn tập\n- Số lần đúng/sai\n- Mức độ thuộc\n\nThống kê giúp biết mình đang ở đâu!",
+            "keywords": ["thống kê", "statistics", "xem", "ở đâu", "where", "stats"]
+        },
+        {
+            "id": 52,
+            "category": "progress",
+            "question": "Làm sao biết mình tiến bộ?",
+            "answer": "Nhiều cách để đo tiến bộ:\n\n**Dấu hiệu tiến bộ:**\n✅ Streak tăng đều\n✅ Điểm quiz cải thiện\n✅ Số từ mastered tăng\n✅ Làm quiz nhanh hơn\n✅ Nhớ từ lâu hơn\n✅ Tự tin hơn khi giao tiếp\n\n**So sánh:**\n- Tuần này vs tuần trước\n- Tháng này vs tháng trước\n- Quiz lần 1 vs lần 2\n\n**Mẹo:**\n- Ghi chép diary học tập\n- Chụp ảnh statistics mỗi tuần\n- Đặt mục tiêu cụ thể\n- Ăn mừng khi đạt milestone!\n\n**Milestone gợi ý:**\n- 100 từ đầu tiên\n- Streak 30 ngày\n- Quiz đạt 90%\n- Hoàn thành 1 topic",
+            "keywords": ["tiến bộ", "progress", "improve", "cải thiện", "better"]
+        },
+        {
+            "id": 53,
+            "category": "account",
+            "question": "Có thể đổi tên không?",
+            "answer": "Có! Đổi tên tài khoản rất dễ:\n\n**Cách đổi tên:**\n1. Vào **Settings** ⚙️\n2. Chọn **Account**\n3. Click **Edit Profile**\n4. Đổi **Display Name**\n5. Nhấn **Save**\n\n**Lưu ý:**\n- Display name: Tên hiển thị (có thể đổi)\n- Username: Tên đăng nhập (không đổi được)\n- Email: Có thể đổi (cần xác thực)\n\n**Giới hạn:**\n- Tên 3-50 ký tự\n- Không chứa ký tự đặc biệt\n- Có thể có dấu cách\n- Chỉ đổi 1 lần/tháng\n\nChọn tên hay để động lực học!",
+            "keywords": ["đổi tên", "change name", "username", "tên", "rename"]
+        },
+        {
+            "id": 54,
+            "category": "account",
+            "question": "Quên mật khẩu phải làm sao?",
+            "answer": "Đừng lo! Reset mật khẩu rất đơn giản:\n\n**Các bước:**\n1. Vào trang Login\n2. Click **Forgot Password?**\n3. Nhập email đã đăng ký\n4. Kiểm tra email (cả spam)\n5. Click link trong email\n6. Nhập mật khẩu mới\n7. Xác nhận mật khẩu\n8. Login lại\n\n**Lưu ý:**\n- Link reset hết hạn sau 1 giờ\n- Mật khẩu mới tối thiểu 8 ký tự\n- Nên có chữ hoa, số, ký tự đặc biệt\n- Không dùng mật khẩu cũ\n\n**Không nhận email?**\n- Kiểm tra spam/junk\n- Chờ 5-10 phút\n- Thử lại hoặc liên hệ support",
+            "keywords": ["quên mật khẩu", "forgot password", "reset", "mật khẩu", "password"]
+        },
+        {
+            "id": 55,
+            "category": "account",
+            "question": "Xóa tài khoản được không?",
+            "answer": "Có thể xóa tài khoản nếu cần:\n\n**⚠️ CẢNH BÁO:**\nXóa tài khoản = **MẤT HẾT DỮ LIỆU:**\n- Tất cả từ đã học\n- Tiến độ học tập\n- Streak history\n- Điểm quiz\n- Thành tích badges\n- Không thể khôi phục!\n\n**Cách xóa:**\n1. Settings → Account\n2. Scroll xuống cuối\n3. Click \"Delete Account\"\n4. Nhập mật khẩu xác nhận\n5. Xác nhận lần cuối\n\n**Thay vì xóa:**\n- Có thể tạm ngưng học\n- Tắt notifications\n- Logout và quay lại sau\n\n**Suy nghĩ kỹ trước khi xóa!**",
+            "keywords": ["xóa tài khoản", "delete account", "hủy", "xóa", "delete"]
+        },
+        {
+            "id": 56,
+            "category": "general",
+            "question": "App có offline không?",
+            "answer": "Tùy tính năng:\n\n**Có thể dùng offline:**\n✅ Xem từ đã tải\n✅ Làm Flashcard\n✅ Xem thống kê\n✅ Xem topic đã mở\n\n**Cần internet:**\n❌ Download topic mới\n❌ Làm quiz\n❌ Chơi game\n❌ Chat với AI\n❌ Đồng bộ dữ liệu\n❌ Cập nhật streak\n\n**Mẹo:**\n- Download topics trước khi offline\n- Dùng Flashcard khi không có mạng\n- Sync ngay khi có wifi\n\n**Tương lai:**\nCó thể sẽ hỗ trợ offline đầy đủ hơn!",
+            "keywords": ["offline", "không có mạng", "internet", "wifi", "không cần mạng"]
+        },
+        {
+            "id": 57,
+            "category": "general",
+            "question": "App có quảng cáo không?",
+            "answer": "**KHÔNG CÓ QUẢNG CÁO!** 🎉\n\nCard Words hoàn toàn:\n✅ Miễn phí 100%\n✅ Không quảng cáo\n✅ Không popup\n✅ Không video ads\n✅ Không tracking bán data\n✅ Không in-app purchase\n\n**Tại sao miễn phí?**\n- Dự án học thuật\n- Mục đích giáo dục\n- Giúp người học tiếng Anh\n- Không vì lợi nhuận\n\n**Cam kết:**\n- Luôn miễn phí\n- Không giới hạn tính năng\n- Không yêu cầu thanh toán\n\n**Hỗ trợ dự án:**\nShare app cho bạn bè là cách tốt nhất!",
+            "keywords": ["quảng cáo", "ads", "advertisement", "free", "miễn phí", "phí"]
+        },
+        {
+            "id": 58,
+            "category": "general",
+            "question": "App có trên iOS không?",
+            "answer": "QUAN TRỌNG: Kiểm tra thông tin phiên bản hiện tại.\n\n**Hiện tại:**\nThông tin về platform hỗ trợ:\n- Web app\n- Android (nếu có)\n- iOS (nếu có)\n\n**Download:**\n- App Store (iOS)\n- Google Play (Android) \n- Website (Web version)\n\n**Tính năng:**\nTất cả platform đều có đầy đủ tính năng:\n- Flashcard\n- Quiz\n- Game\n- AI Chatbot\n- Sync giữa các thiết bị\n\n**Lưu ý:**\nDùng cùng email để sync dữ liệu!",
+            "keywords": ["ios", "iphone", "android", "platform", "hệ điều hành", "app store"]
+        },
+        {
+            "id": 59,
+            "category": "general",
+            "question": "Dữ liệu có an toàn không?",
+            "answer": "Dữ liệu của bạn RẤT AN TOÀN:\n\n**Bảo mật:**\n🔒 Mã hóa end-to-end\n🔒 HTTPS protocol\n🔒 Mật khẩu hash (không lưu plain text)\n🔒 Server bảo mật cao\n🔒 Regular backups\n\n**Quyền riêng tư:**\n✅ Không bán dữ liệu\n✅ Không share cho bên thứ 3\n✅ Không tracking quảng cáo\n✅ Tuân thủ GDPR\n✅ Chỉ lưu dữ liệu học tập\n\n**Bạn kiểm soát:**\n- Xem dữ liệu bất kỳ lúc nào\n- Export dữ liệu\n- Xóa dữ liệu\n- Xóa tài khoản\n\n**Backup:**\nDữ liệu được backup hàng ngày, an tâm học!",
+            "keywords": ["an toàn", "bảo mật", "security", "privacy", "dữ liệu", "data"]
+        },
+        {
+            "id": 60,
+            "category": "general",
+            "question": "Liên hệ support như thế nào?",
+            "answer": "Cần hỗ trợ? Liên hệ qua:\n\n**1. AI Chatbot:** 🤖\n- Ngay trong app\n- Trả lời 24/7\n- Câu hỏi thường gặp\n\n**2. Email:** 📧\n- support@cardwords.com\n- Phản hồi trong 24h\n- Gửi kèm screenshot\n\n**3. Form liên hệ:** 📝\n- Settings → Help & Support\n- Điền form chi tiết\n- Tự động tạo ticket\n\n**4. FAQ:** 📚\n- Kiểm tra FAQ trước\n- Nhiều câu hỏi đã có đáp án\n\n**Khi liên hệ, gửi:**\n- Mô tả vấn đề rõ ràng\n- Screenshot (nếu có)\n- Thông tin tài khoản\n- Các bước đã thử\n\nChúng tôi sẵn sàng giúp đỡ!",
+            "keywords": ["liên hệ", "support", "help", "hỗ trợ", "contact", "email"]
+        },
+        {
+            "id": 61,
+            "category": "topic",
+            "question": "Chủ đề Technology có gì?",
+            "answer": "QUAN TRỌNG: Kiểm tra database context.\n\nChủ đề Technology bao gồm:\n**Thiết bị:** computer, laptop, smartphone, tablet, keyboard, mouse\n**Internet:** wifi, website, email, browser, download, upload\n**Software:** app, program, software, update, install, delete\n**Công nghệ:** AI, robot, drone, VR, blockchain, cloud\n**Động từ:** code, debug, hack, program, develop\n\nPhù hợp cho IT, lập trình viên!",
+            "keywords": ["technology", "công nghệ", "tech", "máy tính", "computer"]
+        },
+        {
+            "id": 62,
+            "category": "topic",
+            "question": "Chủ đề Music có gì?",
+            "answer": "QUAN TRỌNG: Kiểm tra database context.\n\nChủ đề Music:\n**Nhạc cụ:** guitar, piano, drum, violin, flute, saxophone\n**Thể loại:** rock, pop, jazz, classical, rap, country\n**Hành động:** sing, play, listen, compose, record, perform\n**Thuật ngữ:** melody, rhythm, harmony, lyrics, chorus, verse\n**Người:** singer, musician, composer, band, orchestra\n\nYêu âm nhạc? Học topic này!",
+            "keywords": ["music", "âm nhạc", "nhạc", "ca nhạc", "bài hát"]
+        },
+        {
+            "id": 63,
+            "category": "topic",
+            "question": "Chủ đề Sports có gì?",
+            "answer": "QUAN TRỌNG: Kiểm tra database context.\n\nChủ đề Sports:\n**Bóng:** football, basketball, tennis, volleyball, badminton, golf\n**Thể thao nước:** swimming, diving, surfing, sailing\n**Thể hình:** gym, fitness, running, jogging, yoga, exercise\n**Dụng cụ:** ball, bat, racket, glove, helmet, goal\n**Động từ:** play, run, kick, throw, catch, score, win, lose\n\nThích thể thao? Topic này dành cho bạn!",
+            "keywords": ["sports", "thể thao", "bóng đá", "football", "exercise"]
+        },
+        {
+            "id": 64,
+            "category": "topic",
+            "question": "Chủ đề Education có gì?",
+            "answer": "QUAN TRỌNG: Kiểm tra database context.\n\nChủ đề Education:\n**Trường học:** school, university, college, classroom, library\n**Người:** teacher, student, professor, principal, classmate\n**Môn học:** math, science, history, geography, literature\n**Đồ dùng:** book, pen, pencil, notebook, eraser, ruler\n**Hoạt động:** study, learn, teach, read, write, exam, homework\n\nHọc sinh, sinh viên nên học!",
+            "keywords": ["education", "giáo dục", "học", "trường", "school"]
+        },
+        {
+            "id": 65,
+            "category": "topic",
+            "question": "Chủ đề Weather có gì?",
+            "answer": "QUAN TRỌNG: Kiểm tra database context.\n\nChủ đề Weather:\n**Thời tiết:** sunny, rainy, cloudy, windy, snowy, foggy, stormy\n**Nhiệt độ:** hot, cold, warm, cool, freezing, temperature\n**Hiện tượng:** rain, snow, wind, thunder, lightning, rainbow\n**Mùa:** spring, summer, autumn/fall, winter\n**Dự báo:** forecast, weather report, climate\n\nNói về thời tiết mỗi ngày!",
+            "keywords": ["weather", "thời tiết", "rain", "mưa", "sun", "nắng"]
+        },
+        {
+            "id": 66,
+            "category": "topic",
+            "question": "Chủ đề Family có gì?",
+            "answer": "QUAN TRỌNG: Kiểm tra database context.\n\nChủ đề Family:\n**Gia đình gần:** father, mother, brother, sister, son, daughter\n**Gia đình xa:** grandfather, grandmother, uncle, aunt, cousin\n**Quan hệ:** husband, wife, parent, child, sibling, relative\n**Tính từ:** young, old, married, single, divorced\n**Hoạt động:** love, care, support, help, live together\n\nCơ bản và quan trọng nhất!",
+            "keywords": ["family", "gia đình", "relatives", "họ hàng", "bố mẹ"]
+        },
+        {
+            "id": 67,
+            "category": "topic",
+            "question": "Có chủ đề về cảm xúc không?",
+            "answer": "QUAN TRỌNG: Kiểm tra database context.\n\nCó chủ đề Emotions & Feelings:\n**Vui:** happy, joyful, cheerful, excited, delighted\n**Buồn:** sad, unhappy, depressed, disappointed, upset\n**Giận:** angry, mad, furious, annoyed, irritated\n**Sợ:** afraid, scared, frightened, terrified, nervous\n**Khác:** surprised, confused, bored, tired, proud\n\nGiao tiếp cảm xúc rất quan trọng!",
+            "keywords": ["emotions", "feelings", "cảm xúc", "tâm trạng", "mood"]
+        },
+        {
+            "id": 68,
+            "category": "topic",
+            "question": "Có chủ đề về màu sắc không?",
+            "answer": "QUAN TRỌNG: Kiểm tra database context.\n\nCó chủ đề Colors:\n**Màu cơ bản:** red, blue, green, yellow, orange, purple, pink\n**Màu nâng cao:** brown, gray, black, white, gold, silver\n**Sắc độ:** light, dark, bright, pale, vivid\n**Mô tả:** colorful, colourful, rainbow, multicolor\n\nMàu sắc dùng mọi nơi!",
+            "keywords": ["colors", "colours", "màu sắc", "màu", "color"]
+        },
+        {
+            "id": 69,
+            "category": "topic",
+            "question": "Có chủ đề về con số không?",
+            "answer": "QUAN TRỌNG: Kiểm tra database context.\n\nCó chủ đề Numbers:\n**Số đếm:** one, two, three...hundred, thousand, million\n**Số thứ tự:** first, second, third...tenth, hundredth\n**Phân số:** half, quarter, third, fraction, percent\n**Toán học:** plus, minus, multiply, divide, equals\n**Đo lường:** meter, kilogram, liter, inch, pound\n\nCơ bản nhưng rất cần thiết!",
+            "keywords": ["numbers", "con số", "số", "đếm", "number"]
+        },
+        {
+            "id": 70,
+            "category": "topic",
+            "question": "Có chủ đề về quần áo không?",
+            "answer": "QUAN TRỌNG: Kiểm tra database context.\n\nCó chủ đề Clothes & Fashion:\n**Quần áo:** shirt, pants, dress, skirt, jacket, coat, suit\n**Giày dép:** shoes, boots, sandals, sneakers, slippers\n**Phụ kiện:** hat, cap, scarf, belt, tie, gloves, bag\n**Vải:** cotton, silk, wool, leather, denim\n**Động từ:** wear, put on, take off, try on, fit\n\nMua sắm cần topic này!",
+            "keywords": ["clothes", "fashion", "quần áo", "thời trang", "clothing"]
+        },
+        {
+            "id": 71,
+            "category": "learning",
+            "question": "Học từ qua bài hát có tốt không?",
+            "answer": "RẤT TỐT! Học qua bài hát rất hiệu quả:\n\n**Lợi ích:**\n- Nhớ từ qua giai điệu\n- Học phát âm tự nhiên\n- Hiểu văn hóa, slang\n- Vui vẻ, không nhàm chán\n- Luyện nghe hiệu quả\n\n**Cách học:**\n1. Chọn bài hát yêu thích\n2. Đọc lyrics có dịch\n3. Ghi từ mới\n4. Thêm vào app\n5. Hát theo nhiều lần\n6. Ôn tập bằng Flashcard\n\n**Gợi ý:**\n- Pop songs: dễ hiểu\n- Disney songs: rõ ràng\n- Ballad: chậm, dễ nghe\n\nHọc qua bài hát + app = perfect!",
+            "keywords": ["bài hát", "music", "song", "lyrics", "học qua nhạc"]
+        },
+        {
+            "id": 72,
+            "category": "learning",
+            "question": "Nên dùng sổ tay hay app?",
+            "answer": "Kết hợp CẢ HAI là tốt nhất:\n\n**Sổ tay (Notebook):** 📓\n✅ Nhớ lâu hơn (viết tay)\n✅ Tự do sáng tạo\n✅ Vẽ mindmap, hình ảnh\n✅ Không cần điện, mạng\n❌ Mất thời gian viết\n❌ Dễ mất, hỏng\n❌ Không tự động ôn tập\n\n**App (Card Words):** 📱\n✅ Ôn tập tự động (spaced repetition)\n✅ Luôn bên mình\n✅ Sync đa thiết bị\n✅ Game, quiz vui vẻ\n✅ Thống kê chi tiết\n❌ Cần điện thoại\n❌ Cần internet (một số tính năng)\n\n**Combo hiệu quả:**\n- Ghi sổ khi học từ mới\n- Thêm vào app để ôn tập\n- Viết câu ví dụ vào sổ\n- Dùng app mỗi ngày",
+            "keywords": ["sổ tay", "notebook", "app", "viết tay", "digital"]
+        },
+        {
+            "id": 73,
+            "category": "learning",
+            "question": "Học một mình hay học nhóm?",
+            "answer": "Tùy mục đích, kết hợp cả hai:\n\n**Học một mình:** 👤\n✅ Tự do thời gian\n✅ Tập trung cao\n✅ Học theo tốc độ riêng\n✅ Không bị phân tâm\n❌ Dễ lười, thiếu động lực\n❌ Không có người sửa lỗi\n❌ Nhàm chán\n\n**Học nhóm:** 👥\n✅ Động lực cao\n✅ Học từ bạn bè\n✅ Sửa lỗi lẫn nhau\n✅ Vui vẻ, cạnh tranh\n❌ Dễ nói chuyện phiếm\n❌ Phụ thuộc lịch nhóm\n❌ Tiến độ không đều\n\n**Gợi ý:**\n- Học từ mới: một mình\n- Luyện speaking: nhóm\n- Ôn tập: một mình (app)\n- Quiz challenge: nhóm\n\nApp giúp học một mình nhưng vẫn có cạnh tranh!",
+            "keywords": ["một mình", "nhóm", "alone", "group", "study group"]
+        },
+        {
+            "id": 74,
+            "category": "learning",
+            "question": "Có cần học ngữ pháp không?",
+            "answer": "CÓ nhưng không ưu tiên đầu tiên:\n\n**Thứ tự ưu tiên:**\n1. Từ vựng (60%)\n2. Nghe - Nói (25%)\n3. Ngữ pháp (15%)\n\n**Tại sao từ vựng quan trọng hơn:**\n- Không biết từ = không hiểu gì\n- Sai ngữ pháp vẫn hiểu được\n- Trẻ em học từ trước, ngữ pháp sau\n\n**Khi nào học ngữ pháp:**\n- Đã có 500-1000 từ vựng\n- Cần viết email, báo cáo\n- Thi IELTS, TOEIC\n- Đã giao tiếp cơ bản được\n\n**Cách học ngữ pháp:**\n- Học qua câu ví dụ\n- Áp dụng ngay vào thực tế\n- Không học lý thuyết khô khan\n- Ưu tiên ngữ pháp thông dụng\n\n**Kết luận:**\nHọc từ vựng trước, ngữ pháp sau!",
+            "keywords": ["ngữ pháp", "grammar", "có cần", "quan trọng"]
+        },
+        {
+            "id": 75,
+            "category": "flashcard",
+            "question": "Nên lật thẻ khi nào?",
+            "answer": "Quy tắc vàng lật Flashcard:\n\n**ĐÚNG:** ✅\n1. Đọc từ tiếng Anh\n2. Suy nghĩ nghĩa trong đầu (3-5 giây)\n3. LẬT THẺ kiểm tra\n4. Đánh giá trung thực\n\n**SAI:** ❌\n- Lật ngay không suy nghĩ\n- Nhìn qua không cố nhớ\n- Đánh giá Easy khi không nhớ\n- Lật quá nhanh\n\n**Tại sao phải đợi:**\n- Não làm việc = ghi nhớ tốt\n- Active recall hiệu quả nhất\n- Biết từ nào yếu\n- Lên lịch ôn đúng\n\n**Mẹo:**\nNếu nhớ trong 3 giây = Medium\nNếu ngay lập tức = Easy\nNếu >5 giây hoặc sai = Hard\n\nChất lượng > Số lượng!",
+            "keywords": ["lật thẻ", "flip", "khi nào", "when", "flashcard"]
+        },
+        {
+            "id": 76,
+            "category": "quiz",
+            "question": "Làm quiz theo chủ đề hay random?",
+            "answer": "Tùy giai đoạn học:\n\n**Quiz theo chủ đề:** 📚\n**Khi nào:**\n- Mới học xong 1 topic\n- Muốn tập trung 1 chủ đề\n- Củng cố kiến thức mới\n\n**Ưu điểm:**\n- Dễ hơn (từ liên quan)\n- Nhớ theo nhóm nghĩa\n- Đánh giá topic cụ thể\n\n**Quiz random (Mixed):** 🔀\n**Khi nào:**\n- Đã học nhiều topics\n- Chuẩn bị thi\n- Kiểm tra tổng hợp\n\n**Ưu điểm:**\n- Khó hơn = nhớ lâu hơn\n- Thực tế hơn\n- Tránh đoán theo context\n\n**Gợi ý:**\n1. Week 1: Quiz theo topic\n2. Week 2: Quiz random\n3. Luân phiên để đa dạng\n\nKhó = Tiến bộ nhanh!",
+            "keywords": ["quiz", "chủ đề", "topic", "random", "mixed", "theo"]
+        },
+        {
+            "id": 77,
+            "category": "progress",
+            "question": "Bao lâu thì thấy tiến bộ?",
+            "answer": "Tiến bộ thấy rõ sau:\n\n**1 tuần:** 📅\n- Nhớ được 50-70 từ mới\n- Bắt đầu quen với app\n- Streak 7 ngày\n- Cảm thấy tự tin hơn\n\n**1 tháng:** 📆\n- 200-300 từ vựng\n- Nghe hiểu câu đơn giản\n- Quiz điểm cải thiện rõ\n- Streak 30 = thói quen\n\n**3 tháng:** 🎯\n- 600-900 từ\n- Giao tiếp cơ bản\n- Đọc hiểu đoạn văn ngắn\n- Tự tin hơn nhiều\n\n**6 tháng:** 🏆\n- 1200-1500 từ\n- Giao tiếp tốt\n- Hiểu phim có phụ đề\n- Thay đổi rõ rệt\n\n**Lưu ý:**\nTiến bộ = Học đều đặn!\nStreak quan trọng hơn số từ!",
+            "keywords": ["bao lâu", "tiến bộ", "how long", "progress", "thấy"]
+        },
+        {
+            "id": 78,
+            "category": "streak",
+            "question": "Streak bao nhiêu là tốt?",
+            "answer": "Mỗi milestone có ý nghĩa:\n\n**7 ngày:** 🔥\n- Bắt đầu tốt!\n- Tạo thói quen ban đầu\n- Bronze badge\n\n**30 ngày:** 🏅\n- Thói quen đã hình thành\n- Thành tích đáng tự hào\n- Silver badge\n- Não bộ đã quen học hàng ngày\n\n**100 ngày:** 💎\n- Siêu ấn tượng!\n- Kỷ luật cao\n- Gold badge\n- Tiếng Anh cải thiện rõ rệt\n\n**365 ngày:** 👑\n- Huyền thoại!\n- 1 năm không nghỉ\n- Diamond badge\n- Trình độ thay đổi hoàn toàn\n\n**Mục tiêu:**\n- Newbie: 7 ngày\n- Intermediate: 30 ngày\n- Advanced: 100 ngày\n- Master: 365 ngày\n\nStreak càng cao = quyết tâm càng lớn!",
+            "keywords": ["streak", "bao nhiêu", "tốt", "good", "how much"]
+        },
+        {
+            "id": 79,
+            "category": "account",
+            "question": "Có thể có nhiều tài khoản không?",
+            "answer": "Kỹ thuật là CÓ nhưng KHÔNG NÊN:\n\n**Tại sao không nên:**\n❌ Tiến độ bị chia tách\n❌ Khó theo dõi tổng thể\n❌ Mất thời gian quản lý\n❌ Streak bị chia nhỏ\n❌ Thống kê không chính xác\n\n**Trường hợp đặc biệt OK:**\n✅ Tài khoản cá nhân + học sinh (giáo viên)\n✅ Học 2 ngôn ngữ khác nhau\n✅ Test tính năng mới\n\n**Thay vì nhiều account:**\n- Dùng 1 account học nhiều level\n- Tạo custom lists trong 1 account\n- Sync đa thiết bị\n\n**Lưu ý:**\nStreak và progress quan trọng → Dùng 1 account duy nhất!\n\nTập trung = Hiệu quả!",
+            "keywords": ["nhiều tài khoản", "multiple accounts", "2 accounts", "tài khoản"]
+        },
+        {
+            "id": 80,
+            "category": "general",
+            "question": "App có chế độ tối không?",
+            "answer": "QUAN TRỌNG: Kiểm tra tính năng hiện tại.\n\n**Nếu có Dark Mode:**\n✅ Bật/tắt trong Settings\n✅ Tự động theo hệ thống\n✅ Dễ chịu cho mắt buổi tối\n✅ Tiết kiệm pin (OLED)\n\n**Nếu chưa có:**\n- Tính năng đang phát triển\n- Sẽ có trong update sau\n- Có thể góp ý thêm\n\n**Lợi ích Dark Mode:**\n- Bảo vệ mắt khi học tối\n- Giảm ánh sáng xanh\n- Pin điện thoại bền hơn\n- Giao diện hiện đại\n\n**Cài đặt:**\nSettings → Display → Dark Mode",
+            "keywords": ["dark mode", "chế độ tối", "tối", "dark", "night mode"]
+        },
+        {
+            "id": 81,
+            "category": "vocab",
+            "question": "Từ nào hay dùng nhất?",
+            "answer": "QUAN TRỌNG: Kiểm tra database cho từ phổ biến.\n\n**Top từ thông dụng nhất:**\n1. the, be, to, of, and, a, in, that, have, I\n2. it, for, not, on, with, he, as, you, do, at\n\n**Từ nên học đầu tiên (A1):**\n- Đại từ: I, you, he, she, it, we, they\n- Động từ: be, have, do, go, get, make\n- Danh từ: time, people, way, man, woman\n- Tính từ: good, new, first, long, great\n\n**Thống kê:**\n- 100 từ phổ biến = 50% văn bản\n- 1000 từ = 80% văn bản\n- 3000 từ = 95% giao tiếp\n\nHọc từ thông dụng = hiệu quả cao!",
+            "keywords": ["hay dùng", "phổ biến", "common", "frequent", "most used"]
+        },
+        {
+            "id": 82,
+            "category": "vocab",
+            "question": "Học idiom có cần không?",
+            "answer": "Tùy trình độ:\n\n**Người mới (A1-A2):**\n❌ CHƯA CẦN\n- Tập trung từ vựng cơ bản\n- Học ngữ pháp đơn giản\n- 500-1000 từ trước\n\n**Trung cấp (B1-B2):**\n✅ BẮT ĐẦU HỌC\n- Học idioms phổ biến\n- Hiểu văn hóa hơn\n- Giao tiếp tự nhiên hơn\n\n**Nâng cao (C1-C2):**\n✅✅ RẤT CẦN\n- Cần cho IELTS 7.5+\n- Hiểu phim, sách sâu hơn\n- Nói như người bản xứ\n\n**Idioms phổ biến:**\n- piece of cake (dễ ợt)\n- break the ice (phá vỡ im lặng)\n- hit the books (học hành)\n- cost an arm and a leg (đắt cắt cổ)\n\n**Lưu ý:**\nĐừng lạm dụng idioms, dùng đúng chỗ!",
+            "keywords": ["idiom", "thành ngữ", "cần", "learn", "important"]
+        },
+        {
+            "id": 83,
+            "category": "vocab",
+            "question": "Học collocation có quan trọng không?",
+            "answer": "RẤT QUAN TRỌNG!\n\n**Collocation là gì:**\nCụm từ đi cùng nhau tự nhiên:\n- make a decision (không phải do a decision)\n- heavy rain (không phải strong rain)\n- fast food (không phải quick food)\n\n**Tại sao quan trọng:**\n- Nói tự nhiên như người bản xứ\n- Tránh nói \"Việt-Anh\"\n- Cải thiện writing score\n- Nghe hiểu tốt hơn\n\n**Cách học:**\n1. Học từ trong cụm, không đơn lẻ\n2. Ghi chú collocations khi gặp\n3. Dùng collocation dictionary\n4. Học qua ví dụ thực tế\n\n**Ví dụ:**\n- Từ: decision\n- Collocations: make/take a decision, reach a decision, wise decision, final decision\n\nHọc collocation = Nói chuẩn!",
+            "keywords": ["collocation", "cụm từ", "quan trọng", "important", "từ đi cùng"]
+        },
+        {
+            "id": 84,
+            "category": "learning",
+            "question": "Có app nào tốt hơn Card Words không?",
+            "answer": "Mỗi app có ưu nhược điểm riêng:\n\n**Card Words:** 🌟\n✅ Miễn phí 100%\n✅ Không quảng cáo\n✅ AI Chatbot\n✅ Game vui vẻ\n✅ Flashcard thông minh\n✅ Thống kê chi tiết\n\n**App khác:**\n**Duolingo:**\n+ Game hóa tốt\n- Có quảng cáo\n- Ngữ pháp nhiều\n\n**Memrise:**\n+ Video người bản xứ\n- Premium đắt\n- Ít game\n\n**Anki:**\n+ Tùy chỉnh cao\n- Giao diện xấu\n- Khó dùng\n\n**Quizlet:**\n+ Nhiều bộ từ\n- Quảng cáo nhiều\n- Premium mắc\n\n**Kết luận:**\nCard Words tốt nhất cho người Việt học tiếng Anh!\nKết hợp nhiều app cũng OK!",
+            "keywords": ["app tốt", "better app", "so sánh", "comparison", "duolingo", "memrise"]
+        },
+        {
+            "id": 85,
+            "category": "learning",
+            "question": "Cần bao nhiêu từ để giao tiếp?",
+            "answer": "Phụ thuộc level giao tiếp:\n\n**Sinh tồn cơ bản:** 300-500 từ\n- Chào hỏi, cảm ơn\n- Mua sắm đơn giản\n- Hỏi đường\n- Đặt đồ ăn\n\n**Giao tiếp hàng ngày:** 1000-1500 từ\n- Nói chuyện với bạn bè\n- Xem phim có phụ đề\n- Đọc báo đơn giản\n- Email công việc\n\n**Giao tiếp tốt:** 3000-5000 từ\n- Thảo luận sâu\n- Đọc sách, báo\n- Làm việc quốc tế\n- IELTS 6.5-7.0\n\n**Như người bản xứ:** 10,000-20,000 từ\n- Hiểu hầu hết ngữ cảnh\n- Đọc văn học\n- IELTS 8.0+\n\n**Mục tiêu thực tế:**\nHọc 1000 từ đầu tiên = quan trọng nhất!",
+            "keywords": ["bao nhiêu từ", "giao tiếp", "communicate", "how many words", "vocabulary size"]
+        },
+        {
+            "id": 86,
+            "category": "flashcard",
+            "question": "Có nên học cả ví dụ không?",
+            "answer": "CÓ! Học ví dụ rất quan trọng:\n\n**Lợi ích học ví dụ:**\n✅ Hiểu cách dùng từ\n✅ Nhớ từ trong ngữ cảnh\n✅ Học ngữ pháp tự nhiên\n✅ Biết collocations\n✅ Nhớ lâu gấp 3 lần\n\n**Cách học hiệu quả:**\n1. Đọc ví dụ trong flashcard\n2. Hiểu nghĩa cả câu\n3. Tự tạo câu tương tự\n4. Nói thành tiếng\n5. Viết lại bằng tay\n\n**Ví dụ:**\n❌ Học: happy = hạnh phúc\n✅ Học: \"I am happy to see you\" = Tôi vui được gặp bạn\n\n**Quy tắc:**\nTừ + Ví dụ + Hình ảnh = Bộ 3 hoàn hảo!\n\nKhông có ngữ cảnh = Dễ quên!",
+            "keywords": ["ví dụ", "example", "sentence", "câu", "context"]
+        },
+        {
+            "id": 87,
+            "category": "quiz",
+            "question": "Tại sao câu quiz khó quá?",
+            "answer": "Có nhiều nguyên nhân:\n\n**1. Chọn sai level:**\n- Học A1 nhưng làm quiz B2\n- → Chọn quiz theo level đã học\n\n**2. Chưa học kỹ:**\n- Flashcard qua loa\n- Không ôn tập đều\n- → Flashcard trước, quiz sau\n\n**3. Thiếu ngữ cảnh:**\n- Chỉ nhìn từ đơn\n- Không đọc ví dụ\n- → Học từ trong câu\n\n**4. Quiz thiết kế khó:**\n- Đáp án nhiễu giống nhau\n- Từ đồng nghĩa\n- → Đây là cách học tốt!\n\n**Giải pháp:**\n1. Bắt đầu từ quiz dễ (A1)\n2. Học Flashcard kỹ trước\n3. Làm lại quiz nhiều lần\n4. Học từ sai kỹ hơn\n5. Kiên nhẫn, từ từ sẽ tiến bộ\n\nKhó = Bạn đang học đúng level!",
+            "keywords": ["khó", "difficult", "hard", "quiz khó", "câu hỏi khó"]
+        },
+        {
+            "id": 88,
+            "category": "game",
+            "question": "Làm sao để chơi game nhanh hơn?",
+            "answer": "Tips chơi game tốc độ cao:\n\n**1. Học thuộc từ trước:**\n- Flashcard mỗi ngày\n- Ôn tập đều đặn\n- Nhận diện từ nhanh\n\n**2. Luyện phản xạ:**\n- Chơi thường xuyên\n- Bắt đầu chậm → tăng tốc dần\n- Lặp lại nhiều lần\n\n**3. Tập trung:**\n- Tắt thông báo\n- Chơi khi tỉnh táo\n- Môi trường yên tĩnh\n\n**4. Chiến thuật:**\n- Loại đáp án sai trước\n- Đọc hết câu hỏi\n- Không đoán bừa\n\n**5. Thư giãn:**\n- Căng thẳng = chậm\n- Thở sâu trước khi chơi\n- Coi như luyện tập, không thi\n\n**Nhớ:**\nĐúng quan trọng hơn nhanh!\nNhanh mà sai = 0 điểm!",
+            "keywords": ["nhanh", "fast", "speed", "tốc độ", "game"]
+        },
+        {
+            "id": 89,
+            "category": "streak",
+            "question": "Học vào thời gian nào tốt nhất?",
+            "answer": "Mỗi người khác nhau, nhưng:\n\n**Buổi sáng (6-8h):** ☀️\n✅ Não tỉnh táo nhất\n✅ Ghi nhớ tốt\n✅ Ít bị gián đoạn\n❌ Nhiều người không thích dậy sớm\n\n**Buổi trưa (12-14h):** 🌤️\n✅ Giải lao giữa ngày\n✅ Tránh mệt mỏi\n❌ Dễ buồn ngủ sau ăn\n\n**Buổi chiều (16-18h):** 🌅\n✅ Năng lượng tốt\n✅ Sau giờ làm/học\n❌ Dễ bận công việc khác\n\n**Buổi tối (20-22h):** 🌙\n✅ Yên tĩnh\n✅ Có thời gian\n✅ Ôn trước ngủ = nhớ lâu\n❌ Mệt mỏi sau ngày dài\n\n**Khuyến nghị:**\n- Sáng: Học từ mới\n- Tối: Ôn tập Flashcard\n- Quan trọng nhất: **Giờ cố định**\n\nĐều đặn > Thời điểm!",
+            "keywords": ["thời gian", "khi nào", "when", "time", "buổi"]
+        },
+        {
+            "id": 90,
+            "category": "progress",
+            "question": "Mất bao lâu để đạt B1?",
+            "answer": "Phụ thuộc nhiều yếu tố:\n\n**Từ 0 (Beginner) → B1:**\n**Học đều đặn (30 phút/ngày):**\n- 6-9 tháng (nhanh)\n- 9-12 tháng (trung bình)\n- 12-18 tháng (chậm)\n\n**Học tích cực (1-2 giờ/ngày):**\n- 4-6 tháng\n\n**Các yếu tố ảnh hưởng:**\n- Nền tảng: Có A1-A2 chưa?\n- Thời gian học mỗi ngày\n- Chất lượng học tập\n- Streak: Đều đặn hay dứt quãng?\n- Thực hành: Chỉ app hay + speaking?\n\n**Lộ trình điển hình:**\n- Tháng 1-2: A1 (300 từ)\n- Tháng 3-4: A2 (600 từ)\n- Tháng 5-7: A2-B1 (900 từ)\n- Tháng 8-10: B1 vững (1200 từ)\n\n**Mẹo đạt nhanh:**\n- Duy trì streak 100+ ngày\n- Kết hợp app + phim + sách\n- Practice speaking\n\nKiên trì = Thành công!",
+            "keywords": ["bao lâu", "b1", "how long", "đạt b1", "reach b1"]
+        },
+        {
+            "id": 91,
+            "category": "vocab",
+            "question": "Có nên học từ đồng nghĩa không?",
+            "answer": "CÓ nhưng sau khi vững từ gốc:\n\n**Trình tự đúng:**\n1. Học từ gốc thuộc vững (A1-A2)\n2. Thêm từ đồng nghĩa (B1-B2)\n3. Phân biệt sắc thái (C1-C2)\n\n**Lợi ích học từ đồng nghĩa:**\n✅ Vocabulary đa dạng\n✅ Writing hay hơn (không lặp từ)\n✅ Hiểu sắc thái tinh tế\n✅ Điểm IELTS cao hơn\n\n**Ví dụ:**\n- Happy: glad, pleased, delighted, cheerful, joyful\n- Big: large, huge, enormous, massive, giant\n\n**Lưu ý:**\n❌ Không phải đồng nghĩa = dùng thay thế hoàn toàn\n✅ Mỗi từ có ngữ cảnh riêng\n\n**Cách học:**\n- Học từ gốc + 2-3 từ đồng nghĩa\n- Học sự khác biệt\n- Dùng collocation dictionary\n\nĐa dạng nhưng chính xác!",
+            "keywords": ["đồng nghĩa", "synonym", "synonyms", "từ giống nhau"]
+        },
+        {
+            "id": 92,
+            "category": "vocab",
+            "question": "Từ trái nghĩa có quan trọng không?",
+            "answer": "QUAN TRỌNG! Học cặp trái nghĩa rất hiệu quả:\n\n**Lợi ích:**\n✅ Nhớ gấp đôi với cùng effort\n✅ Hiểu sâu hơn nghĩa từ\n✅ Mở rộng vocabulary nhanh\n✅ So sánh, đối chiếu dễ\n\n**Ví dụ cặp trái nghĩa:**\n- hot ↔ cold\n- big ↔ small\n- happy ↔ sad\n- easy ↔ difficult\n- begin ↔ end\n- love ↔ hate\n\n**Cách học:**\n1. Học theo cặp\n2. Tạo flashcard 2 từ cùng lúc\n3. Làm câu có cả 2 từ\n4. Ví dụ: \"Today is hot, yesterday was cold\"\n\n**Mẹo ghi nhớ:**\n- Vẽ mindmap đối lập\n- Dùng hình ảnh tương phản\n- So sánh trong câu\n\nHọc 1 nhớ 2 = Hiệu quả x2!",
+            "keywords": ["trái nghĩa", "antonym", "antonyms", "opposite", "đối lập"]
+        },
+        {
+            "id": 93,
+            "category": "learning",
+            "question": "Có cần học cả từ loại không?",
+            "answer": "CÓ! Từ loại rất quan trọng:\n\n**Tại sao cần:**\n✅ Dùng từ đúng vị trí\n✅ Tránh lỗi ngữ pháp\n✅ Hiểu cấu trúc câu\n✅ Mở rộng từ vựng (word family)\n\n**Từ loại cơ bản:**\n1. **Noun (Danh từ):** dog, happiness, teacher\n2. **Verb (Động từ):** run, study, is\n3. **Adjective (Tính từ):** beautiful, big, happy\n4. **Adverb (Trạng từ):** quickly, very, well\n\n**Học theo word family:**\n- Happy (adj) → Happiness (n) → Happily (adv)\n- Create (v) → Creation (n) → Creative (adj)\n- Beauty (n) → Beautiful (adj) → Beautifully (adv)\n\n**Mẹo:**\n- App thường ghi rõ từ loại\n- Học kèm ví dụ để thấy vị trí\n- Flashcard có thể có nhiều thẻ/1 word family\n\nBiết từ loại = Dùng từ đúng!",
+            "keywords": ["từ loại", "parts of speech", "noun", "verb", "adjective", "word class"]
+        },
+        {
+            "id": 94,
+            "category": "flashcard",
+            "question": "Nên học bao nhiêu thẻ mỗi lần?",
+            "answer": "Tùy năng lực và thời gian:\n\n**Người mới bắt đầu:**\n- 10-15 thẻ/session\n- 1-2 sessions/ngày\n- Tổng: 10-30 thẻ/ngày\n\n**Trung cấp:**\n- 20-30 thẻ/session\n- 2 sessions/ngày\n- Tổng: 40-60 thẻ/ngày\n\n**Nâng cao:**\n- 30-50 thẻ/session\n- 2-3 sessions/ngày\n- Tổng: 60-100 thẻ/ngày\n\n**Quy tắc vàng:**\n❌ Không học quá 50 thẻ mới/ngày\n✅ Chia nhỏ sessions (3x15 tốt hơn 1x45)\n✅ Ôn cũ nhiều hơn học mới (3:1)\n\n**Tối ưu:**\n- Sáng: 15 thẻ mới\n- Trưa: Ôn 30 thẻ cũ\n- Tối: 15 thẻ mới + ôn 20 thẻ\n\n**Nhớ:**\nChất lượng > Số lượng!\nNhớ 10 từ tốt hơn quên 50 từ!",
+            "keywords": ["bao nhiêu thẻ", "how many cards", "số lượng", "per session"]
+        },
+        {
+            "id": 95,
+            "category": "quiz",
+            "question": "Làm quiz có giúp nhớ từ không?",
+            "answer": "CÓ! Quiz rất hiệu quả cho ghi nhớ:\n\n**Nghiên cứu khoa học:**\n- Testing effect: Nhớ tốt hơn 50% so với đọc lại\n- Active recall: Não làm việc = ghi nhớ sâu\n- Feedback ngay: Biết sai, sửa ngay\n\n**Cơ chế:**\n1. Não phải \"tìm\" từ trong trí nhớ\n2. Tạo kết nối thần kinh mạnh\n3. Sai → Gây ấn tượng → Nhớ lâu\n4. Đúng → Củng cố kiến thức\n\n**So sánh:**\n- Đọc flashcard: 30% nhớ sau 1 tuần\n- Làm quiz: 70% nhớ sau 1 tuần\n\n**Combo vàng:**\n1. Học flashcard (input)\n2. Làm quiz (test)\n3. Xem lại sai (review)\n4. Ôn flashcard từ sai (reinforce)\n\n**Kết luận:**\nQuiz không chỉ kiểm tra mà còn GIúP HỌC!",
+            "keywords": ["quiz giúp", "nhớ từ", "testing effect", "recall", "memorize"]
+        },
+        {
+            "id": 96,
+            "category": "game",
+            "question": "Chơi game có tốn thời gian không?",
+            "answer": "Không phải tốn, mà là ĐẦU TƯ:\n\n**Game ≠ Giải trí vô bổ:**\n✅ Học từ vui vẻ\n✅ Ghi nhớ qua trải nghiệm\n✅ Giảm stress học tập\n✅ Tăng động lực tiếp tục\n✅ Củng cố flashcard hiệu quả\n\n**Thời gian hợp lý:**\n- 10-15 phút/ngày\n- Sau khi học flashcard\n- Khi cần nghỉ giải lao\n- Không thay thế flashcard chính\n\n**Lợi ích:**\n- Học không căng thẳng\n- Nhớ lâu hơn học thụ động\n- Phản xạ nhận từ nhanh\n- Bonus: Streak, điểm, badges\n\n**Cân bằng:**\n70% Flashcard + 20% Quiz + 10% Game = Perfect!\n\n**Kết luận:**\nGame là CÔNG CỤ HỌC, không phải lãng phí!\n\nHọc vui = Học lâu dài!",
+            "keywords": ["tốn thời gian", "waste time", "game", "lãng phí", "có nên"]
+        },
+        {
+            "id": 97,
+            "category": "streak",
+            "question": "Nghỉ 1 ngày có sao không?",
+            "answer": "CÓ SAO! Streak sẽ reset về 0:\n\n**Hậu quả nghỉ 1 ngày:**\n❌ Mất streak (về 0)\n❌ Mất badge đã đạt được\n❌ Mất động lực\n❌ Não quên 40% từ mới\n❌ Khó lấy lại thói quen\n\n**\"Chỉ 1 ngày thôi mà\":**\n- 1 ngày → 2 ngày → 3 ngày → Bỏ cuộc\n- Não hình thành thói quen = 21-30 ngày\n- Phá thói quen = chỉ 1-2 ngày\n\n**Giải pháp khi bận:**\n✅ Học chỉ 5 phút (10 flashcard)\n✅ Làm 1 quiz nhanh\n✅ Chơi 1 game ngắn\n✅ Đặt reminder nhiều lần\n\n**Backup plans:**\n- Học lúc đi xe bus\n- Học trong toilet 😄\n- Học trước khi ngủ\n- Thức sớm 5 phút\n\n**Nhớ:**\n5 phút học > 0 phút học!\nStreak quan trọng hơn số từ!",
+            "keywords": ["nghỉ", "skip", "1 ngày", "break", "có sao không"]
+        },
+        {
+            "id": 98,
+            "category": "progress",
+            "question": "Làm sao biết từ nào đã thuộc?",
+            "answer": "App theo dõi chi tiết:\n\n**Cách kiểm tra:**\n\n**1. Vocab Progress:**\n- Xem từng từ vựng\n- Màu xanh = Mastered\n- Màu vàng = Learning\n- Màu đỏ = Need Review\n\n**2. Statistics:**\n- Số từ mastered\n- Tỷ lệ % thuộc\n- Biểu đồ tiến triển\n\n**3. Flashcard:**\n- Đánh giá Easy 3 lần liên tiếp = Thuộc\n- Interval lên 7+ ngày = Mastered\n\n**4. Quiz:**\n- Đúng 90%+ = Thuộc topic\n- Làm nhanh không nghĩ = Thuộc\n\n**Tiêu chí \"thuộc\":**\n✅ Nhớ nghĩa ngay (<2 giây)\n✅ Phát âm đúng\n✅ Dùng được trong câu\n✅ Nhớ được sau 1 tháng\n\n**Lưu ý:**\nThuộc ≠ Sẽ nhớ mãi!\nCần ôn định kỳ!",
+            "keywords": ["từ thuộc", "mastered", "đã nhớ", "biết từ", "learned"]
+        },
+        {
+            "id": 99,
+            "category": "account",
+            "question": "Dữ liệu có bị mất không?",
+            "answer": "AN TOÀN tuyệt đối:\n\n**Bảo vệ dữ liệu:**\n✅ Backup tự động hàng ngày\n✅ Lưu trên server an toàn\n✅ Sync real-time\n✅ Không bị mất khi đổi thiết bị\n\n**Trường hợp bị mất:**\n❌ Xóa tài khoản\n❌ Không dùng > 2 năm (có cảnh báo)\n❌ Vi phạm điều khoản\n\n**Phòng tránh:**\n1. Login định kỳ\n2. Sync đa thiết bị\n3. Kiểm tra backup\n4. Không xóa tài khoản\n\n**Khôi phục khi:**\n- Đăng nhập lại = Dữ liệu về\n- Đổi điện thoại = Login là có\n- Gỡ cài lại app = Vẫn còn\n\n**Lưu ý:**\nDùng cùng email/account để sync!\n\nYên tâm học, dữ liệu an toàn!",
+            "keywords": ["mất dữ liệu", "data loss", "backup", "bị mất", "lưu"]
+        },
+        {
+            "id": 100,
+            "category": "general",
+            "question": "App có cập nhật không?",
+            "answer": "CÓ! App được cập nhật thường xuyên:\n\n**Tần suất:**\n- Bug fixes: Hàng tuần\n- Tính năng mới: Hàng tháng\n- Nội dung: Thêm liên tục\n\n**Cập nhật gần đây:**\n- AI Chatbot thông minh\n- Thêm nhiều topics\n- Cải thiện flashcard algorithm\n- Dark mode\n- Sync đa thiết bị\n\n**Sắp có:**\n- Speaking practice\n- Listening exercises\n- More games\n- Social features\n- Offline mode hoàn chỉnh\n\n**Cách cập nhật:**\n1. Auto update (khuyến nghị)\n2. Manual: App Store/Play Store\n3. Notification khi có update mới\n\n**Góp ý tính năng:**\n- Feedback trong app\n- Email: support@cardwords.com\n\n**Cam kết:**\nLuôn lắng nghe và cải thiện!",
+            "keywords": ["cập nhật", "update", "new features", "version", "tính năng mới"]
+        },
+        {
+            "id": 101,
+            "category": "vocab",
+            "question": "Có nên học phrasal verb không?",
+            "answer": "CÓ! Phrasal verbs rất quan trọng:\n\n**Tại sao cần:**\n- 60% giao tiếp hàng ngày dùng phrasal verbs\n- Hiểu phim, bài hát\n- Nói tự nhiên như người bản xứ\n- IELTS, TOEIC thường có\n\n**Phrasal verbs phổ biến:**\n- get up (thức dậy)\n- look for (tìm kiếm)\n- give up (từ bỏ)\n- turn on/off (bật/tắt)\n- put on (mặc vào)\n\n**Cách học:**\n1. Học theo chủ đề (daily routine, work, etc.)\n2. Học trong câu, không đơn lẻ\n3. Chú ý particle thay đổi nghĩa (look at ≠ look for ≠ look after)\n4. Practice với ví dụ thực tế\n\n**Lưu ý:**\nMột động từ + nhiều particles = nhiều nghĩa khác nhau!\n\nHọc phrasal verbs = Nói chuẩn!",
+            "keywords": ["phrasal verb", "phrasal verbs", "động từ kép", "cụm động từ"]
+        },
+        {
+            "id": 102,
+            "category": "learning",
+            "question": "Có nên học ngữ pháp không?",
+            "answer": "CÓ nhưng đừng quá nhiều:\n\n**Cân bằng vàng:**\n- 70% Vocabulary + Practice\n- 20% Grammar rules\n- 10% Listening/Reading\n\n**Ngữ pháp cần học:**\n✅ Tenses (12 thì)\n✅ Câu điều kiện\n✅ Passive voice\n✅ Modal verbs\n✅ Relative clauses\n\n**Ngữ pháp học sau:**\n⏳ Inversion\n⏳ Subjunctive\n⏳ Cleft sentences\n\n**Lỗi phổ biến:**\n❌ Học ngữ pháp quá nhiều, không practice\n❌ Học lý thuyết mà không dùng\n❌ Sợ sai nên không nói\n\n**Cách học đúng:**\n1. Học rule cơ bản\n2. Làm 5-10 bài tập\n3. Dùng ngay trong câu\n4. Practice speaking/writing\n\n**Kết luận:**\nGrammar = Công cụ, không phải mục đích!\nNói được > Biết rule!",
+            "keywords": ["ngữ pháp", "grammar", "học grammar", "có nên"]
+        },
+        {
+            "id": 103,
+            "category": "learning",
+            "question": "Học phát âm có quan trọng không?",
+            "answer": "RẤT QUAN TRỌNG!\n\n**Tại sao:**\n✅ Người nghe hiểu bạn\n✅ Tự tin khi nói\n✅ Listening tốt hơn\n✅ Nhớ từ chính xác hơn\n\n**Phát âm vs Vocabulary:**\nBiết 1000 từ phát âm đúng\n> \nBiết 3000 từ phát âm sai\n\n**Ưu tiên học:**\n1. **Âm đơn (Phonemes):**\n   - 44 âm tiếng Anh\n   - Âm người Việt hay sai: /θ/, /ð/, /v/, /w/\n\n2. **Trọng âm (Stress):**\n   - PHOto ≠ phoTO\n   - REcord (n) ≠ reCORD (v)\n\n3. **Ngữ điệu (Intonation):**\n   - Câu hỏi lên giọng\n   - Câu khẳng định xuống giọng\n\n**Cách luyện:**\n- Nghe native speaker\n- Shadowing (lặp lại ngay)\n- Record và nghe lại\n- IPA symbols\n\nPhát âm tốt = Giao tiếp tự tin!",
+            "keywords": ["phát âm", "pronunciation", "accent", "speaking"]
+        },
+        {
+            "id": 104,
+            "category": "topic",
+            "question": "Topic nào khó nhất?",
+            "answer": "QUAN TRỌNG: Kiểm tra database cho danh sách topics.\n\n**Khó theo level:**\n\n**A1 - Dễ nhất:**\n- Numbers, Colors, Family\n- Basic, quen thuộc\n\n**B1 - Trung bình:**\n- Work, Travel, Education\n- Vocabulary chuyên sâu hơn\n\n**C1 - Khó nhất:**\n- Technology, Science, Politics\n- Abstract concepts\n- Academic vocabulary\n\n**Khó với người Việt:**\n- Weather (vocabulary phong phú)\n- Emotions (nhiều sắc thái)\n- Technology (thuật ngữ mới)\n\n**Tips với topic khó:**\n1. Bắt đầu từ từ cơ bản\n2. Học theo word family\n3. Đọc bài về topic đó\n4. Xem video giải thích\n5. Làm flashcard nhiều lần\n\n**Nhớ:**\nKhông có topic \"quá khó\"!\nChỉ có \"chưa học đủ\"!",
+            "keywords": ["khó nhất", "hardest topic", "difficult topic", "topic khó"]
+        },
+        {
+            "id": 105,
+            "category": "flashcard",
+            "question": "Quên hết từ học hôm qua, sao vậy?",
+            "answer": "BÌNH THƯỜNG! Đây là Forgetting Curve:\n\n**Khoa học:**\n- Sau 1 ngày: Quên 50-80%\n- Sau 1 tuần: Quên 90%\n- SAU ÔN TẬP: Nhớ lâu hơn gấp 10 lần\n\n**Giải pháp - Spaced Repetition:**\n1. Học ngày 1: 20 từ mới\n2. Ôn ngày 2: Nhớ lại 10 từ\n3. Ôn ngày 4: Nhớ lại 8 từ\n4. Ôn ngày 7: Nhớ lại 7 từ\n5. Ôn ngày 14: Nhớ vững 7 từ\n\n**App tự động:**\n✅ Easy → Ôn sau 7 ngày\n✅ Medium → Ôn sau 3 ngày\n✅ Hard → Ôn lại ngay hôm sau\n\n**Mẹo nhớ lâu:**\n- Học trước ngủ\n- Tạo câu với từ mới\n- Liên kết hình ảnh\n- Dùng trong giao tiếp\n\n**Động lực:**\nQuên = Não đang học!\nÔn lại = Nhớ mãi mãi!",
+            "keywords": ["quên", "forget", "forgetting curve", "không nhớ"]
+        },
+        {
+            "id": 106,
+            "category": "quiz",
+            "question": "Đáp án quiz có sai không?",
+            "answer": "Rất hiếm, nhưng có thể báo lỗi:\n\n**Kiểm tra kỹ trước:**\n1. **Đọc kỹ câu hỏi:**\n   - Có thể đề hỏi từ trái nghĩa\n   - Chú ý \"NOT\", \"EXCEPT\"\n\n2. **Ngữ cảnh:**\n   - Từ có nhiều nghĩa\n   - Đáp án đúng theo context\n\n3. **Cấp độ:**\n   - A1 vs C1 khác nhau\n   - Từ có thể có nghĩa phức tạp\n\n**Nếu thật sự sai:**\n✅ Chụp màn hình\n✅ Báo lỗi trong app\n✅ Ghi rõ: Câu hỏi + Đáp án đúng theo bạn + Tại sao\n\n**Xử lý:**\n- Team kiểm tra trong 24h\n- Sửa nếu đúng là lỗi\n- Cảm ơn + Bonus điểm\n\n**Lưu ý:**\n99% trường hợp là hiểu sai đề!\nĐọc kỹ trước khi báo lỗi!",
+            "keywords": ["sai", "wrong answer", "lỗi quiz", "đáp án sai"]
+        },
+        {
+            "id": 107,
+            "category": "game",
+            "question": "Game nào giúp nhớ từ tốt nhất?",
+            "answer": "QUAN TRỌNG: Kiểm tra database cho danh sách games.\n\n**Tùy mục đích:**\n\n**Nhớ nghĩa nhanh:**\n- Matching game\n- Flash review\n- Quick quiz\n\n**Nhớ spelling:**\n- Typing game\n- Word builder\n- Crossword\n\n**Nhớ phát âm:**\n- Listening game\n- Pronunciation challenge\n\n**Nhớ lâu nhất:**\n- Mix tất cả games\n- Chơi nhiều lần/tuần\n- Kết hợp flashcard\n\n**Combo hiệu quả:**\n1. Flashcard (học)\n2. Matching game (test nhanh)\n3. Quiz (test sâu)\n4. Typing game (nhớ spelling)\n\n**Khuyến nghị:**\nChơi 10 phút/ngày sau flashcard!\nĐa dạng games = Nhớ nhiều chiều!",
+            "keywords": ["game tốt nhất", "best game", "game nào", "which game"]
+        },
+        {
+            "id": 108,
+            "category": "streak",
+            "question": "Có thể freeze streak không?",
+            "answer": "HIỆN TẠI: Chưa có tính năng này.\n\n**Đề xuất tương lai:**\n- Freeze 1 ngày/tháng\n- Dùng điểm để mua freeze\n- Streak shield cho premium\n\n**Hiện tại giải pháp:**\n1. **Học tối thiểu:** 5 phút/ngày\n2. **Đặt nhiều reminder:**\n   - Sáng: 7h\n   - Trưa: 12h\n   - Tối: 20h\n3. **Backup plan:**\n   - Học trên nhiều thiết bị\n   - Đặt alarm trước 23h\n\n**Khi thật sự bận:**\n- 10 flashcard = 3 phút\n- 1 quiz = 2 phút\n- 1 game = 2 phút\n→ Đủ giữ streak!\n\n**Tâm lý:**\nKhông có ngày nào \"quá bận\" để học 5 phút!\nStreak = Kỷ luật = Thành công!",
+            "keywords": ["freeze", "đóng băng", "freeze streak", "bảo vệ streak"]
+        },
+        {
+            "id": 109,
+            "category": "progress",
+            "question": "Làm sao biết mình tiến bộ?",
+            "answer": "Nhiều cách theo dõi:\n\n**1. Trong App:**\n✅ Số từ mastered tăng\n✅ Quiz score cao hơn\n✅ Game speed nhanh hơn\n✅ Streak dài hơn\n✅ Level lên cao\n\n**2. Thực tế:**\n✅ Xem phim ít phụ đề hơn\n✅ Đọc bài tiếng Anh hiểu được\n✅ Chat tiếng Anh tự tin hơn\n✅ Không cần Google Translate nhiều\n\n**3. So sánh:**\n- Screenshot stats tháng trước\n- So sánh với hiện tại\n- Xem biểu đồ progress\n\n**Milestone đáng chú ý:**\n- 100 từ: Giao tiếp cơ bản\n- 500 từ: Hiểu 50% hội thoại\n- 1000 từ: Đọc bài đơn giản\n- 3000 từ: Giao tiếp tốt\n\n**Động lực:**\nCứ 100 từ = Thưởng bản thân!\nTiến bộ nhỏ hàng ngày = Thành công lớn!",
+            "keywords": ["tiến bộ", "progress", "improve", "cải thiện"]
+        },
+        {
+            "id": 110,
+            "category": "account",
+            "question": "Có thể đổi email không?",
+            "answer": "CÓ! Đổi email trong Settings:\n\n**Cách đổi:**\n1. Vào Settings/Cài đặt\n2. Chọn Account\n3. Tap \"Change Email\"\n4. Nhập email mới\n5. Xác nhận qua OTP (gửi về email cũ)\n6. Xác nhận email mới\n\n**Lưu ý:**\n⚠️ Email mới chưa được dùng cho tài khoản khác\n⚠️ Cần access email cũ để xác nhận\n⚠️ Dữ liệu không mất\n\n**Nếu không access được email cũ:**\n1. Liên hệ Support\n2. Cung cấp: Username, Số điện thoại, Thông tin tài khoản\n3. Xác minh danh tính\n4. Support sẽ giúp đổi\n\n**Thời gian:**\n- Tự đổi: Ngay lập tức\n- Qua support: 1-3 ngày\n\nEmail mới = Login mới!",
+            "keywords": ["đổi email", "change email", "email mới", "thay email"]
+        },
+        {
+            "id": 111,
+            "category": "vocab",
+            "question": "Học American hay British English?",
+            "answer": "Tùy mục đích:\n\n**American English:** 🇺🇸\n✅ Chọn nếu:\n- Đi du học Mỹ\n- Làm việc với công ty Mỹ\n- Thi TOEFL\n- Thích văn hóa Mỹ\n\n**British English:** 🇬🇧\n✅ Chọn nếu:\n- Đi du học UK, Úc, NZ\n- Thi IELTS\n- Làm việc với công ty UK\n- Thích văn hóa Anh\n\n**Khác biệt:**\n- **Spelling:** color (US) vs colour (UK)\n- **Vocab:** apartment (US) vs flat (UK)\n- **Phát âm:** water /wɑːtər/ (US) vs /wɔːtə/ (UK)\n\n**Khuyến nghị:**\n- Học 1 loại chính (consistency)\n- Hiểu cả 2 (flexibility)\n- IELTS: Dùng UK hoặc US đều OK\n\n**Card Words:**\nCung cấp cả 2 variants!\n\nQuan trọng: Consistency > Perfect!",
+            "keywords": ["american", "british", "anh anh", "anh mỹ", "uk", "us"]
+        },
+        {
+            "id": 112,
+            "category": "learning",
+            "question": "Có nên học qua TikTok không?",
+            "answer": "CÓ thể, nhưng cẩn thận:\n\n**Ưu điểm TikTok:**\n✅ Ngắn, dễ xem\n✅ Có native speakers\n✅ Học slang, xu hướng mới\n✅ Entertainment + Learning\n\n**Nhược điểm:**\n❌ Thiếu hệ thống\n❌ Không theo trình độ\n❌ Nhiều nội dung sai\n❌ Dễ mất focus (lướt lung tung)\n❌ Không có practice/test\n\n**Cách dùng đúng:**\n1. **Chọn creator uy tín:**\n   - English teacher\n   - Native speaker\n   - Nhiều followers\n\n2. **Follow theo chủ đề:**\n   - Daily vocabulary\n   - Pronunciation tips\n   - Common mistakes\n\n3. **Kết hợp Card Words:**\n   - TikTok: Input (nghe, xem)\n   - Card Words: Practice (flashcard, quiz)\n\n**Thời gian hợp lý:**\n10-15 phút/ngày, không thay thế học chính!\n\nTikTok = Gia vị, không phải bữa chính!",
+            "keywords": ["tiktok", "học tiktok", "social media", "video ngắn"]
+        },
+        {
+            "id": 113,
+            "category": "learning",
+            "question": "Podcast có tốt không?",
+            "answer": "RẤT TốT cho Listening:\n\n**Lợi ích Podcast:**\n✅ Học mọi lúc (đi đường, tập gym)\n✅ Native speaker accent\n✅ Vocabulary trong ngữ cảnh\n✅ Miễn phí, nhiều topic\n✅ Tốc độ tự nhiên\n\n**Podcast cho người mới:**\n- **6 Minute English (BBC):** A2-B1\n- **English Pod:** A1-B1\n- **All Ears English:** B1-B2\n- **Luke's English Podcast:** B2-C1\n\n**Cách nghe hiệu quả:**\n1. Chọn podcast đúng level\n2. Nghe với transcript lần đầu\n3. Nghe lại không transcript\n4. Note từ mới\n5. Thêm vào Card Words flashcard\n6. Review sau 1 tuần\n\n**Thời lượng:**\n- Mới bắt đầu: 5-10 phút/ngày\n- Trung cấp: 15-20 phút/ngày\n- Nâng cao: 30+ phút/ngày\n\nPodcast + Card Words = Combo hoàn hảo!",
+            "keywords": ["podcast", "listening", "nghe", "audio"]
+        },
+        {
+            "id": 114,
+            "category": "flashcard",
+            "question": "Thẻ nào nên đánh Hard?",
+            "answer": "Đánh Hard khi:\n\n**1. Mất >5 giây mới nhớ:**\n- Phải suy nghĩ lâu\n- Không tự nhiên\n- Không chắc chắn\n\n**2. Nhớ sai:**\n- Nhớ nghĩa gần đúng\n- Nhầm với từ khác\n- Phát âm sai\n\n**3. Không dùng được trong câu:**\n- Chỉ nhớ dịch từ điển\n- Không biết ngữ cảnh\n- Không biết collocation\n\n**4. Lần thứ 2-3 vẫn khó:**\n- Đã học nhưng vẫn quên\n- Từ \"khó nhớ\" với bạn\n\n**Kết quả Hard:**\n- Thẻ xuất hiện lại sớm (ngày mai)\n- Ôn nhiều lần hơn\n- Chuyển Medium khi nhớ được\n\n**Tips:**\nĐừng ngại Hard!\nHard = Học kỹ hơn = Nhớ lâu hơn!",
+            "keywords": ["hard", "khó", "đánh hard", "when hard"]
+        },
+        {
+            "id": 115,
+            "category": "quiz",
+            "question": "Có thể làm lại quiz không?",
+            "answer": "CÓ! Làm lại bao nhiêu lần cũng được:\n\n**Lợi ích làm lại:**\n✅ Củng cố kiến thức\n✅ Tăng điểm cao hơn\n✅ Nhớ từ tốt hơn\n✅ Phát hiện lỗi sai\n✅ Practice makes perfect!\n\n**Cách làm lại:**\n1. Vào Quiz section\n2. Chọn quiz đã làm\n3. Tap \"Retake\" hoặc \"Làm lại\"\n4. Câu hỏi sẽ random lại\n\n**Khuyến nghị:**\n- Làm lần 1: Sau học flashcard\n- Làm lần 2: Sau 3 ngày\n- Làm lần 3: Sau 1 tuần\n- Mục tiêu: 90%+ điểm\n\n**Lưu ý:**\n- Điểm cao nhất được lưu\n- Statistics tính tất cả lần làm\n- Câu hỏi có thể khác\n\n**Kết luận:**\nLàm lại quiz = Ôn tập hiệu quả!\nĐạt 100% = Thành thạo topic!",
+            "keywords": ["làm lại", "retake", "quiz lại", "repeat quiz"]
+        },
+        {
+            "id": 116,
+            "category": "game",
+            "question": "Điểm game có ý nghĩa gì?",
+            "answer": "Điểm game phản ánh:\n\n**1. Độ thành thạo:**\n- Điểm cao = Nhớ từ tốt\n- Phản xạ nhanh\n- Ít sai sót\n\n**2. Tốc độ:**\n- Trả lời nhanh = Bonus điểm\n- Combo (đúng liên tiếp) = Nhân điểm\n- Perfect = Điểm max\n\n**3. Tiến bộ:**\n- So sánh lần trước\n- Thấy được cải thiện\n- Động lực tiếp tục\n\n**4. Ranking:**\n- Xếp hạng với bạn bè\n- Leaderboard hàng tuần\n- Thành tích cá nhân\n\n**5. Rewards:**\n- Unlock badges\n- Achievements\n- Bonus features\n\n**Lưu ý:**\nĐiểm cao ≠ Học tốt nếu không nhớ lâu!\nGame = Củng cố, không thay thế flashcard!\n\nChơi vui, học thật!",
+            "keywords": ["điểm", "score", "points", "game score"]
+        },
+        {
+            "id": 117,
+            "category": "streak",
+            "question": "Streak bao nhiêu là tốt?",
+            "answer": "Mỗi milestone có ý nghĩa:\n\n**7 ngày:** 🔥\n- Bắt đầu hình thành thói quen\n- Não quen với việc học\n- Động lực tăng\n\n**30 ngày:** 🔥🔥\n- Thói quen vững chắc\n- Thấy tiến bộ rõ rệt\n- Khó bỏ cuộc\n\n**100 ngày:** 🔥🔥🔥\n- Milestone lớn!\n- Học trở thành lifestyle\n- Level up đáng kể\n\n**365 ngày (1 năm):** 🔥🔥🔥🔥\n- LEGENDARY!\n- Thay đổi hoàn toàn\n- Thành thạo 3000-5000 từ\n\n**Thống kê:**\n- 95% người bỏ trước 7 ngày\n- 70% bỏ trước 30 ngày\n- 10% đạt 100 ngày\n- 1% đạt 365 ngày\n\n**Mục tiêu:**\nStreak đầu tiên: 30 ngày!\nSau đó: 100, 365, 500+\n\nStreak dài = Thành công chắc chắn!",
+            "keywords": ["streak tốt", "good streak", "bao nhiêu ngày", "streak number"]
+        },
+        {
+            "id": 118,
+            "category": "progress",
+            "question": "Có thể export dữ liệu không?",
+            "answer": "CÓ! Export dữ liệu học tập:\n\n**Dữ liệu có thể export:**\n✅ Danh sách từ vựng đã học\n✅ Flashcard progress\n✅ Quiz results\n✅ Streak history\n✅ Statistics tổng hợp\n✅ Learning timeline\n\n**Format:**\n- CSV (Excel)\n- PDF (Report)\n- JSON (Developer)\n\n**Cách export:**\n1. Settings → Data\n2. Chọn \"Export Data\"\n3. Chọn loại data\n4. Chọn format\n5. Download\n\n**Dùng để làm gì:**\n- Backup cá nhân\n- Ôn tập offline\n- Import vào Anki\n- Chia sẻ với giáo viên\n- Theo dõi tiến độ\n\n**Bảo mật:**\nDữ liệu chỉ bạn truy cập!\nKhông share nếu không muốn!\n\nDữ liệu của bạn, quyền của bạn!",
+            "keywords": ["export", "xuất dữ liệu", "download", "backup"]
+        },
+        {
+            "id": 119,
+            "category": "account",
+            "question": "Có thể import từ Anki không?",
+            "answer": "ĐANG PHÁT TRIỂN tính năng này!\n\n**Hiện tại:**\n❌ Chưa hỗ trợ import trực tiếp\n\n**Workaround:**\n1. Export Anki deck → CSV\n2. Tạo custom flashcard trong app\n3. Manual input (cho bộ nhỏ)\n\n**Tính năng sắp có:**\n✅ Import từ Anki (.apkg)\n✅ Import từ Quizlet\n✅ Import từ CSV\n✅ Import từ Excel\n\n**Kế hoạch:**\n- Q2 2024: Import CSV\n- Q3 2024: Import Anki\n- Q4 2024: Import Quizlet\n\n**Góp ý:**\nNếu bạn cần tính năng này gấp:\n- Feedback trong app\n- Vote feature request\n- Email: support@cardwords.com\n\nNhiều người yêu cầu = Ưu tiên cao hơn!\n\nCảm ơn sự kiên nhẫn!",
+            "keywords": ["import", "anki", "quizlet", "nhập dữ liệu"]
+        },
+        {
+            "id": 120,
+            "category": "general",
+            "question": "App có tốn pin không?",
+            "answer": "Tối ưu pin rất tốt:\n\n**Mức tiêu thụ:**\n- Flashcard: 1-2%/30 phút\n- Quiz: 2-3%/30 phút\n- Game: 3-5%/30 phút (có animation)\n- Chatbot AI: 2-4%/session\n\n**So sánh:**\n- Card Words: 2-3%/30 phút\n- TikTok: 8-10%/30 phút\n- YouTube: 10-15%/30 phút\n- Game 3D: 20-30%/30 phút\n\n**Tips tiết kiệm pin:**\n1. Giảm độ sáng\n2. Tắt animation (Settings)\n3. Dark mode (tiết kiệm 15-20%)\n4. Offline mode\n5. Background app refresh OFF\n\n**Tối ưu hóa:**\n✅ Không chạy background khi không dùng\n✅ Cache thông minh\n✅ Sync chỉ khi cần\n✅ Lazy loading\n\nHọc cả ngày vẫn còn pin!",
+            "keywords": ["pin", "battery", "tốn pin", "battery drain"]
+        },
+        {
+            "id": 121,
+            "category": "vocab",
+            "question": "Có những từ nào trong chủ đề Food?",
+            "answer": "QUAN TRỌNG: Kiểm tra database context cho danh sách đầy đủ từ vựng chủ đề Food & Drink.\n\n**Từ cơ bản (A1):**\n- Đồ ăn: bread, rice, meat, fish, egg, milk\n- Rau củ: carrot, potato, tomato, onion\n- Trái cây: apple, banana, orange, grape\n- Đồ uống: water, juice, coffee, tea\n\n**Từ nâng cao (B1-B2):**\n- Món ăn: steak, pasta, sushi, curry\n- Gia vị: salt, pepper, sugar, sauce\n- Cách nấu: boil, fry, bake, grill\n- Miêu tả: delicious, spicy, sweet, sour\n\n**Phrases:**\n- I'm hungry/thirsty\n- Can I have...?\n- It tastes good/bad\n- Medium/Well-done (steak)\n\nApp có danh sách đầy đủ trong Topic Food!",
+            "keywords": ["food", "đồ ăn", "từ food", "food vocabulary"]
+        },
+        {
+            "id": 122,
+            "category": "vocab",
+            "question": "Chủ đề Animals có những từ gì?",
+            "answer": "QUAN TRỌNG: Kiểm tra database context cho danh sách đầy đủ từ vựng chủ đề Animals.\n\n**Động vật nhà (A1):**\n- dog, cat, bird, fish, rabbit\n- chicken, duck, pig, cow, horse\n\n**Động vật hoang dã (A2-B1):**\n- lion, tiger, elephant, giraffe\n- monkey, bear, wolf, fox\n- snake, crocodile, shark\n\n**Côn trùng & bò sát:**\n- butterfly, bee, ant, spider\n- lizard, turtle, frog\n\n**Từ liên quan:**\n- pet (thú cưng)\n- wild (hoang dã)\n- domestic (thuần hóa)\n- endangered (nguy cấp)\n\n**Động từ:**\n- bark (sủa), meow (meo), roar (gầm)\n\nXem đầy đủ trong Topic Animals!",
+            "keywords": ["animals", "động vật", "từ animals", "animal vocabulary"]
+        },
+        {
+            "id": 123,
+            "category": "vocab",
+            "question": "Topic Technology có từ nào?",
+            "answer": "QUAN TRỌNG: Kiểm tra database context cho danh sách đầy đủ từ vựng chủ đề Technology.\n\n**Thiết bị (A2-B1):**\n- computer, laptop, smartphone, tablet\n- keyboard, mouse, screen, printer\n- headphones, speaker, camera\n\n**Internet & Software:**\n- website, app, software, program\n- download, upload, install, update\n- wifi, internet, browser, email\n\n**Social Media:**\n- post, share, like, comment\n- follow, unfollow, block, tag\n\n**Từ nâng cao (B2-C1):**\n- artificial intelligence, machine learning\n- cloud computing, cybersecurity\n- virtual reality, augmented reality\n\n**Verbs:**\n- click, scroll, swipe, type\n- charge, connect, sync\n\nTechnology = Topic xu hướng!",
+            "keywords": ["technology", "công nghệ", "tech", "từ technology"]
+        },
+        {
+            "id": 124,
+            "category": "vocab",
+            "question": "Chủ đề Family có gì?",
+            "answer": "QUAN TRỌNG: Kiểm tra database context cho danh sách đầy đủ từ vựng chủ đề Family.\n\n**Gia đình gần (A1):**\n- father/dad, mother/mom, son, daughter\n- brother, sister, husband, wife\n- parents, children, baby\n\n**Gia đình xa:**\n- grandfather/grandpa, grandmother/grandma\n- uncle, aunt, cousin, nephew, niece\n- father-in-law, mother-in-law\n\n**Từ mô tả:**\n- nuclear family (gia đình nhỏ)\n- extended family (đại gia đình)\n- single parent, stepmother, stepfather\n\n**Phrases:**\n- family tree (cây gia đình)\n- family reunion (họp mặt)\n- close-knit family (gắn bó)\n\n**Activities:**\n- family dinner, family trip\n\nFamily = Topic ấm áp!",
+            "keywords": ["family", "gia đình", "từ family", "family vocabulary"]
+        },
+        {
+            "id": 125,
+            "category": "vocab",
+            "question": "Có từ nào về Weather?",
+            "answer": "QUAN TRỌNG: Kiểm tra database context cho danh sách đầy đủ từ vựng chủ đề Weather.\n\n**Thời tiết cơ bản (A1):**\n- sunny, rainy, cloudy, windy\n- hot, cold, warm, cool\n- snow, rain, storm, fog\n\n**Mô tả chi tiết (A2-B1):**\n- temperature, humidity, forecast\n- thunder, lightning, rainbow\n- drizzle (mưa phùn), shower (mưa rào)\n- heatwave, cold snap, blizzard\n\n**Seasons:**\n- spring, summer, autumn/fall, winter\n\n**Phrases:**\n- What's the weather like?\n- It's pouring (mưa to)\n- Nice weather, isn't it?\n- It's freezing! (lạnh cóng)\n\n**Climate:**\n- tropical, temperate, polar\n- humid, dry, mild\n\nWeather = Chủ đề hay dùng!",
+            "keywords": ["weather", "thời tiết", "từ weather", "weather vocabulary"]
+        },
+        {
+            "id": 126,
+            "category": "learning",
+            "question": "Có nên học qua Netflix không?",
+            "answer": "CÓ! Netflix rất tốt nếu dùng đúng:\n\n**Ưu điểm:**\n✅ Native speaker tự nhiên\n✅ Nhiều accent (Mỹ, Anh, Úc...)\n✅ Vocabulary trong ngữ cảnh\n✅ Slang, idioms thực tế\n✅ Vừa học vừa giải trí\n\n**Cách học hiệu quả:**\n1. **Chọn phim đúng level:**\n   - A2: Kids shows (Peppa Pig)\n   - B1: Sitcoms (Friends, Modern Family)\n   - B2: Drama (Stranger Things)\n   - C1: Phim phức tạp (Dark)\n\n2. **Xem 3 lần:**\n   - Lần 1: Phụ đề Việt (hiểu cốt truyện)\n   - Lần 2: Phụ đề Anh (học từ)\n   - Lần 3: Không phụ đề (test)\n\n3. **Note từ mới:**\n   - Pause khi gặp từ hay\n   - Thêm vào Card Words\n   - Review sau khi xem\n\n**Tips:**\n- 20-30 phút/ngày\n- Tập ngắn tốt hơn phim dài\n\nNetflix + Card Words = Siêu combo!",
+            "keywords": ["netflix", "phim", "movies", "series", "học qua phim"]
+        },
+        {
+            "id": 127,
+            "category": "learning",
+            "question": "Học qua bài hát có hiệu quả không?",
+            "answer": "RẤT HIỆU QUẢ!\n\n**Tại sao:**\n✅ Nhớ lâu nhờ giai điệu\n✅ Phát âm chuẩn (nghe ca sĩ)\n✅ Vocabulary đa dạng\n✅ Học văn hóa, slang\n✅ Vui, không nhàm chán\n\n**Cách học đúng:**\n1. **Chọn bài hát phù hợp:**\n   - A1-A2: Bài chậm, rõ ràng\n   - B1-B2: Pop, ballad\n   - C1: Rap, fast songs\n\n2. **Quy trình:**\n   - Nghe + đọc lyrics\n   - Dịch từ mới\n   - Thêm vào Card Words\n   - Hát theo (shadowing)\n   - Karaoke không lyric\n\n3. **Genres tốt cho học:**\n   - Pop: Từ đơn giản, rõ ràng\n   - Ballad: Chậm, dễ nghe\n   - Country: Giọng rõ, từ đời thường\n\n**Tránh:**\n❌ Rap quá nhanh (cho beginner)\n❌ Heavy metal (khó nghe)\n❌ Bài quá nhiều slang\n\n**Apps:**\n- Lyrics Training\n- LyricsGaps\n\nÂm nhạc = Học không nhàm!",
+            "keywords": ["bài hát", "music", "songs", "lyrics", "học qua nhạc"]
+        },
+        {
+            "id": 128,
+            "category": "flashcard",
+            "question": "Có nên tự tạo flashcard không?",
+            "answer": "CÓ! Rất nên:\n\n**Lợi ích tự tạo:**\n✅ Nhớ ngay khi tạo (50% ghi nhớ)\n✅ Chọn từ cần thiết cho bản thân\n✅ Ngữ cảnh quen thuộc\n✅ Ví dụ từ cuộc sống\n\n**Khi nào tự tạo:**\n- Gặp từ mới trong phim, sách\n- Từ chuyên ngành công việc\n- Từ thường xuyên quên\n- Từ quan trọng với bạn\n\n**Cách tạo hiệu quả:**\n1. **Front (Mặt trước):**\n   - Từ tiếng Anh\n   - Phát âm (IPA)\n   - Từ loại\n\n2. **Back (Mặt sau):**\n   - Nghĩa tiếng Việt\n   - Ví dụ thực tế\n   - Hình ảnh (nếu có)\n\n3. **Tips:**\n   - Câu ví dụ từ trải nghiệm\n   - Liên kết hình ảnh cá nhân\n   - Ghi chú sắc thái riêng\n\n**Cân bằng:**\n70% flashcard sẵn + 30% tự tạo = Tốt nhất!\n\nTự tạo = Nhớ sâu hơn!",
+            "keywords": ["tự tạo", "create flashcard", "custom", "tạo thẻ"]
+        },
+        {
+            "id": 129,
+            "category": "quiz",
+            "question": "Tại sao quiz có 4 đáp án?",
+            "answer": "Thiết kế khoa học:\n\n**Tại sao 4 đáp án:**\n1. **Chuẩn quốc tế:**\n   - TOEIC: 4 đáp án\n   - IELTS Reading: 4 đáp án\n   - SAT: 4 đáp án\n\n2. **Khó vừa phải:**\n   - 2 đáp án: Quá dễ (đoán 50%)\n   - 3 đáp án: Hơi dễ (đoán 33%)\n   - 4 đáp án: Vừa phải (đoán 25%)\n   - 5+ đáp án: Quá khó, mất thời gian\n\n3. **Kiểm tra hiểu sâu:**\n   - 1 đáp án đúng\n   - 1-2 đáp án nhiễu cao (gần đúng)\n   - 1-2 đáp án dễ loại\n\n**Chiến thuật làm:**\n1. Đọc kỹ câu hỏi\n2. Loại 2 đáp án rõ ràng sai\n3. So sánh 2 đáp án còn lại\n4. Chọn đáp án chính xác nhất\n\n**Mục đích:**\nKhông phải đoán, mà phải HIỂU!",
+            "keywords": ["4 đáp án", "why 4", "tại sao", "multiple choice"]
+        },
+        {
+            "id": 130,
+            "category": "game",
+            "question": "Có thể chơi game offline không?",
+            "answer": "CÓ! Hầu hết games offline:\n\n**Games offline hoàn toàn:**\n✅ Matching game\n✅ Word builder\n✅ Flashcard review\n✅ Basic quiz\n\n**Games cần internet:**\n❌ Multiplayer (đấu với người khác)\n❌ Leaderboard realtime\n❌ AI-powered games\n\n**Cách chơi offline:**\n1. Mở app khi có mạng (1 lần)\n2. Download content của topic\n3. Bật Airplane mode\n4. Chơi bình thường\n\n**Lưu ý:**\n- Điểm sẽ sync khi online\n- Progress được lưu local\n- Achievements sẽ unlock khi có mạng\n\n**Ưu điểm offline:**\n- Không tốn data\n- Chơi mọi lúc mọi nơi\n- Tập trung hơn (không bị thông báo)\n\nHọc offline = Không bao giờ gián đoạn!",
+            "keywords": ["offline", "không mạng", "offline mode", "no internet"]
+        },
+        {
+            "id": 131,
+            "category": "streak",
+            "question": "Học nhiều giờ 1 ngày có tính không?",
+            "answer": "Streak chỉ tính 1 lần/ngày:\n\n**Quy tắc:**\n- Học 5 phút: ✅ Streak +1\n- Học 5 giờ: ✅ Streak +1 (không phải +5)\n\n**Tại sao:**\n- Streak đo **consistency** (đều đặn)\n- Không đo quantity (số lượng)\n- Mục đích: Thói quen hàng ngày\n\n**Nên làm:**\n✅ 30 phút x 7 ngày = 7 streak\n✅ Đều đặn mỗi ngày\n✅ Xây dựng thói quen\n\n**Không nên:**\n❌ 5 giờ hôm nay, nghỉ 6 ngày = 1 streak\n❌ Học dồn\n❌ \"Bù\" ngày nghỉ\n\n**Bonus cho học nhiều:**\n- Điểm (XP) cao hơn\n- Badges đặc biệt\n- Level up nhanh\n- Mastered nhiều từ\n\n**Kết luận:**\nStreak = Đều đặn, không phải nhiều giờ!\n30 phút/ngày x 30 ngày > 10 giờ/ngày x 3 ngày!",
+            "keywords": ["học nhiều", "1 ngày", "streak count", "hours"]
+        },
+        {
+            "id": 132,
+            "category": "progress",
+            "question": "Làm sao so sánh với bạn bè?",
+            "answer": "Nhiều cách để compare:\n\n**1. Leaderboard:**\n- Xếp hạng tuần/tháng\n- Theo điểm XP\n- Theo streak\n- Theo số từ mastered\n\n**2. Challenge bạn bè:**\n- Tạo challenge\n- Mời bạn tham gia\n- So điểm quiz, game\n- Winner nhận badge\n\n**3. Share Progress:**\n- Chia sẻ achievements\n- Post milestone (100 streak!)\n- Compare stats\n\n**4. Study together:**\n- Cùng học topic\n- Cùng làm quiz\n- Động viên nhau\n\n**Lợi ích:**\n✅ Động lực cao hơn\n✅ Học vui hơn\n✅ Cạnh tranh lành mạnh\n✅ Học từ nhau\n\n**Lưu ý:**\n- Không so sánh tiêu cực\n- Mỗi người tiến độ khác nhau\n- Focus vào bản thân trước\n\nBạn bè = Động lực, không phải áp lực!",
+            "keywords": ["bạn bè", "friends", "compare", "so sánh", "leaderboard"]
+        },
+        {
+            "id": 133,
+            "category": "account",
+            "question": "Có thể học nhiều ngôn ngữ không?",
+            "answer": "HIỆN TẠI: Chỉ tiếng Anh\n\n**Kế hoạch tương lai:**\n📅 Q3 2024: Tiếng Nhật\n📅 Q4 2024: Tiếng Hàn\n📅 2025: Tiếng Trung, Pháp, Đức, Tây Ban Nha\n\n**Tính năng sẽ có:**\n- Switch giữa các ngôn ngữ\n- Track progress riêng\n- Shared flashcard system\n- Universal game mechanics\n\n**Hiện tại khuyến nghị:**\n1. Tập trung tiếng Anh vững trước\n2. Đạt B2 (1500-2000 từ)\n3. Sau đó học ngôn ngữ thứ 2\n\n**Lý do:**\n- Tránh confusion giữa 2 ngôn ngữ\n- Xây thói quen học tốt với 1 ngôn ngữ\n- Áp dụng phương pháp cho ngôn ngữ khác\n\n**Góp ý:**\nNgôn ngữ nào bạn muốn học?\nVote trong app để ưu tiên!\n\nMaster 1 trước, sau đó expand!",
+            "keywords": ["nhiều ngôn ngữ", "multiple languages", "language", "tiếng khác"]
+        },
+        {
+            "id": 134,
+            "category": "vocab",
+            "question": "Có từ nào về Emotions?",
+            "answer": "QUAN TRỌNG: Kiểm tra database context cho danh sách đầy đủ từ vựng chủ đề Emotions.\n\n**Cảm xúc cơ bản (A1):**\n- happy, sad, angry, scared\n- surprised, excited, tired, bored\n\n**Cảm xúc phức tạp (B1-B2):**\n- delighted, miserable, furious, terrified\n- amazed, thrilled, exhausted, fed up\n- anxious, confused, disappointed, embarrassed\n\n**Mức độ:**\n- A bit/Slightly happy\n- Very/Really happy\n- Extremely/Incredibly happy\n\n**Expressions:**\n- over the moon (cực vui)\n- down in the dumps (buồn)\n- scared to death (sợ chết khiếp)\n- bored to tears (chán ngắt)\n\n**Verbs:**\n- feel, seem, look, sound + adj\n\nEmotions = Từ quan trọng giao tiếp!",
+            "keywords": ["emotions", "cảm xúc", "feelings", "từ cảm xúc"]
+        },
+        {
+            "id": 135,
+            "category": "vocab",
+            "question": "Chủ đề Colors có gì?",
+            "answer": "QUAN TRỌNG: Kiểm tra database context cho danh sách đầy đủ từ vựng chủ đề Colors.\n\n**Màu cơ bản (A1):**\n- red, blue, yellow, green\n- black, white, gray, brown\n- orange, purple, pink\n\n**Sắc thái (A2-B1):**\n- light blue, dark blue, navy blue\n- bright red, dark red, crimson\n- pale yellow, golden yellow\n\n**Màu đặc biệt:**\n- silver, gold, bronze\n- beige, cream, ivory\n- turquoise, violet, indigo\n\n**Patterns:**\n- striped (sọc), dotted (chấm bi)\n- checkered (kẻ ô), plain (trơn)\n\n**Expressions:**\n- feel blue (buồn)\n- green with envy (ghen tị)\n- see red (nổi giận)\n\n**Collocations:**\n- bright/vivid colors\n- dark/dull colors\n\nColors = Topic đơn giản nhưng quan trọng!",
+            "keywords": ["colors", "màu sắc", "colours", "từ màu"]
+        },
+        {
+            "id": 136,
+            "category": "vocab",
+            "question": "Topic Sports có từ nào?",
+            "answer": "QUAN TRỌNG: Kiểm tra database context cho danh sách đầy đủ từ vựng chủ đề Sports.\n\n**Môn thể thao (A1-A2):**\n- football/soccer, basketball, tennis\n- swimming, running, cycling\n- volleyball, badminton, table tennis\n\n**Dụng cụ:**\n- ball, racket, bat, net\n- goal, court, field, track\n\n**Động từ:**\n- play (football, basketball)\n- do (yoga, aerobics)\n- go (swimming, running, cycling)\n\n**Từ nâng cao (B1-B2):**\n- athlete, coach, referee, spectator\n- compete, train, practice, warm up\n- tournament, championship, league\n\n**Collocations:**\n- win/lose a match\n- score a goal\n- break a record\n- beat an opponent\n\n**Phrases:**\n- Good game!\n- Fair play\n- Team spirit\n\nSports = Healthy topic!",
+            "keywords": ["sports", "thể thao", "từ sports", "sport vocabulary"]
+        },
+        {
+            "id": 137,
+            "category": "learning",
+            "question": "Có nên đọc sách tiếng Anh không?",
+            "answer": "CÓ! Nhưng chọn sách đúng level:\n\n**Level A1-A2:**\n- Graded readers (Oxford, Penguin)\n- Children's books\n- Picture books with text\n- Ví dụ: The Little Prince (simplified)\n\n**Level B1:**\n- Young adult novels\n- Simple fiction\n- Ví dụ: Diary of a Wimpy Kid, Holes\n\n**Level B2-C1:**\n- Popular fiction\n- Non-fiction\n- Ví dụ: Harry Potter, The Hunger Games\n\n**Level C2:**\n- Literary fiction\n- Academic books\n- Ví dụ: 1984, To Kill a Mockingbird\n\n**Cách đọc hiệu quả:**\n1. Chọn sách흥미롭다 (thú vị)\n2. Không tra hết từ mới (max 5-10 từ/trang)\n3. Đoán nghĩa qua ngữ cảnh\n4. Note từ hay vào Card Words\n5. Đọc đều đặn (10-20 trang/ngày)\n\n**Rule 90/10:**\nHiểu 90% → Đúng level\nHiểu <70% → Quá khó\n\nĐọc nhiều = Vocabulary tăng nhanh!",
+            "keywords": ["đọc sách", "books", "reading", "read books"]
+        },
+        {
+            "id": 138,
+            "category": "flashcard",
+            "question": "Có nên học flashcard trước khi ngủ không?",
+            "answer": "CÓ! Rất hiệu quả:\n\n**Khoa học chứng minh:**\n- Não consolidate memory khi ngủ\n- Học trước ngủ → Nhớ tốt hơn 30-50%\n- Deep sleep = Long-term memory\n\n**Quy trình tối ưu:**\n1. **30-60 phút trước ngủ:**\n   - Học 10-20 flashcard mới\n   - Ôn 20-30 flashcard cũ\n   - Đọc ví dụ to ra\n\n2. **Ngay trước ngủ (10 phút):**\n   - Review nhanh các từ vừa học\n   - Không học từ mới\n\n3. **Sáng hôm sau:**\n   - Review lại ngay sau thức dậy\n   - Củng cố ghi nhớ\n\n**Lưu ý:**\n❌ Không học quá nhiều (gây stress)\n❌ Không học từ quá khó (mất ngủ)\n✅ Môi trường yên tĩnh\n✅ Ánh sáng vừa phải\n✅ Thư giãn sau khi học\n\nNgủ ngon = Nhớ lâu!",
+            "keywords": ["trước ngủ", "before sleep", "buổi tối", "evening"]
+        },
+        {
+            "id": 139,
+            "category": "quiz",
+            "question": "Quiz có giới hạn thời gian không?",
+            "answer": "Có 2 modes:\n\n**1. Practice Mode (Luyện tập):**\n❌ KHÔNG giới hạn thời gian\n- Suy nghĩ thoải mái\n- Tra từ điển được\n- Học kỹ từng câu\n- Phù hợp người mới\n\n**2. Challenge Mode (Thử thách):**\n✅ CÓ giới hạn thời gian\n- 30-60 giây/câu (tùy độ khó)\n- Không được tra\n- Điểm cao hơn\n- Bonus cho câu trả lời nhanh\n\n**Khuyến nghị:**\n- Beginner: Practice mode\n- Intermediate: Mix cả 2\n- Advanced: Challenge mode\n\n**Lợi ích time limit:**\n✅ Tăng phản xạ\n✅ Nhớ từ nhanh hơn\n✅ Chuẩn bị cho thi thật (TOEIC, IELTS)\n✅ Hồi hộp, thú vị hơn\n\n**Settings:**\nBật/tắt timer trong Settings > Quiz\n\nChọn mode phù hợp level!",
+            "keywords": ["thời gian", "time limit", "timer", "giới hạn"]
+        },
+        {
+            "id": 140,
+            "category": "general",
+            "question": "App có quảng cáo không?",
+            "answer": "KHÔNG! 100% miễn phí, không quảng cáo:\n\n**Cam kết:**\n✅ Không quảng cáo pop-up\n✅ Không quảng cáo video\n✅ Không banner ads\n✅ Không sponsored content\n\n**Tại sao miễn phí:**\n- Sứ mệnh: Giúp người Việt học tiếng Anh\n- Tài trợ từ tổ chức giáo dục\n- Duy trì bởi cộng đồng\n\n**Tương lai:**\n- Vẫn miễn phí mãi mãi\n- Có thể có Premium (optional):\n  + Offline full content\n  + Advanced statistics\n  + Priority support\n  + Exclusive features\n- Nhưng tính năng core luôn FREE!\n\n**So sánh:**\n- Duolingo: Ads mỗi bài\n- Memrise: Ads + Paywall\n- Card Words: 0 ADS!\n\n**Hỗ trợ app:**\n- Chia sẻ với bạn bè\n- Rate 5⭐ trên Store\n- Feedback cải thiện\n\nMiễn phí mãi mãi!",
+            "keywords": ["quảng cáo", "ads", "advertisement", "free", "miễn phí"]
+        }
+    ]
+}

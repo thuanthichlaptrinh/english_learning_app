@@ -95,6 +95,15 @@ firebase:
         bucket-name: ${FIREBASE_STORAGE_BUCKET}
         service-account-path: ${FIREBASE_SERVICE_ACCOUNT_PATH:classpath}
 
+# Gemini AI Configuration
+gemini:
+    api:
+        key: ${GEMINI_API_KEY}
+        model: gemini-2.5-flash
+        base-url: https://generativelanguage.googleapis.com/v1beta/models
+        max-tokens: 8192
+        temperature: 0.7
+
 logging:
     level:
         org:

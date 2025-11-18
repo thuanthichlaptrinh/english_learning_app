@@ -47,4 +47,7 @@ public interface VocabRepository extends JpaRepository<Vocab, UUID> {
     @Query("SELECT COUNT(v) FROM Vocab v WHERE v.topic.id = :topicId")
     long countByTopicId(@Param("topicId") Long topicId);
 
+    // Search vocab by word containing (case insensitive)
+    List<Vocab> findByWordContainingIgnoreCase(String word);
+
 }

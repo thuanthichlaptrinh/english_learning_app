@@ -136,6 +136,9 @@ services:
             # AI Service URL (for integration)
             - AI_SERVICE_URL=${AI_SERVICE_URL}
 
+            # Gemini AI
+            - GEMINI_API_KEY=${GEMINI_API_KEY}
+
         ports:
             - '${SERVER_SPRING_PORT}:${SERVER_SPRING_PORT}'
         depends_on:

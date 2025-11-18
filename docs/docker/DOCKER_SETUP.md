@@ -1,310 +1,261 @@
-# Docker Setup Guide - Card Words Services
+# 🐳 Docker Setup Guide - AI Chatbot
 
-## 📋 Quick Start
+## Quick Start
 
-### 1. Prerequisites
+### 1. Setup Environment
 
-- Docker Desktop installed
-- Docker Compose v2.0+
-- Git
-
-### 2. Setup Environment
-
+**Windows:**
 ```bash
-# Copy environment template
-cp .env.example .env
+# Copy .env.example to .env
+copy .env.example .env
 
-# Edit .env with your actual values
-nano .env  # or use your favorite editor
+# Edit .env and add your Gemini API Key
+notepad .env
 ```
 
-**Important variables to change:**
-- `POSTGRES_PASSWORD` - Strong database password
-- `JWT_SECRET` - Generate with: `openssl rand -base64 32`
-- `MAIL_USERNAME` & `MAIL_PASSWORD` - Your Gmail credentials
-- `GOOGLE_OAUTH_CLIENT_ID` & `GOOGLE_OAUTH_CLIENT_SECRET` - Your OAuth credentials
+**Linux/Mac:**
+```bash
+cp .env.example .env
+nano .env  # or vim .env
+```
 
-### 3. Build and Run
+### 2. Update GEMINI_API_KEY in .env
+
+```env
+GEMINI_API_KEY=AIzaSyARBiuwzsy915sWLW4d0JYSLVeHiOR9PL4
+```
+
+### 3. Build & Run with Docker Compose
 
 ```bash
-# Build all services
+# Build images
 docker-compose build
 
-# Start all services (development)
+# Start all services
 docker-compose up -d
 
-# Or start with development overrides
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
-
-# View logs
-docker-compose logs -f
+# Check logs
+docker-compose logs -f app
 ```
 
 ### 4. Verify Services
 
-```bash
-# Check status
-docker-compose ps
+- **Application**: http://localhost:8080
+- **Swagger UI**: http://localhost:8080/swagger-ui.html
+- **PgAdmin**: http://localhost:5050
+- **Redis Insight**: http://localhost:5540
 
-# Test Spring Boot API
-curl http://localhost:8080/actuator/health
-
-# Test Python AI Service
-curl http://localhost:8001/health
-
-# Test PostgreSQL
-docker-compose exec postgres pg_isready -U postgres
-
-# Test Redis
-docker-compose exec redis redis-cli ping
-```
-
----
-
-## 🏗️ Project Structure
-
-```
-card-words-services/
-├── docker-compose.yml              # Main orchestration
-├── docker-compose.dev.yml          # Development overrides
-├── docker-compose.prod.yml         # Production overrides
-├── .env                            # Environment variables (gitignored)
-├── .env.example                    # Environment template
-│
-├── card-words/                     # Spring Boot Backend
-│   ├── src/
-│   ├── pom.xml
-│   ├── Dockerfile
-│   └── .dockerignore
-│
-└── card-words-ai/                  # Python AI Service
-    ├── app/
-    ├── models/
-    ├── pyproject.toml
-    ├── Dockerfile
-    └── .dockerignore
-```
-
----
-
-## 🚀 Common Commands
-
-### Development
+### 5. Test Chatbot API
 
 ```bash
-# Start all services
-docker-compose up -d
+# 1. Login to get JWT token
+curl -X POST http://localhost:8080/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "your-email@example.com",
+    "password": "your-password"
+  }'
 
-# Start with hot reload
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+# 2. Chat with AI (replace {token} with your JWT)
+curl -X POST http://localhost:8080/api/v1/chatbot/chat \
+  -H "Authorization: Bearer {token}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "Làm sao để học từ vựng hiệu quả?",
+    "includeContext": true,
+    "searchFaq": true
+  }'
+```
 
-# Stop all services
+## Docker Commands
+
+### Rebuild after code changes
+
+```bash
+# Stop containers
 docker-compose down
 
-# Rebuild specific service
-docker-compose up -d --build card-words-ai
+# Rebuild app service
+docker-compose build app
 
-# View logs
-docker-compose logs -f card-words-api
-docker-compose logs -f card-words-ai
+# Start again
+docker-compose up -d
 
-# Execute command in container
-docker-compose exec card-words-api bash
-docker-compose exec card-words-ai bash
+# Or do all in one command
+docker-compose up -d --build app
 ```
 
-### Database Management
+### View logs
 
 ```bash
-# Connect to PostgreSQL
-docker-compose exec postgres psql -U postgres -d card_words
+# All services
+docker-compose logs -f
+
+# App only
+docker-compose logs -f app
+
+# Last 100 lines
+docker-compose logs --tail=100 app
+```
+
+### Database operations
+
+```bash
+# Access PostgreSQL container
+docker exec -it card-words-postgres psql -U postgres -d card_words
+
+# Run migrations manually (if needed)
+docker exec -it card-words-app java -jar app.jar --spring.flyway.enabled=true
 
 # Backup database
-docker-compose exec postgres pg_dump -U postgres card_words > backup.sql
+docker exec card-words-postgres pg_dump -U postgres card_words > backup.sql
 
 # Restore database
-docker-compose exec -T postgres psql -U postgres card_words < backup.sql
-
-# Access PgAdmin
-# Open: http://localhost:5050
-# Login: admin@cardwords.com / admin123
+docker exec -i card-words-postgres psql -U postgres card_words < backup.sql
 ```
 
-### Redis Management
+### Cleanup
 
 ```bash
-# Connect to Redis CLI
-docker-compose exec redis redis-cli
+# Stop and remove containers
+docker-compose down
 
-# Access Redis Insight
-# Open: http://localhost:5540
+# Remove volumes (WARNING: deletes all data)
+docker-compose down -v
+
+# Remove images
+docker-compose down --rmi all
 ```
 
----
+## Troubleshooting
 
-## 🔧 Service URLs
+### Error: "Cannot connect to Gemini API"
 
-| Service | URL | Description |
-|---------|-----|-------------|
-| **Spring Boot API** | http://localhost:8080 | Main backend API |
-| **Python AI Service** | http://localhost:8001 | ML prediction service |
-| **PgAdmin** | http://localhost:5050 | PostgreSQL GUI |
-| **Redis Insight** | http://localhost:5540 | Redis GUI |
-| **Swagger UI** | http://localhost:8080/swagger-ui.html | API documentation |
-
----
-
-## 🐛 Troubleshooting
-
-### Port Already in Use
+Check:
+1. GEMINI_API_KEY is set correctly in `.env`
+2. Container has internet access
+3. API key is valid: https://makersuite.google.com/app/apikey
 
 ```bash
-# Check what's using the port
-netstat -ano | findstr :8080  # Windows
-lsof -i :8080                 # Linux/Mac
-
-# Change port in docker-compose.yml
-ports:
-  - '8081:8080'  # Use different external port
+# Check environment variables in container
+docker exec card-words-app env | grep GEMINI
 ```
 
-### Container Won't Start
+### Error: "Port already in use"
+
+Change ports in `docker-compose.yml`:
+
+```yaml
+app:
+  ports:
+    - '8081:8080'  # Use 8081 instead of 8080
+```
+
+### Error: "Database migration failed"
+
+```bash
+# Check Flyway migration status
+docker exec -it card-words-app java -jar app.jar --spring.flyway.info=true
+
+# Force repair if needed
+docker exec -it card-words-app java -jar app.jar --spring.flyway.repair=true
+```
+
+### Container keeps restarting
 
 ```bash
 # Check logs
-docker-compose logs card-words-api
+docker logs card-words-app
 
-# Restart container
-docker-compose restart card-words-api
-
-# Remove and recreate
-docker-compose rm -f card-words-api
-docker-compose up -d card-words-api
+# Check health
+docker inspect card-words-app | grep -A 10 Health
 ```
 
-### Database Connection Failed
+### Cannot build Maven dependencies
+
+Clear Maven cache and rebuild:
 
 ```bash
-# Check if postgres is healthy
-docker-compose ps postgres
-
-# Check postgres logs
-docker-compose logs postgres
-
-# Test connection
-docker-compose exec postgres psql -U postgres -c "SELECT 1;"
+docker-compose build --no-cache app
 ```
 
-### Out of Memory
+## Production Deployment
+
+### 1. Use docker-compose.shared-db.yml
+
+For production with external database:
 
 ```bash
-# Check Docker resources
-docker stats
+# Copy .env.shared-db-example to .env
+cp .env.shared-db-example .env
 
-# Increase Docker memory limit
-# Docker Desktop → Settings → Resources → Memory
+# Update database credentials
+nano .env
 
-# Or add to docker-compose.yml
-services:
-  card-words-api:
-    mem_limit: 2g
+# Run with shared DB config
+docker-compose -f docker-compose.shared-db.yml up -d
 ```
+
+### 2. Secure API Key
+
+Never commit `.env` to git. Use Docker secrets or environment variables in production.
+
+### 3. Enable HTTPS
+
+Use reverse proxy (Nginx/Traefik) with SSL certificates.
+
+### 4. Resource Limits
+
+Add to `docker-compose.yml`:
+
+```yaml
+app:
+  deploy:
+    resources:
+      limits:
+        cpus: '2'
+        memory: 2G
+      reservations:
+        cpus: '1'
+        memory: 1G
+```
+
+## Architecture
+
+```
+┌─────────────────────────────────────────┐
+│         Docker Network                  │
+│  ┌──────────┐  ┌──────────┐            │
+│  │          │  │          │            │
+│  │ Postgres │  │  Redis   │            │
+│  │          │  │          │            │
+│  └────▲─────┘  └────▲─────┘            │
+│       │             │                   │
+│       │             │                   │
+│  ┌────┴─────────────┴─────┐            │
+│  │                         │            │
+│  │   Spring Boot App       │            │
+│  │   + Gemini AI           │            │
+│  │                         │            │
+│  └─────────────────────────┘            │
+│              │                          │
+└──────────────┼──────────────────────────┘
+               │
+          Port 8080
+               ▼
+         Your Browser
+```
+
+## Next Steps
+
+1. ✅ Test API endpoints via Swagger
+2. ✅ Configure production database
+3. ✅ Setup monitoring (Prometheus/Grafana)
+4. ✅ Add rate limiting
+5. ✅ Setup CI/CD pipeline
 
 ---
 
-## 🌍 Production Deployment
-
-### 1. Update Environment
-
-```bash
-# Create production .env
-cp .env.example .env.prod
-
-# Edit with production values
-nano .env.prod
-```
-
-### 2. Deploy
-
-```bash
-# Build for production
-docker-compose -f docker-compose.yml -f docker-compose.prod.yml build
-
-# Start services
-docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
-
-# Check status
-docker-compose -f docker-compose.yml -f docker-compose.prod.yml ps
-```
-
-### 3. Monitor
-
-```bash
-# View logs
-docker-compose -f docker-compose.yml -f docker-compose.prod.yml logs -f
-
-# Check resource usage
-docker stats
-```
-
----
-
-## 🧹 Cleanup
-
-```bash
-# Stop all services
-docker-compose down
-
-# Stop and remove volumes (⚠️ deletes data)
-docker-compose down -v
-
-# Remove all images
-docker-compose down --rmi all
-
-# Clean up system
-docker system prune -a
-```
-
----
-
-## 📝 Notes
-
-### card-words-ai Models
-
-The `card-words-ai/models/` directory is mounted as a volume. Place your trained models here:
-
-```bash
-card-words-ai/models/
-├── lightgbm_vocab_predictor.txt
-└── feature_names.json
-```
-
-Models can be updated without rebuilding the container.
-
-### Hot Reload
-
-Development mode enables hot reload:
-- **Spring Boot**: Requires spring-boot-devtools
-- **Python AI**: Automatically enabled with `--reload` flag
-
-### Environment Variables
-
-All services share the same `.env` file for consistency. Service-specific variables are prefixed:
-- Spring Boot: No prefix
-- Python AI: `AI_` prefix (optional)
-
----
-
-## 🆘 Support
-
-If you encounter issues:
-
-1. Check logs: `docker-compose logs -f`
-2. Verify environment: `docker-compose config`
-3. Check health: `docker-compose ps`
-4. Restart services: `docker-compose restart`
-
----
-
-**Last Updated:** 2024-11-16  
-**Version:** 1.0
+**Status**: ✅ Ready for Docker deployment  
+**Model**: gemini-2.5-flash-exp  
+**Cost**: FREE
