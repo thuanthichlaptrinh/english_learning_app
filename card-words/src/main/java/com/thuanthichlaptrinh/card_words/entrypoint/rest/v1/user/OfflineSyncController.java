@@ -1,6 +1,6 @@
 package com.thuanthichlaptrinh.card_words.entrypoint.rest.v1.user;
 
-import com.thuanthichlaptrinh.card_words.core.domain.User;
+import com.thuanthichlaptrinh.card_words.common.helper.AuthenticationHelper;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.ApiResponse;
 import com.thuanthichlaptrinh.card_words.core.usecase.user.OfflineSyncService;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.offline.*;
@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,6 +25,7 @@ import java.util.UUID;
 public class OfflineSyncController {
 
         private final OfflineSyncService offlineSyncService;
+        private final AuthenticationHelper authHelper;
 
         // ==================== DOWNLOAD APIs ====================
 
@@ -39,7 +39,7 @@ public class OfflineSyncController {
         public ResponseEntity<ApiResponse<List<TopicProgressResponse>>> getTopicsWithProgress(
                         Authentication authentication) {
 
-                UUID userId = getUserIdFromAuth(authentication);
+                UUID userId = authHelper.getCurrentUserId(authentication);
                 List<TopicProgressResponse> topics = offlineSyncService.getTopicsWithProgress(userId);
 
                 return ResponseEntity.ok(ApiResponse.success(
@@ -58,7 +58,7 @@ public class OfflineSyncController {
                         Authentication authentication,
                         @PathVariable Long topicId) {
 
-                UUID userId = getUserIdFromAuth(authentication);
+                UUID userId = authHelper.getCurrentUserId(authentication);
                 List<VocabWithProgressResponse> vocabs = offlineSyncService.getVocabsByTopic(userId, topicId);
 
                 return ResponseEntity.ok(ApiResponse.success(
@@ -73,7 +73,7 @@ public class OfflineSyncController {
         public ResponseEntity<ApiResponse<List<VocabWithProgressResponse>>> getRecentVocabs(
                         Authentication authentication) {
 
-                UUID userId = getUserIdFromAuth(authentication);
+                UUID userId = authHelper.getCurrentUserId(authentication);
                 List<VocabWithProgressResponse> vocabs = offlineSyncService.getRecentVocabs(userId);
 
                 return ResponseEntity.ok(ApiResponse.success(
@@ -111,7 +111,7 @@ public class OfflineSyncController {
                         Authentication authentication,
                         @RequestBody BatchSyncRequest request) {
 
-                UUID userId = getUserIdFromAuth(authentication);
+                UUID userId = authHelper.getCurrentUserId(authentication);
                 Map<String, Object> result = offlineSyncService.syncBatch(userId, request);
 
                 return ResponseEntity.ok(ApiResponse.success(
@@ -119,7 +119,56 @@ public class OfflineSyncController {
                                 result));
         }
 
-        // ==================== UPLOAD APIs - Individual (Fallback) ====================
+        @PostMapping("/sync/complete")
+        @Operation(summary = "Complete Sync - Upload game sessions + details + vocab progress", description = "**API đầy đủ nhất - Upload 3 list cùng lúc:**\n\n"
+                        +
+                        "1. **gameSessions** - Danh sách các lần chơi game (3 sessions)\n" +
+                        "2. **gameSessionDetails** - Chi tiết từng câu hỏi (15 details = 3×5 câu)\n" +
+                        "3. **vocabProgress** - Tiến trình học từ vựng (optional)\n\n" +
+                        "**Processing flow:**\n" +
+                        "- Step 1: Lưu game sessions\n" +
+                        "- Step 2: Lưu game session details → **Tự động cập nhật user_vocab_progress**\n" +
+                        "  - isCorrect = true → timesCorrect++\n" +
+                        "  - isCorrect = false → timesWrong++\n" +
+                        "  - Áp dụng SM-2 algorithm (Spaced Repetition)\n" +
+                        "  - Update status: UNKNOWN → KNOWN → MASTERED\n" +
+                        "- Step 3: Merge với vocabProgress manual updates (nếu có)\n\n" +
+                        "**Response:**\n" +
+                        "```json\n" +
+                        "{\n" +
+                        "  \"syncedGameSessions\": 3,\n" +
+                        "  \"syncedGameSessionDetails\": 15,\n" +
+                        "  \"syncedVocabProgress\": 0,\n" +
+                        "  \"errors\": []\n" +
+                        "}\n" +
+                        "```\n\n" +
+                        "**Use case:** Offline mode - User chơi 3 game × 5 câu, khi có mạng gửi tất cả lên")
+        public ResponseEntity<ApiResponse<Map<String, Object>>> completeSyncAll(
+                        Authentication authentication,
+                        @RequestBody BatchSyncRequest request) {
+
+                UUID userId = authHelper.getCurrentUserId(authentication);
+
+                // Validate request
+                if (request.getGameSessions() == null || request.getGameSessions().isEmpty()) {
+                        return ResponseEntity.badRequest().body(
+                                        ApiResponse.error("400", "gameSessions is required"));
+                }
+
+                if (request.getGameSessionDetails() == null || request.getGameSessionDetails().isEmpty()) {
+                        return ResponseEntity.badRequest().body(
+                                        ApiResponse.error("400", "gameSessionDetails is required"));
+                }
+
+                Map<String, Object> result = offlineSyncService.syncBatch(userId, request);
+
+                return ResponseEntity.ok(ApiResponse.success(
+                                String.format("Complete sync finished: %d sessions, %d details, %d progress updates",
+                                                result.get("syncedGameSessions"),
+                                                result.get("syncedGameSessionDetails"),
+                                                result.get("syncedVocabProgress")),
+                                result));
+        }
 
         @PostMapping("/game-sessions")
         @Operation(summary = "Upload game sessions riêng lẻ", description = "Upload game sessions và details (fallback nếu batch sync fail).\n\n"
@@ -129,7 +178,7 @@ public class OfflineSyncController {
                         Authentication authentication,
                         @RequestBody List<OfflineGameSessionRequest> sessions) {
 
-                UUID userId = getUserIdFromAuth(authentication);
+                UUID userId = authHelper.getCurrentUserId(authentication);
                 int syncedCount = offlineSyncService.syncGameSessions(userId, sessions);
 
                 return ResponseEntity.ok(ApiResponse.success(
@@ -145,7 +194,7 @@ public class OfflineSyncController {
                         Authentication authentication,
                         @RequestBody List<OfflineVocabProgressRequest> progressList) {
 
-                UUID userId = getUserIdFromAuth(authentication);
+                UUID userId = authHelper.getCurrentUserId(authentication);
                 int syncedCount = offlineSyncService.syncVocabProgress(userId, progressList);
 
                 return ResponseEntity.ok(ApiResponse.success(
@@ -163,7 +212,7 @@ public class OfflineSyncController {
                         @Parameter(description = "ID của game session", required = true) @RequestParam Long sessionId,
                         @RequestBody List<OfflineGameDetailRequest> details) {
 
-                UUID userId = getUserIdFromAuth(authentication);
+                UUID userId = authHelper.getCurrentUserId(authentication);
                 int syncedCount = offlineSyncService.syncGameSessionDetails(userId, sessionId, details);
 
                 return ResponseEntity.ok(ApiResponse.success(
@@ -171,15 +220,4 @@ public class OfflineSyncController {
                                 null));
         }
 
-        // ==================== HELPER ====================
-
-        private UUID getUserIdFromAuth(Authentication authentication) {
-                if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
-                        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-                        if (userDetails instanceof User) {
-                                return ((User) userDetails).getId();
-                        }
-                }
-                throw new RuntimeException("Unable to get user ID from authentication");
-        }
 }

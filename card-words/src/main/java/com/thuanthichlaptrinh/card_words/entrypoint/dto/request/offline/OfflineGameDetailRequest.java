@@ -12,6 +12,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OfflineGameDetailRequest {
+    private String clientSessionId; // Link to OfflineGameSessionRequest
     private UUID vocabId;
     private Integer questionNumber;
     private String userAnswer;

@@ -20,4 +20,8 @@ public class OfflineVocabProgressRequest {
     private Double easeFactor;
     private Integer repetitions;
     private Integer interval;
+
+    // Performance metrics (optional - will be merged with server data)
+    private Integer timesCorrect;
+    private Integer timesWrong;
 }

@@ -110,26 +110,40 @@ public class OfflineSyncService {
     }
 
     /**
-     * Batch sync: Upload game sessions and vocab progress in one transaction
+     * Batch sync: Upload game sessions, details, and vocab progress in one
+     * transaction
+     * 
+     * Processing flow:
+     * 1. Save game sessions (without details)
+     * 2. Save game session details (linked by clientSessionId)
+     * 3. Auto-update user_vocab_progress based on game performance
+     * 4. Merge with explicit vocab progress updates (optional)
      */
     @Transactional
     public Map<String, Object> syncBatch(UUID userId, BatchSyncRequest request) {
         log.info("Starting batch sync for user: {}, clientId: {}", userId, request.getClientId());
 
         int syncedSessions = 0;
+        int syncedDetails = 0;
         int syncedProgress = 0;
         int skippedDuplicates = 0;
         List<String> errors = new ArrayList<>();
 
-        // Sync game sessions
+        // Map to store clientSessionId -> saved GameSession
+        Map<String, GameSession> sessionMap = new HashMap<>();
+
+        // Step 1: Save game sessions first (without details)
         if (request.getGameSessions() != null) {
             for (OfflineGameSessionRequest sessionReq : request.getGameSessions()) {
                 try {
                     if (isDuplicateSession(userId, sessionReq)) {
                         skippedDuplicates++;
+                        log.debug("Skipped duplicate session: {}", sessionReq.getClientSessionId());
                         continue;
                     }
-                    syncGameSession(userId, sessionReq);
+
+                    GameSession savedSession = saveGameSessionOnly(userId, sessionReq);
+                    sessionMap.put(sessionReq.getClientSessionId(), savedSession);
                     syncedSessions++;
                 } catch (Exception e) {
                     log.error("Failed to sync session: {}", sessionReq.getClientSessionId(), e);
@@ -138,7 +152,27 @@ public class OfflineSyncService {
             }
         }
 
-        // Sync vocab progress
+        // Step 2: Save game session details and auto-update vocab progress
+        if (request.getGameSessionDetails() != null) {
+            for (OfflineGameDetailRequest detail : request.getGameSessionDetails()) {
+                try {
+                    GameSession session = sessionMap.get(detail.getClientSessionId());
+                    if (session == null) {
+                        log.warn("Session not found for detail with clientSessionId: {}", detail.getClientSessionId());
+                        errors.add("Detail for session " + detail.getClientSessionId() + ": Session not found");
+                        continue;
+                    }
+
+                    syncGameSessionDetail(session, detail);
+                    syncedDetails++;
+                } catch (Exception e) {
+                    log.error("Failed to sync detail for vocab: {}", detail.getVocabId(), e);
+                    errors.add("Detail vocab " + detail.getVocabId() + ": " + e.getMessage());
+                }
+            }
+        }
+
+        // Step 3: Merge with explicit vocab progress (optional - for manual updates)
         if (request.getVocabProgress() != null) {
             for (OfflineVocabProgressRequest progressReq : request.getVocabProgress()) {
                 try {
@@ -153,13 +187,14 @@ public class OfflineSyncService {
 
         Map<String, Object> result = new HashMap<>();
         result.put("syncedGameSessions", syncedSessions);
+        result.put("syncedGameSessionDetails", syncedDetails);
         result.put("syncedVocabProgress", syncedProgress);
         result.put("skippedDuplicates", skippedDuplicates);
         result.put("errors", errors);
         result.put("serverTimestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
 
-        log.info("Batch sync completed: {} sessions, {} progress, {} skipped",
-                syncedSessions, syncedProgress, skippedDuplicates);
+        log.info("Batch sync completed: {} sessions, {} details, {} progress, {} skipped, {} errors",
+                syncedSessions, syncedDetails, syncedProgress, skippedDuplicates, errors.size());
 
         return result;
     }
@@ -337,6 +372,23 @@ public class OfflineSyncService {
     }
 
     private void syncGameSession(UUID userId, OfflineGameSessionRequest request) {
+        GameSession session = saveGameSessionOnly(userId, request);
+
+        // Save details
+        if (request.getDetails() != null) {
+            for (OfflineGameDetailRequest detail : request.getDetails()) {
+                syncGameSessionDetail(session, detail);
+            }
+        }
+
+        log.info("Synced game session with {} details: {}",
+                request.getDetails() != null ? request.getDetails().size() : 0, session.getId());
+    }
+
+    /**
+     * Save game session without details (used in batch sync)
+     */
+    private GameSession saveGameSessionOnly(UUID userId, OfflineGameSessionRequest request) {
         User user = new User();
         user.setId(userId);
 
@@ -361,15 +413,9 @@ public class OfflineSyncService {
                 .build();
 
         session = gameSessionRepository.save(session);
+        log.debug("Saved game session: {}", session.getId());
 
-        // Save details
-        if (request.getDetails() != null) {
-            for (OfflineGameDetailRequest detail : request.getDetails()) {
-                syncGameSessionDetail(session, detail);
-            }
-        }
-
-        log.info("Synced game session: {}", session.getId());
+        return session;
     }
 
     private void syncVocabProgress(UUID userId, OfflineVocabProgressRequest request) {
@@ -413,6 +459,8 @@ public class OfflineSyncService {
                     .efFactor(request.getEaseFactor())
                     .repetition(request.getRepetitions())
                     .intervalDays(request.getInterval())
+                    .timesCorrect(request.getTimesCorrect() != null ? request.getTimesCorrect() : 0)
+                    .timesWrong(request.getTimesWrong() != null ? request.getTimesWrong() : 0)
                     .build();
         }
 
@@ -428,11 +476,20 @@ public class OfflineSyncService {
         progress.setEfFactor(request.getEaseFactor());
         progress.setRepetition(request.getRepetitions());
         progress.setIntervalDays(request.getInterval());
+
+        // Merge timesCorrect and timesWrong (client data takes precedence if provided)
+        if (request.getTimesCorrect() != null) {
+            // Use max to prevent data loss from concurrent updates
+            progress.setTimesCorrect(Math.max(progress.getTimesCorrect(), request.getTimesCorrect()));
+        }
+        if (request.getTimesWrong() != null) {
+            progress.setTimesWrong(Math.max(progress.getTimesWrong(), request.getTimesWrong()));
+        }
     }
 
     private void syncGameSessionDetail(GameSession session, OfflineGameDetailRequest detail) {
-        Vocab vocab = new Vocab();
-        vocab.setId(detail.getVocabId());
+        Vocab vocab = vocabRepository.findById(detail.getVocabId())
+                .orElseThrow(() -> new IllegalArgumentException("Vocab not found: " + detail.getVocabId()));
 
         GameSessionDetail detailEntity = GameSessionDetail.builder()
                 .session(session)
@@ -443,5 +500,105 @@ public class OfflineSyncService {
 
         gameSessionDetailRepository.save(detailEntity);
         log.debug("Synced game session detail for vocab: {}", detail.getVocabId());
+
+        // Update user vocab progress based on game result
+        updateUserVocabProgressFromGameResult(session.getUser().getId(), vocab, detail.getIsCorrect());
+    }
+
+    /**
+     * Update user vocab progress based on game performance
+     * Implements Spaced Repetition (SM-2 algorithm)
+     */
+    private void updateUserVocabProgressFromGameResult(UUID userId, Vocab vocab, Boolean isCorrect) {
+        Optional<UserVocabProgress> existingProgress = userVocabProgressRepository.findByUserIdAndVocabId(userId,
+                vocab.getId());
+
+        UserVocabProgress progress;
+        if (existingProgress.isPresent()) {
+            progress = existingProgress.get();
+        } else {
+            // Create new progress entry
+            User user = new User();
+            user.setId(userId);
+
+            progress = UserVocabProgress.builder()
+                    .user(user)
+                    .vocab(vocab)
+                    .status(VocabStatus.UNKNOWN)
+                    .timesCorrect(0)
+                    .timesWrong(0)
+                    .efFactor(2.5)
+                    .intervalDays(1)
+                    .repetition(0)
+                    .lastReviewed(LocalDate.now())
+                    .nextReviewDate(LocalDate.now().plusDays(1))
+                    .build();
+        }
+
+        // Update times correct/wrong
+        if (Boolean.TRUE.equals(isCorrect)) {
+            progress.setTimesCorrect(progress.getTimesCorrect() + 1);
+        } else {
+            progress.setTimesWrong(progress.getTimesWrong() + 1);
+        }
+
+        // Apply SM-2 algorithm for spaced repetition
+        applySpacedRepetition(progress, isCorrect);
+
+        // Update last reviewed date
+        progress.setLastReviewed(LocalDate.now());
+
+        userVocabProgressRepository.save(progress);
+        log.debug("Updated vocab progress for vocab {} - correct: {}, total correct: {}, total wrong: {}",
+                vocab.getId(), isCorrect, progress.getTimesCorrect(), progress.getTimesWrong());
+    }
+
+    /**
+     * Apply SM-2 Spaced Repetition Algorithm
+     * Quality: 5 (perfect) for correct, 0-2 for incorrect
+     */
+    private void applySpacedRepetition(UserVocabProgress progress, Boolean isCorrect) {
+        int quality = Boolean.TRUE.equals(isCorrect) ? 5 : 1; // 5 = perfect recall, 1 = incorrect
+
+        if (quality >= 3) {
+            // Correct answer
+            if (progress.getRepetition() == 0) {
+                progress.setIntervalDays(1);
+            } else if (progress.getRepetition() == 1) {
+                progress.setIntervalDays(6);
+            } else {
+                progress.setIntervalDays((int) Math.round(progress.getIntervalDays() * progress.getEfFactor()));
+            }
+
+            progress.setRepetition(progress.getRepetition() + 1);
+
+            // Update status based on performance metrics
+            int totalAttempts = progress.getTimesCorrect() + progress.getTimesWrong();
+            double accuracy = totalAttempts > 0 ? (progress.getTimesCorrect() * 100.0 / totalAttempts) : 0;
+
+            if (progress.getTimesCorrect() >= 10 && progress.getTimesWrong() <= 2 && accuracy >= 80.0) {
+                progress.setStatus(VocabStatus.MASTERED);
+            } else if (progress.getTimesCorrect() >= 3 && accuracy >= 60.0) {
+                progress.setStatus(VocabStatus.KNOWN);
+            } else {
+                progress.setStatus(VocabStatus.UNKNOWN);
+            }
+        } else {
+            // Incorrect answer - reset
+            progress.setRepetition(0);
+            progress.setIntervalDays(1);
+            progress.setStatus(VocabStatus.UNKNOWN);
+        }
+
+        // Update EF (Ease Factor): EF' = EF + (0.1 - (5 - quality) * (0.08 + (5 -
+        // quality) * 0.02))
+        double newEF = progress.getEfFactor() + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
+        if (newEF < 1.3) {
+            newEF = 1.3; // Minimum EF
+        }
+        progress.setEfFactor(newEF);
+
+        // Calculate next review date
+        progress.setNextReviewDate(LocalDate.now().plusDays(progress.getIntervalDays()));
     }
 }
