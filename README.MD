@@ -14,17 +14,17 @@
 
 ## 📖 Table of Contents
 
-- [Overview](#-overview)
-- [Architecture](#-architecture)
-- [Quick Start](#-quick-start)
-- [Services](#-services)
-- [Key Features](#-key-features)
-- [Configuration](#️-configuration)
-- [Development](#-development)
-- [Database](#️-database)
-- [API Documentation](#-api-documentation)
-- [Troubleshooting](#️-troubleshooting)
-- [Contributing](#-contributing)
+-   [Overview](#-overview)
+-   [Architecture](#-architecture)
+-   [Quick Start](#-quick-start)
+-   [Services](#-services)
+-   [Key Features](#-key-features)
+-   [Configuration](#️-configuration)
+-   [Development](#-development)
+-   [Database](#️-database)
+-   [API Documentation](#-api-documentation)
+-   [Troubleshooting](#️-troubleshooting)
+-   [Contributing](#-contributing)
 
 ---
 
@@ -32,11 +32,11 @@
 
 **Card Words Platform** is a comprehensive vocabulary learning system that combines:
 
-- **Spring Boot Backend**: RESTful API with real-time WebSocket notifications
-- **AI Service**: LightGBM-powered smart review predictions
-- **PostgreSQL**: Robust relational database with Flyway migrations
-- **Redis**: High-performance caching and session management
-- **Docker**: Containerized deployment for all services
+-   **Spring Boot Backend**: RESTful API with real-time WebSocket notifications
+-   **AI Service**: LightGBM-powered smart review predictions
+-   **PostgreSQL**: Robust relational database with Flyway migrations
+-   **Redis**: High-performance caching and session management
+-   **Docker**: Containerized deployment for all services
 
 ### Core Capabilities
 
@@ -48,7 +48,7 @@
 ✅ **AI-Powered Reviews** - Machine learning predictions  
 ✅ **Automated Reminders** - Daily streak emails via scheduler  
 ✅ **Admin Dashboard** - User monitoring and analytics  
-✅ **Offline Sync** - Mobile-friendly data synchronization  
+✅ **Offline Sync** - Mobile-friendly data synchronization
 
 ---
 
@@ -93,19 +93,19 @@ card-words-platform/
 
 ### Technology Stack
 
-| Component | Technology | Version | Purpose |
-|-----------|-----------|---------|---------|
-| **Backend API** | Spring Boot | 3.2.5 | RESTful API & WebSocket server |
-| **Language** | Java | 17 | Primary programming language |
-| **AI Service** | FastAPI | Latest | ML prediction endpoints |
-| **ML Engine** | LightGBM | Latest | Smart review predictions |
-| **Database** | PostgreSQL | 16 | Primary data store |
-| **Cache** | Redis | 7 | Session & performance caching |
-| **Message Queue** | STOMP | - | WebSocket messaging |
-| **Build Tool** | Maven | 3.9+ | Java dependency management |
-| **Migration** | Flyway | - | Database schema versioning |
-| **Container** | Docker | Latest | Service orchestration |
-| **Auth** | JWT + OAuth2 | - | Authentication & authorization |
+| Component         | Technology   | Version | Purpose                        |
+| ----------------- | ------------ | ------- | ------------------------------ |
+| **Backend API**   | Spring Boot  | 3.2.5   | RESTful API & WebSocket server |
+| **Language**      | Java         | 17      | Primary programming language   |
+| **AI Service**    | FastAPI      | Latest  | ML prediction endpoints        |
+| **ML Engine**     | LightGBM     | Latest  | Smart review predictions       |
+| **Database**      | PostgreSQL   | 16      | Primary data store             |
+| **Cache**         | Redis        | 7       | Session & performance caching  |
+| **Message Queue** | STOMP        | -       | WebSocket messaging            |
+| **Build Tool**    | Maven        | 3.9+    | Java dependency management     |
+| **Migration**     | Flyway       | -       | Database schema versioning     |
+| **Container**     | Docker       | Latest  | Service orchestration          |
+| **Auth**          | JWT + OAuth2 | -       | Authentication & authorization |
 
 ---
 
@@ -115,14 +115,15 @@ card-words-platform/
 
 Ensure you have the following installed:
 
-- **Docker Desktop** 20.10+ (or Docker Engine + Docker Compose)
-- **Git** for version control
+-   **Docker Desktop** 20.10+ (or Docker Engine + Docker Compose)
+-   **Git** for version control
 
 **Optional (for local development):**
-- Java 17+ (Eclipse Temurin recommended)
-- Maven 3.9+
-- Python 3.11+ with Poetry
-- Node.js 18+ (for frontend integration)
+
+-   Java 17+ (Eclipse Temurin recommended)
+-   Maven 3.9+
+-   Python 3.11+ with Poetry
+-   Node.js 18+ (for frontend integration)
 
 ### Installation
 
@@ -172,20 +173,19 @@ docker-compose exec postgres pg_isready -U postgres
 
 ### Access Services
 
-
-| Service | URL | Credentials |
-|---------|-----|-------------|
-| **Spring Boot API** | http://localhost:8080 | JWT token required |
-| Swagger UI | http://localhost:8080/swagger-ui.html | - |
-| API Documentation | http://localhost:8080/v3/api-docs | - |
-| Actuator | http://localhost:8080/actuator | - |
-| **WebSocket** | ws://localhost:8080/ws | JWT in handshake |
-| **AI Service** | http://localhost:8001 | Shared JWT auth |
-| AI Documentation | http://localhost:8001/docs | - |
-| **PostgreSQL** | localhost:5433 | `postgres` / see `.env` |
-| **Redis** | localhost:6379 | No password |
-| **PgAdmin** | http://localhost:5050 | admin@cardwords.com / admin |
-| **Redis Insight** | http://localhost:5540 | - |
+| Service             | URL                                   | Credentials                 |
+| ------------------- | ------------------------------------- | --------------------------- |
+| **Spring Boot API** | http://localhost:8080                 | JWT token required          |
+| Swagger UI          | http://localhost:8080/swagger-ui.html | -                           |
+| API Documentation   | http://localhost:8080/v3/api-docs     | -                           |
+| Actuator            | http://localhost:8080/actuator        | -                           |
+| **WebSocket**       | ws://localhost:8080/ws                | JWT in handshake            |
+| **AI Service**      | http://localhost:8001                 | Shared JWT auth             |
+| AI Documentation    | http://localhost:8001/docs            | -                           |
+| **PostgreSQL**      | localhost:5433                        | `postgres` / see `.env`     |
+| **Redis**           | localhost:6379                        | No password                 |
+| **PgAdmin**         | http://localhost:5050                 | admin@cardwords.com / admin |
+| **Redis Insight**   | http://localhost:5540                 | -                           |
 
 ### Quick API Test
 
@@ -213,12 +213,13 @@ curl -X POST http://localhost:8080/api/v1/auth/signin \
 ```
 
 **Response:**
+
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiIs...",
-  "type": "Bearer",
-  "email": "john@example.com",
-  "name": "John Doe"
+    "token": "eyJhbGciOiJIUzI1NiIs...",
+    "type": "Bearer",
+    "email": "john@example.com",
+    "name": "John Doe"
 }
 ```
 
@@ -232,6 +233,7 @@ curl -X GET http://localhost:8080/api/v1/vocabs \
 #### 4. Test WebSocket Connection
 
 Open `test-websocket-events.html` in your browser:
+
 1. Paste your JWT token
 2. Click "Connect WebSocket"
 3. Subscribe to notification channels
@@ -244,139 +246,152 @@ Open `test-websocket-events.html` in your browser:
 
 ### Spring Boot Backend (card-words)
 
-
 **Core Technologies:**
 
-- Spring Boot 3.2.5 (Java 17)
-- Spring Security + JWT Authentication
-- Spring WebSocket + STOMP Messaging
-- Spring Data JPA + Hibernate
-- Spring Scheduler (Automated tasks)
-- PostgreSQL 16 (Primary database)
-- Redis 7 (Caching layer)
-- Flyway (Database migrations)
-- Firebase Storage (Image uploads)
-- Google OAuth2 (Social login)
-- JavaMailSender (Email service)
+-   Spring Boot 3.2.5 (Java 17)
+-   Spring Security + JWT Authentication
+-   Spring WebSocket + STOMP Messaging
+-   Spring Data JPA + Hibernate
+-   Spring Scheduler (Automated tasks)
+-   PostgreSQL 16 (Primary database)
+-   Redis 7 (Caching layer)
+-   Flyway (Database migrations)
+-   Firebase Storage (Image uploads)
+-   Google OAuth2 (Social login)
+-   JavaMailSender (Email service)
 
 **Key Features:**
 
 🔐 **Authentication & Authorization**
-- JWT-based authentication with refresh tokens
-- Google OAuth2 integration
-- Role-based access control (ADMIN, USER)
-- Secure password hashing with BCrypt
+
+-   JWT-based authentication with refresh tokens
+-   Google OAuth2 integration
+-   Role-based access control (ADMIN, USER)
+-   Secure password hashing with BCrypt
 
 📚 **Vocabulary Management**
-- CRUD operations for words and topics
-- Rich metadata (definitions, examples, images)
-- Advanced search and filtering
-- Multi-language support
+
+-   CRUD operations for words and topics
+-   Rich metadata (definitions, examples, images)
+-   Advanced search and filtering
+-   Multi-language support
 
 🎮 **Interactive Games**
-- Quick Quiz (True/False with streak bonuses)
-- Image-Word Matching (Memory game)
-- Word Definition Matching
-- Real-time leaderboards
-- Score calculation with time bonuses
+
+-   Quick Quiz (True/False with streak bonuses)
+-   Image-Word Matching (Memory game)
+-   Word Definition Matching
+-   Real-time leaderboards
+-   Score calculation with time bonuses
 
 📊 **Learning Progress**
-- SM-2 spaced repetition algorithm
-- Vocabulary mastery tracking
-- Progress analytics and statistics
-- Personalized review scheduling
+
+-   SM-2 spaced repetition algorithm
+-   Vocabulary mastery tracking
+-   Progress analytics and statistics
+-   Personalized review scheduling
 
 🔥 **Streak System**
-- Daily learning consistency tracking
-- Automatic streak updates
-- Milestone achievements (7, 30, 100 days)
-- Visual activity calendar
-- Personal best records
+
+-   Daily learning consistency tracking
+-   Automatic streak updates
+-   Milestone achievements (7, 30, 100 days)
+-   Visual activity calendar
+-   Personal best records
 
 🔔 **Real-time Notifications**
-- WebSocket + STOMP protocol
-- 5 dedicated notification channels
-- Instant multi-device synchronization
-- Auto-triggered achievements
-- Admin broadcast capabilities
+
+-   WebSocket + STOMP protocol
+-   5 dedicated notification channels
+-   Instant multi-device synchronization
+-   Auto-triggered achievements
+-   Admin broadcast capabilities
 
 📧 **Email Automation**
-- Welcome emails for new users
-- Account activation links
-- Password reset with secure tokens
-- Daily streak reminders (9:00 AM)
-- Beautiful HTML templates
+
+-   Welcome emails for new users
+-   Account activation links
+-   Password reset with secure tokens
+-   Daily streak reminders (9:00 AM)
+-   Beautiful HTML templates
 
 📝 **Admin Dashboard**
-- User activity monitoring
-- Action logs with detailed tracking
-- System statistics and analytics
-- Notification management
-- User management tools
+
+-   User activity monitoring
+-   Action logs with detailed tracking
+-   System statistics and analytics
+-   Notification management
+-   User management tools
 
 💾 **Offline Sync Support**
-- Batch data download endpoints
-- Conflict resolution strategies
-- Delta synchronization
-- Mobile-optimized responses
+
+-   Batch data download endpoints
+-   Conflict resolution strategies
+-   Delta synchronization
+-   Mobile-optimized responses
 
 **API Endpoints:** `http://localhost:8080/api/v1/`
 
 **Documentation:**
-- Swagger UI: `/swagger-ui.html`
-- OpenAPI Spec: `/v3/api-docs`
-- WebSocket Guide: `docs/WEBSOCKET_EVENTS.md`
-- Notification API: `docs/NOTIFICATION_API_COMPLETE.md`
+
+-   Swagger UI: `/swagger-ui.html`
+-   OpenAPI Spec: `/v3/api-docs`
+-   WebSocket Guide: `docs/WEBSOCKET_EVENTS.md`
+-   Notification API: `docs/NOTIFICATION_API_COMPLETE.md`
 
 ---
 
 ### AI Service (card-words-ai)
 
-
 **Core Technologies:**
 
-- Python 3.11
-- FastAPI (High-performance API framework)
-- LightGBM (Gradient boosting ML library)
-- PostgreSQL (Read-only database access)
-- Redis (Prediction caching)
-- SQLAlchemy (Database ORM)
-- Pydantic (Data validation)
-- Poetry (Dependency management)
+-   Python 3.11
+-   FastAPI (High-performance API framework)
+-   LightGBM (Gradient boosting ML library)
+-   PostgreSQL (Read-only database access)
+-   Redis (Prediction caching)
+-   SQLAlchemy (Database ORM)
+-   Pydantic (Data validation)
+-   Poetry (Dependency management)
 
 **Key Features:**
 
 🤖 **Smart Review Predictions**
-- LightGBM machine learning model
-- Predicts optimal review timing
-- Considers user performance patterns
-- Adapts to individual learning curves
+
+-   LightGBM machine learning model
+-   Predicts optimal review timing
+-   Considers user performance patterns
+-   Adapts to individual learning curves
 
 ⚡ **Performance Optimization**
-- Redis caching for predictions
-- Asynchronous database queries
-- Connection pooling
-- Response time < 100ms
+
+-   Redis caching for predictions
+-   Asynchronous database queries
+-   Connection pooling
+-   Response time < 100ms
 
 🔐 **Security**
-- JWT authentication (shared with Spring Boot)
-- Read-only database access
-- Request rate limiting
-- Input validation with Pydantic
+
+-   JWT authentication (shared with Spring Boot)
+-   Read-only database access
+-   Request rate limiting
+-   Input validation with Pydantic
 
 📊 **Model Features**
-- User correctness history
-- Time since last review
-- Vocabulary difficulty
-- User performance metrics
-- Streak consistency
+
+-   User correctness history
+-   Time since last review
+-   Vocabulary difficulty
+-   User performance metrics
+-   Streak consistency
 
 **API Endpoints:** `http://localhost:8001/api/`
 
 **Documentation:**
-- Interactive Docs: `/docs`
-- ReDoc: `/redoc`
-- Model Details: `docs/AI/`
+
+-   Interactive Docs: `/docs`
+-   ReDoc: `/redoc`
+-   Model Details: `docs/AI/`
 
 ---
 
@@ -387,56 +402,62 @@ Open `test-websocket-events.html` in your browser:
 **Complete push notification system with zero polling overhead.**
 
 #### Architecture
-- **Protocol**: STOMP over WebSocket with SockJS fallback
-- **Authentication**: JWT token in handshake header
-- **Latency**: < 100ms end-to-end
-- **Scalability**: Supports thousands of concurrent connections
+
+-   **Protocol**: STOMP over WebSocket with SockJS fallback
+-   **Authentication**: JWT token in handshake header
+-   **Latency**: < 100ms end-to-end
+-   **Scalability**: Supports thousands of concurrent connections
 
 #### Notification Channels
 
-| Channel | Purpose | Trigger |
-|---------|---------|---------|
-| `/user/queue/notifications` | New notifications | Achievement, reminder, admin message |
-| `/user/queue/notifications/read` | Mark as read | User marks single notification read |
-| `/user/queue/notifications/read-all` | Mark all read | User marks all notifications read |
-| `/user/queue/notifications/deleted` | Single delete | User deletes notification |
-| `/user/queue/notifications/batch-deleted` | Batch delete | User deletes multiple notifications |
+| Channel                                   | Purpose           | Trigger                              |
+| ----------------------------------------- | ----------------- | ------------------------------------ |
+| `/user/queue/notifications`               | New notifications | Achievement, reminder, admin message |
+| `/user/queue/notifications/read`          | Mark as read      | User marks single notification read  |
+| `/user/queue/notifications/read-all`      | Mark all read     | User marks all notifications read    |
+| `/user/queue/notifications/deleted`       | Single delete     | User deletes notification            |
+| `/user/queue/notifications/batch-deleted` | Batch delete      | User deletes multiple notifications  |
 
 #### Auto-triggered Notifications
 
 ✨ **Game Achievements** (Instant delivery)
-- Perfect accuracy (100%)
-- High score milestones
-- Speed completion bonuses
+
+-   Perfect accuracy (100%)
+-   High score milestones
+-   Speed completion bonuses
 
 🔥 **Streak Milestones** (Real-time updates)
-- 7-day consistency
-- 30-day dedication
-- 100-day mastery
+
+-   7-day consistency
+-   30-day dedication
+-   100-day mastery
 
 📧 **Daily Reminders** (Dual delivery)
-- Scheduled at 9:00 AM
-- Email + WebSocket notification
-- Smart targeting (users with streaks ≥ 3 days)
+
+-   Scheduled at 9:00 AM
+-   Email + WebSocket notification
+-   Smart targeting (users with streaks ≥ 3 days)
 
 📢 **Admin Broadcasts** (Push to all users)
-- System announcements
-- Platform updates
-- Maintenance notices
+
+-   System announcements
+-   Platform updates
+-   Maintenance notices
 
 #### Performance Benefits
 
-| Metric | Polling | WebSocket | Improvement |
-|--------|---------|-----------|-------------|
-| Latency | 10-30s | < 100ms | **99.7% faster** |
-| Server Requests | 360/hour | 1/session | **99.9% reduction** |
-| Battery Impact | High | Minimal | **~90% savings** |
-| Multi-device Sync | Delayed | Instant | **Real-time** |
+| Metric            | Polling  | WebSocket | Improvement         |
+| ----------------- | -------- | --------- | ------------------- |
+| Latency           | 10-30s   | < 100ms   | **99.7% faster**    |
+| Server Requests   | 360/hour | 1/session | **99.9% reduction** |
+| Battery Impact    | High     | Minimal   | **~90% savings**    |
+| Multi-device Sync | Delayed  | Instant   | **Real-time**       |
 
 **Testing Tools:**
-- Interactive test: `test-websocket-events.html`
-- Client examples: React, Flutter, JavaScript
-- See: `docs/WEBSOCKET_EVENTS.md`
+
+-   Interactive test: `test-websocket-events.html`
+-   Client examples: React, Flutter, JavaScript
+-   See: `docs/WEBSOCKET_EVENTS.md`
 
 ---
 
@@ -447,29 +468,33 @@ Open `test-websocket-events.html` in your browser:
 #### Email Types
 
 📧 **Welcome Email**
-- Sent on user registration
-- Includes temporary password
-- Platform introduction
+
+-   Sent on user registration
+-   Includes temporary password
+-   Platform introduction
 
 🔑 **Account Activation**
-- Secure activation link
-- 24-hour expiration
-- Email verification
+
+-   Secure activation link
+-   24-hour expiration
+-   Email verification
 
 🔒 **Password Reset**
-- Secure reset token
-- One-time use link
-- 1-hour expiration
+
+-   Secure reset token
+-   One-time use link
+-   1-hour expiration
 
 ⏰ **Daily Streak Reminders**
-- Automated schedule: 9:00 AM daily
-- Smart targeting criteria:
-  - ✅ Studied yesterday
-  - ❌ Haven't studied today
-  - 🔥 Streak ≥ 3 days (worth protecting)
-- Dual delivery: Email + WebSocket
-- Beautiful HTML template
-- Zero manual intervention
+
+-   Automated schedule: 9:00 AM daily
+-   Smart targeting criteria:
+    -   ✅ Studied yesterday
+    -   ❌ Haven't studied today
+    -   🔥 Streak ≥ 3 days (worth protecting)
+-   Dual delivery: Email + WebSocket
+-   Beautiful HTML template
+-   Zero manual intervention
 
 #### Configuration
 
@@ -492,15 +517,17 @@ spring.mail.password=your-app-password  # Use App Password, not account password
 #### Algorithm: SM-2 Enhanced with ML
 
 **Traditional SM-2 Parameters:**
-- `EF` (Easiness Factor): 1.3 - 2.5
-- `Interval`: Days until next review
-- `Repetition`: Number of successful reviews
+
+-   `EF` (Easiness Factor): 1.3 - 2.5
+-   `Interval`: Days until next review
+-   `Repetition`: Number of successful reviews
 
 **ML Enhancements:**
-- User performance patterns
-- Time-of-day effectiveness
-- Vocabulary difficulty
-- Historical accuracy trends
+
+-   User performance patterns
+-   Time-of-day effectiveness
+-   Vocabulary difficulty
+-   Historical accuracy trends
 
 #### Prediction Process
 
@@ -512,10 +539,10 @@ User Request → Model Features → LightGBM Prediction → Redis Cache → Resp
 
 #### Performance
 
-- **Prediction Time**: < 50ms (cached: < 5ms)
-- **Model Accuracy**: ~85% (F1 score)
-- **Cache Hit Rate**: > 90%
-- **Features**: 15 engineered features
+-   **Prediction Time**: < 50ms (cached: < 5ms)
+-   **Model Accuracy**: ~85% (F1 score)
+-   **Cache Hit Rate**: > 90%
+-   **Features**: 15 engineered features
 
 **Model Training:** `card-words-ai/train-model.sh`
 
@@ -528,29 +555,33 @@ User Request → Model Features → LightGBM Prediction → Redis Cache → Resp
 #### Features
 
 📊 **Analytics**
-- Total users and growth
-- Active sessions
-- Game completion rates
-- Learning progress metrics
+
+-   Total users and growth
+-   Active sessions
+-   Game completion rates
+-   Learning progress metrics
 
 📝 **Action Logs**
-- User activity tracking
-- Login/logout events
-- Game completions
-- Vocabulary interactions
-- Advanced filtering by date, user, action type
+
+-   User activity tracking
+-   Login/logout events
+-   Game completions
+-   Vocabulary interactions
+-   Advanced filtering by date, user, action type
 
 🔔 **Notification Management**
-- Create system notifications
-- Broadcast to all users
-- Targeted user notifications
-- View notification history
+
+-   Create system notifications
+-   Broadcast to all users
+-   Targeted user notifications
+-   View notification history
 
 👥 **User Management**
-- View user profiles
-- Activity monitoring
-- Role assignment
-- Account status management
+
+-   View user profiles
+-   Activity monitoring
+-   Role assignment
+-   Account status management
 
 **Documentation:** `docs/admin/ADMIN_DASHBOARD_API.md`
 
@@ -563,22 +594,25 @@ User Request → Model Features → LightGBM Prediction → Redis Cache → Resp
 #### Game Modes
 
 🎯 **Quick Quiz**
-- True/False format
-- 10 questions per session
-- Time bonus: +10 points if < 5 seconds
-- Streak bonus: +5 points per consecutive correct answer
-- Perfect score achievement: 100% accuracy
+
+-   True/False format
+-   10 questions per session
+-   Time bonus: +10 points if < 5 seconds
+-   Streak bonus: +5 points per consecutive correct answer
+-   Perfect score achievement: 100% accuracy
 
 🖼️ **Image-Word Matching**
-- Memory-style card game
-- Match words to images
-- Time-based scoring
-- Difficulty levels
+
+-   Memory-style card game
+-   Match words to images
+-   Time-based scoring
+-   Difficulty levels
 
 📖 **Word Definition Matching**
-- Match words to definitions
-- Multiple choice format
-- Adaptive difficulty
+
+-   Match words to definitions
+-   Multiple choice format
+-   Adaptive difficulty
 
 #### Scoring Algorithm
 
@@ -591,10 +625,10 @@ Final Score = Base + Time Bonus + Streak Bonus
 
 #### Leaderboards
 
-- **Global**: All-time top scores
-- **Game-specific**: Per-game rankings
-- **Time-based**: Daily, weekly, monthly
-- **Personal**: Individual progress tracking
+-   **Global**: All-time top scores
+-   **Game-specific**: Per-game rankings
+-   **Time-based**: Daily, weekly, monthly
+-   **Personal**: Individual progress tracking
 
 **Documentation:** `docs/game/GAME_ALGORITHMS_DESIGN.md`
 
@@ -803,22 +837,22 @@ poetry run pytest tests/test_predictions.py
 
 **Flyway migrations** manage all schema changes:
 
-- **Location:** `card-words/src/main/resources/db/migration/`
-- **Auto-run:** On application startup
-- **Naming:** `V{version}__{description}.sql`
-- **Versioning:** Sequential (V1, V2, V3, ...)
+-   **Location:** `card-words/src/main/resources/db/migration/`
+-   **Auto-run:** On application startup
+-   **Naming:** `V{version}__{description}.sql`
+-   **Versioning:** Sequential (V1, V2, V3, ...)
 
 #### Migration History
 
-| Version | Description | Tables Added |
-|---------|-------------|--------------|
-| V1 | Initial schema | `users`, `roles`, `topics`, `vocabs` |
-| V2 | Games system | `games`, `game_sessions`, `game_session_details` |
-| V3 | Learning progress | `user_vocab_progress` (SM-2 algorithm) |
-| V4 | Streak tracking | `streak_records` |
-| V5 | Leaderboards | `leaderboards`, `game_leaderboards` |
-| V6 | Notifications | `notifications` |
-| V7 | Admin tools | `action_logs` + missing columns |
+| Version | Description       | Tables Added                                     |
+| ------- | ----------------- | ------------------------------------------------ |
+| V1      | Initial schema    | `users`, `roles`, `topics`, `vocabs`             |
+| V2      | Games system      | `games`, `game_sessions`, `game_session_details` |
+| V3      | Learning progress | `user_vocab_progress` (SM-2 algorithm)           |
+| V4      | Streak tracking   | `streak_records`                                 |
+| V5      | Leaderboards      | `leaderboards`, `game_leaderboards`              |
+| V6      | Notifications     | `notifications`                                  |
+| V7      | Admin tools       | `action_logs` + missing columns                  |
 
 #### Create New Migration
 
@@ -889,6 +923,7 @@ cd card-words
 #### Core Tables
 
 **users** - User accounts
+
 ```sql
 - id (UUID, PK)
 - email (VARCHAR, UNIQUE)
@@ -900,6 +935,7 @@ cd card-words
 ```
 
 **vocabs** - Vocabulary words
+
 ```sql
 - id (UUID, PK)
 - word (VARCHAR)
@@ -912,6 +948,7 @@ cd card-words
 ```
 
 **user_vocab_progress** - SM-2 spaced repetition
+
 ```sql
 - id (UUID, PK)
 - user_id (UUID, FK → users)
@@ -929,6 +966,7 @@ cd card-words
 ```
 
 **notifications** - User notifications
+
 ```sql
 - id (UUID, PK)
 - user_id (UUID, FK → users)
@@ -952,10 +990,11 @@ Interactive API documentation with try-it-out functionality:
 **URL:** http://localhost:8080/swagger-ui.html
 
 **Features:**
-- Complete endpoint listing
-- Request/response schemas
-- Authentication testing
-- Live API calls
+
+-   Complete endpoint listing
+-   Request/response schemas
+-   Authentication testing
+-   Live API calls
 
 ### OpenAPI Specification
 
@@ -970,55 +1009,62 @@ Import collection from: `docs/postman/Card-Words-API.postman_collection.json`
 ### API Endpoint Categories
 
 #### Authentication (`/api/v1/auth`)
-- `POST /register` - User registration
-- `POST /signin` - JWT authentication
-- `POST /google` - OAuth2 login
-- `POST /refresh` - Refresh token
-- `POST /forgot-password` - Request password reset
-- `POST /reset-password` - Reset password with token
+
+-   `POST /register` - User registration
+-   `POST /signin` - JWT authentication
+-   `POST /google` - OAuth2 login
+-   `POST /refresh` - Refresh token
+-   `POST /forgot-password` - Request password reset
+-   `POST /reset-password` - Reset password with token
 
 #### Vocabularies (`/api/v1/vocabs`)
-- `GET /` - List vocabularies (paginated, filterable)
-- `GET /{id}` - Get vocabulary details
-- `POST /` - Create vocabulary (ADMIN)
-- `PUT /{id}` - Update vocabulary (ADMIN)
-- `DELETE /{id}` - Delete vocabulary (ADMIN)
-- `GET /search` - Search vocabularies
+
+-   `GET /` - List vocabularies (paginated, filterable)
+-   `GET /{id}` - Get vocabulary details
+-   `POST /` - Create vocabulary (ADMIN)
+-   `PUT /{id}` - Update vocabulary (ADMIN)
+-   `DELETE /{id}` - Delete vocabulary (ADMIN)
+-   `GET /search` - Search vocabularies
 
 #### Games (`/api/v1/games`)
-- `GET /` - List available games
-- `POST /sessions` - Start game session
-- `POST /sessions/{id}/answers` - Submit answer
-- `POST /sessions/{id}/complete` - Complete session
-- `GET /sessions/{id}` - Get session results
-- `GET /leaderboard` - Global leaderboard
-- `GET /{gameId}/leaderboard` - Game-specific leaderboard
+
+-   `GET /` - List available games
+-   `POST /sessions` - Start game session
+-   `POST /sessions/{id}/answers` - Submit answer
+-   `POST /sessions/{id}/complete` - Complete session
+-   `GET /sessions/{id}` - Get session results
+-   `GET /leaderboard` - Global leaderboard
+-   `GET /{gameId}/leaderboard` - Game-specific leaderboard
 
 #### Notifications (`/api/v1/notifications`)
-- `GET /` - List user notifications
-- `GET /unread-count` - Get unread count
-- `PATCH /{id}/read` - Mark as read
-- `PATCH /read-all` - Mark all as read
-- `DELETE /{id}` - Delete notification
-- `DELETE /batch` - Batch delete
+
+-   `GET /` - List user notifications
+-   `GET /unread-count` - Get unread count
+-   `PATCH /{id}/read` - Mark as read
+-   `PATCH /read-all` - Mark all as read
+-   `DELETE /{id}` - Delete notification
+-   `DELETE /batch` - Batch delete
 
 #### Admin (`/api/v1/admin`)
-- `GET /users` - List all users
-- `GET /dashboard/stats` - Dashboard statistics
-- `GET /action-logs` - User activity logs
-- `POST /notifications` - Create notification
-- `POST /notifications/broadcast` - Broadcast to all users
+
+-   `GET /users` - List all users
+-   `GET /dashboard/stats` - Dashboard statistics
+-   `GET /action-logs` - User activity logs
+-   `POST /notifications` - Create notification
+-   `POST /notifications/broadcast` - Broadcast to all users
 
 #### Offline Sync (`/api/v1/offline`)
-- `GET /user-vocab-progress` - Download all progress
-- `GET /user-vocab-progress/topic/{id}` - Download by topic
-- `GET /user-vocab-progress/due-review` - Download due reviews
+
+-   `GET /user-vocab-progress` - Download all progress
+-   `GET /user-vocab-progress/topic/{id}` - Download by topic
+-   `GET /user-vocab-progress/due-review` - Download due reviews
 
 ### WebSocket Endpoints
 
 **Connection:** `ws://localhost:8080/ws`
 
 **Subscriptions:**
+
 ```javascript
 // New notifications
 stompClient.subscribe('/user/queue/notifications', callback);
@@ -1037,9 +1083,10 @@ stompClient.subscribe('/user/queue/notifications/batch-deleted', callback);
 ```
 
 **Documentation:**
-- Complete guide: `docs/WEBSOCKET_EVENTS.md`
-- Client examples: `docs/WEBSOCKET_CLIENT_GUIDE.md`
-- Quick test: `test-websocket-events.html`
+
+-   Complete guide: `docs/WEBSOCKET_EVENTS.md`
+-   Client examples: `docs/WEBSOCKET_CLIENT_GUIDE.md`
+-   Quick test: `test-websocket-events.html`
 
 ---
 
@@ -1256,10 +1303,10 @@ git push origin feature/your-feature-name
 2. Click "New Pull Request"
 3. Select your feature branch
 4. Fill in PR template:
-   - Description of changes
-   - Related issues
-   - Testing performed
-   - Screenshots (if UI changes)
+    - Description of changes
+    - Related issues
+    - Testing performed
+    - Screenshots (if UI changes)
 5. Request review from team members
 6. Address review comments
 7. Merge when approved
@@ -1278,16 +1325,16 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 #### Types
 
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `refactor`: Code refactoring (no functional changes)
-- `test`: Adding or updating tests
-- `chore`: Maintenance tasks (dependencies, configs)
-- `perf`: Performance improvements
-- `style`: Code formatting (no logic changes)
-- `ci`: CI/CD pipeline changes
-- `build`: Build system changes
+-   `feat`: New feature
+-   `fix`: Bug fix
+-   `docs`: Documentation changes
+-   `refactor`: Code refactoring (no functional changes)
+-   `test`: Adding or updating tests
+-   `chore`: Maintenance tasks (dependencies, configs)
+-   `perf`: Performance improvements
+-   `style`: Code formatting (no logic changes)
+-   `ci`: CI/CD pipeline changes
+-   `build`: Build system changes
 
 #### Examples
 
@@ -1321,11 +1368,11 @@ Closes #123"
 
 #### Java (Spring Boot)
 
-- Follow [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html)
-- Use meaningful variable names
-- Add JavaDoc for public methods
-- Keep methods under 50 lines
-- Write unit tests (target: > 80% coverage)
+-   Follow [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html)
+-   Use meaningful variable names
+-   Add JavaDoc for public methods
+-   Keep methods under 50 lines
+-   Write unit tests (target: > 80% coverage)
 
 ```java
 /**
@@ -1342,11 +1389,11 @@ public UserVocabProgress calculateNextReview(UserVocabProgress progress, int qua
 
 #### Python (AI Service)
 
-- Follow [PEP 8](https://peps.python.org/pep-0008/)
-- Use type hints
-- Add docstrings for functions
-- Format with Black
-- Lint with Flake8
+-   Follow [PEP 8](https://peps.python.org/pep-0008/)
+-   Use type hints
+-   Add docstrings for functions
+-   Format with Black
+-   Lint with Flake8
 
 ```python
 from typing import Dict, List
@@ -1358,12 +1405,12 @@ def predict_review_success(
 ) -> float:
     """
     Predicts probability of successful vocabulary recall.
-    
+
     Args:
         user_id: User's UUID
         vocab_id: Vocabulary UUID
         features: Engineered features for prediction
-        
+
     Returns:
         Probability score between 0.0 and 1.0
     """
@@ -1372,10 +1419,10 @@ def predict_review_success(
 
 ### Testing Requirements
 
-- All new features must include tests
-- Bug fixes must include regression tests
-- Aim for > 80% code coverage
-- Run tests before committing
+-   All new features must include tests
+-   Bug fixes must include regression tests
+-   Aim for > 80% code coverage
+-   Run tests before committing
 
 ```bash
 # Java tests
@@ -1408,24 +1455,25 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ### Documentation
 
-- **Main Docs**: `docs/`
-- **API Reference**: http://localhost:8080/swagger-ui.html
-- **WebSocket Guide**: `docs/WEBSOCKET_EVENTS.md`
-- **Deployment**: `docs/docker/`
+-   **Main Docs**: `docs/`
+-   **API Reference**: http://localhost:8080/swagger-ui.html
+-   **WebSocket Guide**: `docs/WEBSOCKET_EVENTS.md`
+-   **Deployment**: `docs/docker/`
 
 ### Issue Reporting
 
 Found a bug? Please create an issue on GitHub with:
-- Description of the problem
-- Steps to reproduce
-- Expected vs actual behavior
-- Screenshots (if applicable)
-- Environment details (OS, Docker version, etc.)
+
+-   Description of the problem
+-   Steps to reproduce
+-   Expected vs actual behavior
+-   Screenshots (if applicable)
+-   Environment details (OS, Docker version, etc.)
 
 ### Contact
 
-- Email: ngominhthuan@example.com
-- GitHub: [@thuanthichlaptrinh](https://github.com/thuanthichlaptrinh)
+-   Email: ngominhthuan@example.com
+-   GitHub: [@thuanthichlaptrinh](https://github.com/thuanthichlaptrinh)
 
 ---
 
