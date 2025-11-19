@@ -78,8 +78,3 @@ BEGIN
         RAISE NOTICE 'V3: No cleanup needed. Table already clean.';
     END IF;
 END $$;
-        RAISE NOTICE 'Created non-unique index: idx_vocab_topic_id';
-    END IF;
-
-    RAISE NOTICE 'Migration V3 completed successfully';
-END $$;
