@@ -32,6 +32,11 @@ public interface UserVocabProgressRepository extends JpaRepository<UserVocabProg
         @Query("SELECT uvp FROM UserVocabProgress uvp LEFT JOIN FETCH uvp.vocab WHERE uvp.user.id = :userId ORDER BY uvp.lastReviewed DESC")
         List<UserVocabProgress> findByUserIdWithVocab(@Param("userId") UUID userId);
 
+        // Get ALL vocab progress for download (with DISTINCT to avoid duplicates from
+        // JOIN FETCH)
+        @Query("SELECT DISTINCT uvp FROM UserVocabProgress uvp LEFT JOIN FETCH uvp.vocab v LEFT JOIN FETCH uvp.user WHERE uvp.user.id = :userId ORDER BY uvp.lastReviewed DESC")
+        List<UserVocabProgress> findAllByUserIdForDownload(@Param("userId") UUID userId);
+
         // Get only correct vocabs (timesCorrect > 0)
         @Query("SELECT uvp FROM UserVocabProgress uvp LEFT JOIN FETCH uvp.vocab WHERE uvp.user.id = :userId AND uvp.timesCorrect > 0 ORDER BY uvp.timesCorrect DESC")
         List<UserVocabProgress> findCorrectVocabsByUserId(@Param("userId") UUID userId);

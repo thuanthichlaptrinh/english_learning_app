@@ -5,6 +5,7 @@ import com.thuanthichlaptrinh.card_words.core.domain.*;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.*;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.offline.*;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.offline.TopicProgressResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.offline.UserVocabProgressDownloadResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.offline.VocabWithProgressResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -600,5 +601,80 @@ public class OfflineSyncService {
 
         // Calculate next review date
         progress.setNextReviewDate(LocalDate.now().plusDays(progress.getIntervalDays()));
+    }
+
+    /**
+     * Get all UserVocabProgress for a user with full details
+     */
+    @Transactional(readOnly = true)
+    public List<UserVocabProgressDownloadResponse> getAllUserVocabProgress(UUID userId) {
+        log.info("Fetching all UserVocabProgress for user: {}", userId);
+
+        List<UserVocabProgress> progressList = userVocabProgressRepository.findAllByUserIdForDownload(userId);
+
+        return progressList.stream()
+                .map(this::convertToDownloadResponse)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get UserVocabProgress by topic
+     */
+    @Transactional(readOnly = true)
+    public List<UserVocabProgressDownloadResponse> getUserVocabProgressByTopic(UUID userId, Long topicId) {
+        log.info("Fetching UserVocabProgress for user: {} and topic: {}", userId, topicId);
+
+        Topic topic = topicRepository.findById(topicId)
+                .orElseThrow(() -> new IllegalArgumentException("Topic not found: " + topicId));
+
+        // Get all vocabs in topic
+        List<Vocab> vocabs = vocabRepository.findByTopicNameIgnoreCase(topic.getName());
+
+        // Get progress for these vocabs
+        List<UserVocabProgressDownloadResponse> result = new ArrayList<>();
+        for (Vocab vocab : vocabs) {
+            Optional<UserVocabProgress> progress = userVocabProgressRepository.findByUserIdAndVocabId(userId,
+                    vocab.getId());
+            progress.ifPresent(p -> result.add(convertToDownloadResponse(p)));
+        }
+
+        log.info("Retrieved {} vocab progress records for topic {}", result.size(), topicId);
+        return result;
+    }
+
+    /**
+     * Get UserVocabProgress that are due for review (nextReviewDate <= today)
+     */
+    @Transactional(readOnly = true)
+    public List<UserVocabProgressDownloadResponse> getDueUserVocabProgress(UUID userId) {
+        log.info("Fetching due UserVocabProgress for user: {}", userId);
+
+        List<UserVocabProgress> dueProgress = userVocabProgressRepository.findDueForReview(userId, LocalDate.now());
+
+        return dueProgress.stream()
+                .map(this::convertToDownloadResponse)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Convert UserVocabProgress entity to DownloadResponse DTO
+     * Chỉ map các trường có trong database
+     */
+    private UserVocabProgressDownloadResponse convertToDownloadResponse(UserVocabProgress progress) {
+        return UserVocabProgressDownloadResponse.builder()
+                .id(progress.getId())
+                .user_id(progress.getUser().getId())
+                .vocab_id(progress.getVocab().getId())
+                .status(progress.getStatus())
+                .last_reviewed(progress.getLastReviewed())
+                .times_correct(progress.getTimesCorrect())
+                .times_wrong(progress.getTimesWrong())
+                .ef_factor(progress.getEfFactor())
+                .interval_days(progress.getIntervalDays())
+                .repetition(progress.getRepetition())
+                .next_review_date(progress.getNextReviewDate())
+                .created_at(progress.getCreatedAt())
+                .updated_at(progress.getUpdatedAt())
+                .build();
     }
 }

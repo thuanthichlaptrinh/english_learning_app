@@ -5,6 +5,7 @@ import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.ApiResponse;
 import com.thuanthichlaptrinh.card_words.core.usecase.user.OfflineSyncService;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.offline.*;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.offline.TopicProgressResponse;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.offline.UserVocabProgressDownloadResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.offline.VocabWithProgressResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -94,6 +95,20 @@ public class OfflineSyncController {
                 return ResponseEntity.ok(ApiResponse.success(
                                 "Update check completed",
                                 updateInfo));
+        }
+
+        @GetMapping("/user-vocab-progress")
+        @Operation(summary = "Download tất cả UserVocabProgress của user", description = "Trả về tất cả tiến trình học từ vựng của user với đầy đủ các trường từ database.")
+        public ResponseEntity<ApiResponse<List<UserVocabProgressDownloadResponse>>> getAllUserVocabProgress(
+                        Authentication authentication) {
+
+                UUID userId = authHelper.getCurrentUserId(authentication);
+                List<UserVocabProgressDownloadResponse> progressList = offlineSyncService
+                                .getAllUserVocabProgress(userId);
+
+                return ResponseEntity.ok(ApiResponse.success(
+                                String.format("Downloaded %d vocab progress records", progressList.size()),
+                                progressList));
         }
 
         // ==================== UPLOAD APIs - Batch ====================
