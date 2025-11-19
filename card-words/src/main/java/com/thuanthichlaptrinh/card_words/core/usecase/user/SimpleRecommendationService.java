@@ -22,59 +22,59 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class SimpleRecommendationService {
-    
+
     private final UserVocabProgressRepository userVocabProgressRepository;
-    
+
     /**
      * Lấy gợi ý ôn tập thông minh dựa trên rule-based algorithm
      * 
-     * @param user User hiện tại
-     * @param limit Số lượng gợi ý tối đa (default: 20)
-     * @param topicFilter Lọc theo topic (optional)
+     * @param user         User hiện tại
+     * @param limit        Số lượng gợi ý tối đa (default: 20)
+     * @param topicFilter  Lọc theo topic (optional)
      * @param statusFilter Lọc theo status (optional)
      * @return SmartReviewResponse với danh sách gợi ý và summary
      */
     @Transactional(readOnly = true)
     public SmartReviewResponse getRecommendations(
-            User user, 
+            User user,
             Integer limit,
             String topicFilter,
             String statusFilter) {
-        
-        log.info("Getting smart recommendations for user: {}, limit: {}, topic: {}, status: {}", 
+
+        log.info("Getting smart recommendations for user: {}, limit: {}, topic: {}, status: {}",
                 user.getId(), limit, topicFilter, statusFilter);
-        
+
         // 1. Lấy tất cả vocab progress của user
         List<UserVocabProgress> allProgress = userVocabProgressRepository.findByUserIdWithVocab(user.getId());
-        
+
         if (allProgress.isEmpty()) {
             log.info("User {} has no vocab progress yet", user.getId());
             return buildEmptyResponse();
         }
-        
+
         // 2. Apply filters
         List<UserVocabProgress> filteredProgress = applyFilters(allProgress, topicFilter, statusFilter);
-        
+
         log.info("Filtered {} vocabs from {} total", filteredProgress.size(), allProgress.size());
-        
+
         // 3. Calculate priority for each vocab
         List<VocabRecommendation> recommendations = filteredProgress.stream()
                 .map(this::calculatePriority)
-                .filter(r -> r.getPriorityScore() > 0)  // Chỉ lấy có priority
+                .filter(r -> r.getPriorityScore() > 0) // Chỉ lấy có priority
                 .sorted((a, b) -> b.getPriorityScore().compareTo(a.getPriorityScore()))
                 .collect(Collectors.toList());
-        
+
         // 4. Apply limit
         int finalLimit = (limit != null && limit > 0) ? limit : 20;
         if (recommendations.size() > finalLimit) {
             recommendations = recommendations.subList(0, finalLimit);
         }
-        
+
         // 5. Build summary
         SmartReviewResponse.RecommendationSummary summary = buildSummary(recommendations);
-        
+
         log.info("Generated {} recommendations for user {}", recommendations.size(), user.getId());
-        
+
         return SmartReviewResponse.builder()
                 .recommendations(recommendations)
                 .totalAnalyzed(filteredProgress.size())
@@ -82,29 +82,30 @@ public class SimpleRecommendationService {
                 .summary(summary)
                 .build();
     }
-    
+
     /**
      * Tính priority score cho một vocab progress
-     * Priority Score = Overdue (40) + Status (30) + Accuracy (20) + Difficulty (10) + Bonus (10)
+     * Priority Score = Overdue (40) + Status (30) + Accuracy (20) + Difficulty (10)
+     * + Bonus (10)
      */
     private VocabRecommendation calculatePriority(UserVocabProgress progress) {
         LocalDate today = LocalDate.now();
         Vocab vocab = progress.getVocab();
-        
+
         int priorityScore = 0;
         List<String> reasons = new ArrayList<>();
-        
+
         // Calculate time metrics
         int daysSinceLastReview = progress.getLastReviewed() != null
                 ? (int) ChronoUnit.DAYS.between(progress.getLastReviewed(), today)
                 : 999;
-        
+
         int daysUntilNextReview = progress.getNextReviewDate() != null
                 ? (int) ChronoUnit.DAYS.between(today, progress.getNextReviewDate())
                 : 0;
-        
+
         int daysOverdue = daysUntilNextReview < 0 ? Math.abs(daysUntilNextReview) : 0;
-        
+
         // ===== RULE 1: OVERDUE SCORE (40 điểm) =====
         if (daysOverdue > 0) {
             int overdueScore = Math.min(daysOverdue * 5, 40);
@@ -114,7 +115,7 @@ public class SimpleRecommendationService {
             priorityScore += 10;
             reasons.add("Đến hạn ôn tập hôm nay");
         }
-        
+
         // ===== RULE 2: STATUS SCORE (30 điểm) =====
         int statusScore = 0;
         switch (progress.getStatus()) {
@@ -134,14 +135,14 @@ public class SimpleRecommendationService {
                 break;
         }
         priorityScore += statusScore;
-        
+
         // ===== RULE 3: ACCURACY SCORE (20 điểm) =====
         int totalAttempts = progress.getTimesCorrect() + progress.getTimesWrong();
         double accuracyRate = 0;
-        
+
         if (totalAttempts > 0) {
             accuracyRate = (double) progress.getTimesCorrect() / totalAttempts;
-            
+
             int accuracyScore = 0;
             if (accuracyRate < 0.3) {
                 accuracyScore = 20;
@@ -156,7 +157,7 @@ public class SimpleRecommendationService {
             }
             priorityScore += accuracyScore;
         }
-        
+
         // ===== RULE 4: DIFFICULTY SCORE (10 điểm) =====
         String cefr = vocab.getCefr();
         int difficultyScore = 0;
@@ -176,7 +177,7 @@ public class SimpleRecommendationService {
             difficultyScore = 1;
         }
         priorityScore += difficultyScore;
-        
+
         // ===== RULE 5: BONUS - LONG TIME NO REVIEW =====
         if (daysSinceLastReview > 30) {
             priorityScore += 10;
@@ -184,7 +185,7 @@ public class SimpleRecommendationService {
         } else if (daysSinceLastReview > 14) {
             priorityScore += 5;
         }
-        
+
         // Determine priority level
         String priorityLevel;
         if (priorityScore >= 60) {
@@ -194,9 +195,9 @@ public class SimpleRecommendationService {
         } else {
             priorityLevel = "LOW";
         }
-        
+
         return VocabRecommendation.builder()
-                .vocabId(vocab.getId())
+                .id(vocab.getId())
                 .word(vocab.getWord())
                 .transcription(vocab.getTranscription())
                 .meaningVi(vocab.getMeaningVi())
@@ -217,7 +218,7 @@ public class SimpleRecommendationService {
                 .daysOverdue(daysOverdue)
                 .build();
     }
-    
+
     /**
      * Apply filters (topic, status) to vocab progress list
      */
@@ -225,16 +226,16 @@ public class SimpleRecommendationService {
             List<UserVocabProgress> progressList,
             String topicFilter,
             String statusFilter) {
-        
+
         return progressList.stream()
                 .filter(p -> topicFilter == null || topicFilter.trim().isEmpty() ||
-                        (p.getVocab().getTopic() != null && 
-                         p.getVocab().getTopic().getName().equalsIgnoreCase(topicFilter)))
+                        (p.getVocab().getTopic() != null &&
+                                p.getVocab().getTopic().getName().equalsIgnoreCase(topicFilter)))
                 .filter(p -> statusFilter == null || statusFilter.trim().isEmpty() ||
                         p.getStatus().name().equalsIgnoreCase(statusFilter))
                 .collect(Collectors.toList());
     }
-    
+
     /**
      * Build summary statistics from recommendations
      */
@@ -242,27 +243,27 @@ public class SimpleRecommendationService {
         int highPriority = (int) recommendations.stream()
                 .filter(r -> r.getPriorityScore() >= 60)
                 .count();
-        
+
         int mediumPriority = (int) recommendations.stream()
                 .filter(r -> r.getPriorityScore() >= 30 && r.getPriorityScore() < 60)
                 .count();
-        
+
         int lowPriority = (int) recommendations.stream()
                 .filter(r -> r.getPriorityScore() < 30)
                 .count();
-        
+
         int overdueCount = (int) recommendations.stream()
                 .filter(r -> r.getDaysOverdue() > 0)
                 .count();
-        
+
         int unknownCount = (int) recommendations.stream()
                 .filter(r -> r.getStatus() == VocabStatus.UNKNOWN)
                 .count();
-        
+
         int lowAccuracyCount = (int) recommendations.stream()
                 .filter(r -> r.getAccuracyRate() != null && r.getAccuracyRate() < 0.5)
                 .count();
-        
+
         return SmartReviewResponse.RecommendationSummary.builder()
                 .highPriority(highPriority)
                 .mediumPriority(mediumPriority)
@@ -272,7 +273,7 @@ public class SimpleRecommendationService {
                 .lowAccuracyCount(lowAccuracyCount)
                 .build();
     }
-    
+
     /**
      * Build empty response when user has no vocab progress
      */
