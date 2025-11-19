@@ -1,6 +1,6 @@
 package com.thuanthichlaptrinh.card_words.entrypoint.rest.v1.user;
 
-import com.thuanthichlaptrinh.card_words.core.domain.User;
+import com.thuanthichlaptrinh.card_words.common.helper.AuthenticationHelper;
 import com.thuanthichlaptrinh.card_words.core.usecase.user.UserStatsService;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.ApiResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.game.UserHighScoresResponse;
@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -25,6 +24,7 @@ import java.util.UUID;
 public class UserStatsController {
 
     private final UserStatsService userStatsService;
+    private final AuthenticationHelper authHelper;
 
     @GetMapping("/high-scores")
     @Operation(summary = "Lấy điểm cao nhất của user cho tất cả game", description = "Lấy điểm cao nhất mà user đã đạt được cho từng game.\n\n"
@@ -39,7 +39,7 @@ public class UserStatsController {
             "- Word-Definition Matching")
     public ResponseEntity<ApiResponse<UserHighScoresResponse>> getUserHighScores(
             Authentication authentication) {
-        UUID userId = getUserIdFromAuth(authentication);
+        UUID userId = authHelper.getCurrentUserId(authentication);
         log.info("GET /api/v1/user/stats/high-scores - User: {}", userId);
 
         UserHighScoresResponse response = userStatsService.getUserHighScores(userId);
@@ -47,14 +47,4 @@ public class UserStatsController {
         return ResponseEntity.ok(ApiResponse.success("Lấy điểm cao nhất thành công", response));
     }
 
-    // Helper method to extract user ID from authentication
-    private UUID getUserIdFromAuth(Authentication authentication) {
-        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            if (userDetails instanceof User) {
-                return ((User) userDetails).getId();
-            }
-        }
-        throw new RuntimeException("Unable to get user ID from authentication");
-    }
 }

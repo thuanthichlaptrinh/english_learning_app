@@ -81,18 +81,33 @@ public class SecurityConfiguration {
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .authenticationProvider(authenticationProvider)
                                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                                // .exceptionHandling(exceptionHandling -> exceptionHandling
+                                // .authenticationEntryPoint((request, response, authException) -> {
+                                // response.setStatus(HttpStatus.FORBIDDEN.value());
+                                // response.setContentType("application/json");
+                                // response.getWriter()
+                                // .write("{\"status\":\"403\",\"message\":\"Access Denied\",\"data\":null}");
+                                // })
+                                // .accessDeniedHandler((request, response, accessDeniedException) -> {
+                                // response.setStatus(HttpStatus.FORBIDDEN.value());
+                                // response.setContentType("application/json");
+                                // response.getWriter()
+                                // .write("{\"status\":\"403\",\"message\":\"Access Denied\",\"data\":null}");
+                                // }))
                                 .exceptionHandling(exceptionHandling -> exceptionHandling
                                                 .authenticationEntryPoint((request, response, authException) -> {
-                                                        response.setStatus(HttpStatus.FORBIDDEN.value());
+                                                        response.setStatus(HttpStatus.UNAUTHORIZED.value());
                                                         response.setContentType("application/json");
-                                                        response.getWriter()
-                                                                        .write("{\"status\":\"403\",\"message\":\"Access Denied\",\"data\":null}");
+                                                        response.setCharacterEncoding("UTF-8");
+                                                        response.getWriter().write(
+                                                                        "{\"status\":401,\"message\":\"Phiên đăng nhập hết hạn hoặc không hợp lệ.\",\"data\":null}");
                                                 })
                                                 .accessDeniedHandler((request, response, accessDeniedException) -> {
                                                         response.setStatus(HttpStatus.FORBIDDEN.value());
                                                         response.setContentType("application/json");
-                                                        response.getWriter()
-                                                                        .write("{\"status\":\"403\",\"message\":\"Access Denied\",\"data\":null}");
+                                                        response.setCharacterEncoding("UTF-8");
+                                                        response.getWriter().write(
+                                                                        "{\"status\":403,\"message\":\"Bạn không có quyền truy cập vào tài nguyên này.\",\"data\":null}");
                                                 }))
                                 .logout(AbstractHttpConfigurer::disable);
 

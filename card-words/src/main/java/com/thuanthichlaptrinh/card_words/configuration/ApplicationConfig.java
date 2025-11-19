@@ -37,7 +37,7 @@ public class ApplicationConfig {
                 .findByEmailWithRoles(username)
                 .orElseThrow(
                         () -> new UsernameNotFoundException(
-                                "User not found: " + username));
+                                "Không tìm thấy người dùng: " + username));
     }
 
     @Bean

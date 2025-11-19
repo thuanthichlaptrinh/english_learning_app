@@ -255,7 +255,7 @@ public class OfflineSyncService {
                 .orElseThrow(() -> new IllegalArgumentException("Game session not found: " + sessionId));
 
         if (!session.getUser().getId().equals(userId)) {
-            throw new IllegalArgumentException("Session does not belong to user");
+            throw new IllegalArgumentException("Session không thuộc về người dùng");
         }
 
         int syncedCount = 0;

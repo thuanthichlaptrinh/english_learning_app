@@ -17,7 +17,7 @@ public class UserStatsResponse {
 
     public UserStatsResponse(User user) {
         if (user == null) {
-            throw new IllegalArgumentException("User cannot be null");
+            throw new IllegalArgumentException("User không được null");
         }
         this.user = user;
     }

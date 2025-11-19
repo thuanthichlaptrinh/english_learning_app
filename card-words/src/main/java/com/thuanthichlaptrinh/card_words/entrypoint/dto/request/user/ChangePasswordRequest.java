@@ -1,5 +1,9 @@
 package com.thuanthichlaptrinh.card_words.entrypoint.dto.request.user;
 
+import static com.thuanthichlaptrinh.card_words.common.constants.PasswordConstants.MIN_LENGTH;
+import static com.thuanthichlaptrinh.card_words.common.constants.PasswordConstants.MAX_LENGTH;
+import static com.thuanthichlaptrinh.card_words.common.constants.PasswordConstants.LENGTH_MESSAGE;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -17,7 +21,7 @@ public class ChangePasswordRequest {
     private String currentPassword;
 
     @NotBlank(message = "Mật khẩu mới không được để trống")
-    @Size(min = 6, max = 100, message = "Mật khẩu mới phải từ 6-100 ký tự")
+    @Size(min = MIN_LENGTH, max = MAX_LENGTH, message = LENGTH_MESSAGE)
     private String newPassword;
 
     @NotBlank(message = "Xác nhận mật khẩu không được để trống")

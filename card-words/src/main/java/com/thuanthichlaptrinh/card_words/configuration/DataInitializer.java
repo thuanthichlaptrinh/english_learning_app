@@ -61,9 +61,9 @@ public class DataInitializer {
                 },
                 () -> {
                     Role adminRole = roleRepository.findByName("ROLE_ADMIN")
-                            .orElseThrow(() -> new RuntimeException("ROLE_ADMIN not found"));
+                            .orElseThrow(() -> new RuntimeException("Không tìm thấy ROLE_ADMIN"));
                     Role userRole = roleRepository.findByName("ROLE_USER")
-                            .orElseThrow(() -> new RuntimeException("ROLE_USER not found"));
+                            .orElseThrow(() -> new RuntimeException("Không tìm thấy ROLE_USER"));
 
                     Set<Role> roles = new HashSet<>();
                     roles.add(adminRole);

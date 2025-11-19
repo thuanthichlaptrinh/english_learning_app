@@ -1,6 +1,6 @@
 package com.thuanthichlaptrinh.card_words.entrypoint.rest.v1.user;
 
-import com.thuanthichlaptrinh.card_words.core.domain.User;
+import com.thuanthichlaptrinh.card_words.common.helper.AuthenticationHelper;
 import com.thuanthichlaptrinh.card_words.core.usecase.user.UserGameSettingService;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.game.UpdateGameSettingRequest;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.ApiResponse;
@@ -12,7 +12,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -24,6 +23,7 @@ import java.util.UUID;
 public class GameSettingController {
 
     private final UserGameSettingService userGameSettingService;
+    private final AuthenticationHelper authenticationHelper;
 
     @PutMapping
     @Operation(summary = "Cập nhật cài đặt game", description = "Cập nhật cài đặt cho tất cả games. Chỉ cập nhật các trường có dữ liệu, các trường null sẽ giữ nguyên giá trị cũ.\n\n"
@@ -37,7 +37,7 @@ public class GameSettingController {
             Authentication authentication,
             @Valid @RequestBody UpdateGameSettingRequest request) {
 
-        UUID userId = getUserIdFromAuth(authentication);
+        UUID userId = authenticationHelper.getCurrentUserId(authentication);
         GameSettingResponse response = userGameSettingService.updateGameSetting(userId, request);
 
         return ResponseEntity.ok(ApiResponse.success("Cập nhật cài đặt game thành công", response));
@@ -48,20 +48,10 @@ public class GameSettingController {
     public ResponseEntity<ApiResponse<GameSettingResponse>> getGameSetting(
             Authentication authentication) {
 
-        UUID userId = getUserIdFromAuth(authentication);
+        UUID userId = authenticationHelper.getCurrentUserId(authentication);
         GameSettingResponse response = userGameSettingService.getGameSetting(userId);
 
         return ResponseEntity.ok(ApiResponse.success("Lấy cài đặt game thành công", response));
     }
 
-    // Helper method to extract user ID from authentication
-    private UUID getUserIdFromAuth(Authentication authentication) {
-        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            if (userDetails instanceof User) {
-                return ((User) userDetails).getId();
-            }
-        }
-        throw new RuntimeException("Unable to get user ID from authentication");
-    }
 }

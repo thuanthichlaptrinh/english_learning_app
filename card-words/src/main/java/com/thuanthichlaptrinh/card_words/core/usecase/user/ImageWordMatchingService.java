@@ -354,7 +354,7 @@ public class ImageWordMatchingService {
                 // Get session data from Redis cache
                 SessionData sessionData = gameSessionCacheService.getImageMatchingSession(sessionId, SessionData.class);
                 if (sessionData == null) {
-                        throw new ErrorException("Session cache expired. Please start a new game.");
+                        throw new ErrorException("Session không tồn tại hoặc đã hết hạn. Vui lòng bắt đầu game mới.");
                 }
 
                 // Determine status

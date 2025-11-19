@@ -26,8 +26,8 @@ public class ReviewVocabRequest {
     @Schema(description = "Kết quả ôn tập: true = đúng, false = sai", example = "true")
     private Boolean isCorrect;
 
-    @Min(value = 0, message = "Điểm chất lượng phải từ 0-5")
-    @Max(value = 5, message = "Điểm chất lượng phải từ 0-5")
-    @Schema(description = "Điểm chất lượng (0-5): 0=hoàn toàn quên, 3=khó nhớ, 5=rất dễ nhớ", example = "4")
+    @Min(value = 0, message = "Quality phải từ 0-5")
+    @Max(value = 5, message = "Quality phải từ 0-5")
+    @Schema(description = "Quality (0-5): 0=hoàn toàn quên, 3=khó nhớ, 5=rất dễ nhớ", example = "4")
     private Integer quality;
 }

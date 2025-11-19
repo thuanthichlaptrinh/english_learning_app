@@ -55,7 +55,7 @@ public class GeminiService {
                     log.error("Gemini API error: {}", response.code());
                     String errorBody = response.body() != null ? response.body().string() : "No error body";
                     log.error("Error body: {}", errorBody);
-                    throw new IOException("Unexpected response code: " + response.code());
+                    throw new IOException("Mã phản hồi không mong đợi: " + response.code());
                 }
 
                 String responseBody = response.body().string();

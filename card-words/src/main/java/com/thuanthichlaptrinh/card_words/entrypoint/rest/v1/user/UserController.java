@@ -3,7 +3,6 @@ package com.thuanthichlaptrinh.card_words.entrypoint.rest.v1.user;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -11,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.thuanthichlaptrinh.card_words.common.helper.AuthenticationHelper;
 import com.thuanthichlaptrinh.card_words.core.usecase.user.GameHistoryService;
 import com.thuanthichlaptrinh.card_words.core.usecase.user.UserService;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.user.ChangePasswordRequest;
@@ -43,6 +43,7 @@ public class UserController {
 
     private final UserService userService;
     private final GameHistoryService gameHistoryService;
+    private final AuthenticationHelper authHelper;
 
     @GetMapping
     @Operation(summary = "Lấy thông tin profile", description = "Lấy thông tin cá nhân của user đang đăng nhập.", security = @SecurityRequirement(name = "Bearer Authentication"))
@@ -83,7 +84,7 @@ public class UserController {
             @Parameter(description = "Số trang") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Kích thước trang") @RequestParam(defaultValue = "20") int size) {
 
-        UUID userId = getUserIdFromAuth(authentication);
+        UUID userId = authHelper.getCurrentUserId(authentication);
         Page<GameHistoryResponse> response = gameHistoryService.getUserGameHistory(userId, gameId, page, size);
 
         return ResponseEntity.ok(ApiResponse.success(
@@ -100,7 +101,7 @@ public class UserController {
             "- Độ chính xác trung bình & cao nhất\n" +
             "- Thống kê riêng cho từng loại game", security = @SecurityRequirement(name = "Bearer Authentication"))
     public ResponseEntity<ApiResponse<GameStatsResponse>> getGameStats(Authentication authentication) {
-        UUID userId = getUserIdFromAuth(authentication);
+        UUID userId = authHelper.getCurrentUserId(authentication);
         GameStatsResponse response = gameHistoryService.getUserGameStats(userId);
 
         return ResponseEntity.ok(ApiResponse.success("Lấy thống kê game thành công", response));
@@ -126,17 +127,6 @@ public class UserController {
                 request.getNewPassword(),
                 request.getConfirmPassword());
         return ResponseEntity.ok(ApiResponse.success("Đổi mật khẩu thành công", null));
-    }
-
-    // Helper method
-    private UUID getUserIdFromAuth(Authentication authentication) {
-        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            if (userDetails instanceof com.thuanthichlaptrinh.card_words.core.domain.User) {
-                return ((com.thuanthichlaptrinh.card_words.core.domain.User) userDetails).getId();
-            }
-        }
-        throw new RuntimeException("Unable to get user ID from authentication");
     }
 
 }

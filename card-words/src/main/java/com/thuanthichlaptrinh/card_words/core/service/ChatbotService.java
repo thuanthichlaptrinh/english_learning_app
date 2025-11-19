@@ -81,7 +81,7 @@ public class ChatbotService {
 
         } catch (Exception e) {
             log.error("Error processing chat request", e);
-            throw new RuntimeException("Failed to process chat request: " + e.getMessage());
+            throw new RuntimeException("Không thể xử lý yêu cầu chat: " + e.getMessage());
         }
     }
 

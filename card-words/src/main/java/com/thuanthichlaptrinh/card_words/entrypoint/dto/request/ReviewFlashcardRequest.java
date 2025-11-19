@@ -18,7 +18,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ReviewFlashcardRequest {
 
-    @NotNull(message = "Vocab ID is required")
+    @NotNull(message = "Vocab ID không được để trống")
     private UUID vocabId;
     /**
      * Quality rating (SM-2 algorithm):
@@ -29,9 +29,9 @@ public class ReviewFlashcardRequest {
      * 4 - Correct, hesitated
      * 5 - Perfect, easy recall
      */
-    @NotNull(message = "Quality rating is required")
-    @Min(value = 0, message = "Quality must be between 0 and 5")
-    @Max(value = 5, message = "Quality must be between 0 and 5")
+    @NotNull(message = "Quality không được để trống")
+    @Min(value = 0, message = "Quality phải từ 0 đến 5")
+    @Max(value = 5, message = "Quality phải từ 0 đến 5")
     private Integer quality;
 
     // Time spent reviewing in seconds (optional)

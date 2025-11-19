@@ -1,5 +1,6 @@
 package com.thuanthichlaptrinh.card_words.entrypoint.rest.v1.user;
 
+import com.thuanthichlaptrinh.card_words.common.helper.AuthenticationHelper;
 import com.thuanthichlaptrinh.card_words.core.usecase.user.NotificationService;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.NotificationFilterRequest;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.ApiResponse;
@@ -27,6 +28,7 @@ import java.util.UUID;
 public class NotificationController {
 
     private final NotificationService notificationService;
+    private final AuthenticationHelper authHelper;
 
     @GetMapping
     @Operation(summary = "Lấy danh sách thông báo", description = "Lấy danh sách thông báo của user với filters\n\n" +
@@ -42,7 +44,7 @@ public class NotificationController {
             Authentication authentication,
             @Valid @ModelAttribute NotificationFilterRequest request) {
 
-        UUID userId = getUserIdFromAuth(authentication);
+        UUID userId = authHelper.getCurrentUserId(authentication);
         Page<NotificationResponse> response = notificationService.getNotifications(userId, request);
         return ResponseEntity.ok(ApiResponse.success("Lấy danh sách thông báo thành công", response));
     }
@@ -55,7 +57,7 @@ public class NotificationController {
             "- unreadNotifications: Số thông báo chưa đọc\n" +
             "- readNotifications: Số thông báo đã đọc")
     public ResponseEntity<ApiResponse<NotificationSummaryResponse>> getSummary(Authentication authentication) {
-        UUID userId = getUserIdFromAuth(authentication);
+        UUID userId = authHelper.getCurrentUserId(authentication);
         NotificationSummaryResponse response = notificationService.getSummary(userId);
         return ResponseEntity.ok(ApiResponse.success("Lấy tổng quan thành công", response));
     }
@@ -68,7 +70,7 @@ public class NotificationController {
             Authentication authentication,
             @Parameter(description = "ID của thông báo") @PathVariable Long id) {
 
-        UUID userId = getUserIdFromAuth(authentication);
+        UUID userId = authHelper.getCurrentUserId(authentication);
         notificationService.markAsRead(userId, id);
         return ResponseEntity.ok(ApiResponse.success("Đánh dấu đã đọc thành công", null));
     }
@@ -78,7 +80,7 @@ public class NotificationController {
             +
             "**URL**: `PUT http://localhost:8080/api/v1/notifications/read-all`")
     public ResponseEntity<ApiResponse<Integer>> markAllAsRead(Authentication authentication) {
-        UUID userId = getUserIdFromAuth(authentication);
+        UUID userId = authHelper.getCurrentUserId(authentication);
         int count = notificationService.markAllAsRead(userId);
         return ResponseEntity.ok(ApiResponse.success("Đã đánh dấu " + count + " thông báo", count));
     }
@@ -91,7 +93,7 @@ public class NotificationController {
             Authentication authentication,
             @Parameter(description = "ID của thông báo") @PathVariable Long id) {
 
-        UUID userId = getUserIdFromAuth(authentication);
+        UUID userId = authHelper.getCurrentUserId(authentication);
         notificationService.deleteNotification(userId, id);
         return ResponseEntity.ok(ApiResponse.success("Xóa thông báo thành công", null));
     }
@@ -104,20 +106,8 @@ public class NotificationController {
             Authentication authentication,
             @RequestBody List<Long> notificationIds) {
 
-        UUID userId = getUserIdFromAuth(authentication);
+        UUID userId = authHelper.getCurrentUserId(authentication);
         notificationService.deleteNotifications(userId, notificationIds);
         return ResponseEntity.ok(ApiResponse.success("Xóa thông báo thành công", null));
-    }
-
-    private UUID getUserIdFromAuth(Authentication authentication) {
-        if (authentication != null
-                && authentication.getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails) {
-            org.springframework.security.core.userdetails.UserDetails userDetails = (org.springframework.security.core.userdetails.UserDetails) authentication
-                    .getPrincipal();
-            if (userDetails instanceof com.thuanthichlaptrinh.card_words.core.domain.User) {
-                return ((com.thuanthichlaptrinh.card_words.core.domain.User) userDetails).getId();
-            }
-        }
-        throw new IllegalStateException("Unable to extract user ID from authentication");
     }
 }

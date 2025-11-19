@@ -69,7 +69,7 @@ public class QuickQuizService {
                 filterInfo += " cefr='" + cefr + "'";
             }
             throw new ErrorException(
-                    "No vocabularies found" + (filterInfo.isEmpty() ? "" : " with filters:" + filterInfo));
+                    "Không tìm thấy từ vựng" + (filterInfo.isEmpty() ? "" : " với bộ lọc:" + filterInfo));
         }
 
         // Shuffle for randomness
@@ -195,10 +195,10 @@ public class QuickQuizService {
         log.info("Getting results for session: {}", sessionId);
 
         GameSession session = gameSessionRepository.findById(sessionId)
-                .orElseThrow(() -> new ErrorException("Game session not found"));
+                .orElseThrow(() -> new ErrorException("Không tìm thấy session game"));
 
         if (!session.getUser().getId().equals(userId)) {
-            throw new ErrorException("Unauthorized: This session belongs to another user");
+            throw new ErrorException("Không có quyền: Session này thuộc về người dùng khác");
         }
 
         List<GameSessionDetail> details = new ArrayList<>(session.getDetails());
@@ -252,7 +252,7 @@ public class QuickQuizService {
     private Game loadQuickQuizGame() {
         return gameRepository.findByName(GAME_NAME)
                 .orElseThrow(() -> new ErrorException(
-                        "Game 'Quick Reflex Quiz' not found. Please initialize game data."));
+                        "Không tìm thấy game 'Quick Reflex Quiz'. Vui lòng khởi tạo dữ liệu game."));
     }
 
     // 2. Get and validate vocabularies
@@ -262,7 +262,7 @@ public class QuickQuizService {
 
         if (vocabs.size() < requiredCount) {
             throw new ErrorException(
-                    "Not enough vocabularies. Found: " + vocabs.size() + ", Required: " + requiredCount);
+                    "Không đủ từ vựng. Đã tìm thấy: " + vocabs.size() + ", Yêu cầu: " + requiredCount);
         }
 
         return vocabs;
@@ -392,14 +392,14 @@ public class QuickQuizService {
     // 1. Validate and load session
     private GameSession validateAndLoadSession(Long sessionId, UUID userId) {
         GameSession session = gameSessionRepository.findById(sessionId)
-                .orElseThrow(() -> new ErrorException("Game session not found"));
+                .orElseThrow(() -> new ErrorException("Không tìm thấy session game"));
 
         if (!session.getUser().getId().equals(userId)) {
-            throw new ErrorException("Unauthorized: This session belongs to another user");
+            throw new ErrorException("Không có quyền: Session này thuộc về người dùng khác");
         }
 
         if (session.getFinishedAt() != null) {
-            throw new ErrorException("Game session already finished");
+            throw new ErrorException("Session game đã kết thúc");
         }
 
         return session;
@@ -409,7 +409,7 @@ public class QuickQuizService {
     private List<QuestionData> getCachedQuestions(Long sessionId) {
         List<QuestionData> cachedQuestions = gameSessionCacheService.getQuizQuestions(sessionId);
         if (cachedQuestions == null || cachedQuestions.isEmpty()) {
-            throw new ErrorException("Session questions not found. Please start a new game.");
+            throw new ErrorException("Không tìm thấy câu hỏi của session. Vui lòng bắt đầu game mới.");
         }
         return cachedQuestions;
     }
@@ -417,7 +417,7 @@ public class QuickQuizService {
     // 3. Validate question number
     private void validateQuestionNumber(int questionNumber, int totalQuestions) {
         if (questionNumber > totalQuestions) {
-            throw new ErrorException("Invalid question number");
+            throw new ErrorException("Số câu hỏi không hợp lệ");
         }
     }
 
@@ -430,7 +430,7 @@ public class QuickQuizService {
                 .count();
 
         if (answeredCount > 0) {
-            throw new ErrorException("Question already answered. Cannot submit again.");
+            throw new ErrorException("Câu hỏi đã được trả lời. Không thể gửi lại.");
         }
     }
 
@@ -440,8 +440,8 @@ public class QuickQuizService {
         if (request.getSelectedOptionIndex() < 0 ||
                 request.getSelectedOptionIndex() >= questionData.getOptionVocabs().size()) {
             throw new ErrorException(
-                    "Invalid option index: " + request.getSelectedOptionIndex() +
-                            ". Valid range: 0-" + (questionData.getOptionVocabs().size() - 1));
+                    "Chỉ số tùy chọn không hợp lệ: " + request.getSelectedOptionIndex() +
+                            ". Khoảng hợp lệ: 0-" + (questionData.getOptionVocabs().size() - 1));
         }
 
         // Validate time taken
@@ -453,7 +453,8 @@ public class QuickQuizService {
         // Check minimum time
         if (request.getTimeTaken() < MIN_ANSWER_TIME) {
             throw new ErrorException(
-                    "Invalid time taken: " + request.getTimeTaken() + "ms. Minimum: " + MIN_ANSWER_TIME + "ms");
+                    "Thời gian trả lời không hợp lệ: " + request.getTimeTaken() + "ms. Tối thiểu: " + MIN_ANSWER_TIME
+                            + "ms");
         }
 
         // Check timeout
@@ -464,7 +465,8 @@ public class QuickQuizService {
 
         if (request.getTimeTaken() > timeLimit) {
             throw new ErrorException(
-                    "Answer timeout. Time limit: " + timeLimit + "ms, but took: " + request.getTimeTaken() + "ms");
+                    "Hết thời gian trả lời. Giới hạn: " + timeLimit + "ms, nhưng mất: " + request.getTimeTaken()
+                            + "ms");
         }
 
         // Validate server-side timestamp
@@ -487,8 +489,8 @@ public class QuickQuizService {
                 log.warn("Time exceeded. Client: {}ms, Server: {}ms, Limit: {}ms",
                         request.getTimeTaken(), actualTimeTaken, timeLimit);
                 throw new ErrorException(
-                        "Time exceeded. Server measured: " + actualTimeTaken + "ms, " +
-                                "Limit: " + timeLimit + "ms");
+                        "Hết thời gian. Máy chủ đo: " + actualTimeTaken + "ms, " +
+                                "Giới hạn: " + timeLimit + "ms");
             }
 
             // Warning nếu chênh lệch quá lớn nhưng không throw error
@@ -699,9 +701,9 @@ public class QuickQuizService {
 
         if (!result.isAllowed()) {
             throw new ErrorException(
-                    "Too many game sessions. Maximum " + MAX_GAMES_PER_5_MIN +
-                            " games per 5 minutes. Please wait " + result.getResetInSeconds() +
-                            " seconds before starting a new game.");
+                    "Quá nhiều phiên chơi. Tối đa " + MAX_GAMES_PER_5_MIN +
+                            " game mỗi 5 phút. Vui lòng đợi " + result.getResetInSeconds() +
+                            " giây trước khi bắt đầu game mới.");
         }
 
         log.debug("User {} passed rate limit check: {}/{} games",

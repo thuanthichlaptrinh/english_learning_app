@@ -84,13 +84,13 @@ public class JwtService {
     private Key getSignInKey() {
         String secretKey = jwtProperties.getSecretKey();
         if (secretKey == null || secretKey.isEmpty()) {
-            throw new IllegalArgumentException("JWT secret key cannot be null or empty");
+            throw new IllegalArgumentException("JWT secret key không được null hoặc rỗng");
         }
         try {
             byte[] keyBytes = Decoders.BASE64.decode(secretKey);
             return Keys.hmacShaKeyFor(keyBytes);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid JWT secret key format: " + e.getMessage());
+            throw new IllegalArgumentException("Định dạng JWT secret key không hợp lệ: " + e.getMessage());
         }
     }
 }

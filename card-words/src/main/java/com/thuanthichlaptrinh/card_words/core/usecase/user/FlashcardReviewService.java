@@ -2,7 +2,6 @@ package com.thuanthichlaptrinh.card_words.core.usecase.user;
 
 import com.thuanthichlaptrinh.card_words.common.enums.VocabStatus;
 import com.thuanthichlaptrinh.card_words.common.exceptions.ErrorException;
-import com.thuanthichlaptrinh.card_words.common.exceptions.Exceptions;
 import com.thuanthichlaptrinh.card_words.core.domain.User;
 import com.thuanthichlaptrinh.card_words.core.domain.UserVocabProgress;
 import com.thuanthichlaptrinh.card_words.core.domain.Vocab;
@@ -70,8 +69,7 @@ public class FlashcardReviewService {
                 .orElseGet(() -> {
                     // Create new progress if not exists
                     Vocab vocab = vocabRepository.findById(vocabId)
-                            .orElseThrow(() -> new ErrorException(Exceptions.NOTFOUND_ERROR,
-                                    "Vocab not found with id: " + vocabId));
+                            .orElseThrow(() -> new ErrorException("Vocab not found with id: " + vocabId));
 
                     UserVocabProgress newProgress = UserVocabProgress.builder()
                             .user(user)
@@ -104,8 +102,7 @@ public class FlashcardReviewService {
                 .findByUserIdAndVocabId(user.getId(), request.getVocabId())
                 .orElseGet(() -> {
                     Vocab vocab = vocabRepository.findById(request.getVocabId())
-                            .orElseThrow(() -> new ErrorException(Exceptions.NOTFOUND_ERROR,
-                                    "Vocab not found with id: " + request.getVocabId()));
+                            .orElseThrow(() -> new ErrorException("Vocab not found with id: " + request.getVocabId()));
 
                     return UserVocabProgress.builder()
                             .user(user)

@@ -2,7 +2,6 @@ package com.thuanthichlaptrinh.card_words.core.usecase.user;
 
 import com.thuanthichlaptrinh.card_words.common.enums.VocabStatus;
 import com.thuanthichlaptrinh.card_words.common.exceptions.ErrorException;
-import com.thuanthichlaptrinh.card_words.common.exceptions.Exceptions;
 import com.thuanthichlaptrinh.card_words.core.domain.User;
 import com.thuanthichlaptrinh.card_words.core.domain.UserVocabProgress;
 import com.thuanthichlaptrinh.card_words.core.domain.Vocab;
@@ -341,8 +340,7 @@ public class LearnVocabService {
 
     private UserVocabProgress createNewProgress(User user, UUID vocabId) {
         Vocab vocab = vocabRepository.findById(vocabId)
-                .orElseThrow(() -> new ErrorException(Exceptions.NOTFOUND_ERROR,
-                        "Không tìm thấy từ vựng với ID: " + vocabId));
+                .orElseThrow(() -> new ErrorException("Không tìm thấy từ vựng với ID: " + vocabId));
 
         return UserVocabProgress.builder()
                 .user(user)

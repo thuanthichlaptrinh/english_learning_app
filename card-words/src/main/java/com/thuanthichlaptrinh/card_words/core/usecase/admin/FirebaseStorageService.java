@@ -40,12 +40,12 @@ public class FirebaseStorageService {
      */
     public String uploadFile(MultipartFile file, String folder) throws IOException {
         if (bucket == null) {
-            throw new IllegalStateException("Firebase storage bucket is not configured or could not be resolved. " +
-                    "Check FIREBASE_STORAGE_BUCKET in your configuration and ensure the service account has access.");
+            throw new IllegalStateException("Firebase storage bucket chưa được cấu hình hoặc không thể giải quyết. " +
+                    "Kiểm tra FIREBASE_STORAGE_BUCKET trong cấu hình và đảm bảo service account có quyền truy cập.");
         }
 
         if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("File is empty or null");
+            throw new IllegalArgumentException("File trống hoặc null");
         }
 
         // Generate unique filename
@@ -100,12 +100,12 @@ public class FirebaseStorageService {
      */
     public BulkUploadResponse uploadMultipleImages(MultipartFile[] files, String folder) {
         if (bucket == null) {
-            throw new IllegalStateException("Firebase storage bucket is not configured or could not be resolved. " +
-                    "Check FIREBASE_STORAGE_BUCKET in your configuration and ensure the service account has access.");
+            throw new IllegalStateException("Firebase storage bucket chưa được cấu hình hoặc không thể giải quyết. " +
+                    "Kiểm tra FIREBASE_STORAGE_BUCKET trong cấu hình và đảm bảo service account có quyền truy cập.");
         }
 
         if (files == null || files.length == 0) {
-            throw new IllegalArgumentException("No files provided");
+            throw new IllegalArgumentException("Không có file nào được cung cấp");
         }
 
         log.info("Starting bulk upload of {} images", files.length);
@@ -207,12 +207,12 @@ public class FirebaseStorageService {
     // Upload multiple audio files in parallel
     public BulkUploadResponse uploadMultipleAudios(MultipartFile[] files, String folder) {
         if (bucket == null) {
-            throw new IllegalStateException("Firebase storage bucket is not configured or could not be resolved. " +
-                    "Check FIREBASE_STORAGE_BUCKET in your configuration and ensure the service account has access.");
+            throw new IllegalStateException("Firebase storage bucket chưa được cấu hình hoặc không thể giải quyết. " +
+                    "Kiểm tra FIREBASE_STORAGE_BUCKET trong cấu hình và đảm bảo service account có quyền truy cập.");
         }
 
         if (files == null || files.length == 0) {
-            throw new IllegalArgumentException("No files provided");
+            throw new IllegalArgumentException("Không có file nào được cung cấp");
         }
 
         log.info("Starting bulk upload of {} audio files", files.length);
@@ -313,8 +313,8 @@ public class FirebaseStorageService {
     // Delete file from Firebase Storage
     public void deleteFile(String fileUrl) {
         if (bucket == null) {
-            throw new IllegalStateException("Firebase storage bucket is not configured or could not be resolved. " +
-                    "Check FIREBASE_STORAGE_BUCKET in your configuration and ensure the service account has access.");
+            throw new IllegalStateException("Firebase storage bucket chưa được cấu hình hoặc không thể giải quyết. " +
+                    "Kiểm tra FIREBASE_STORAGE_BUCKET trong cấu hình và đảm bảo service account có quyền truy cập.");
         }
         try {
             // Extract filename from URL
@@ -366,12 +366,12 @@ public class FirebaseStorageService {
     private void validateImageFile(MultipartFile file) {
         String contentType = file.getContentType();
         if (contentType == null || !contentType.startsWith("image/")) {
-            throw new IllegalArgumentException("File must be an image (jpg, png, gif, webp)");
+            throw new IllegalArgumentException("File phải là hình ảnh (jpg, png, gif, webp)");
         }
 
         // Check file size (max 5MB)
         if (file.getSize() > 5 * 1024 * 1024) {
-            throw new IllegalArgumentException("Image size must not exceed 5MB");
+            throw new IllegalArgumentException("Kích thước hình ảnh không được vượt quá 5MB");
         }
     }
 
@@ -379,11 +379,11 @@ public class FirebaseStorageService {
     private void validateAudioFile(MultipartFile file) {
         String contentType = file.getContentType();
         if (contentType == null || !contentType.startsWith("audio/")) {
-            throw new IllegalArgumentException("File must be an audio (mp3, wav, ogg)");
+            throw new IllegalArgumentException("File phải là âm thanh (mp3, wav, ogg)");
         }
 
         if (file.getSize() > 10 * 1024 * 1024) {
-            throw new IllegalArgumentException("Audio size must not exceed 10MB");
+            throw new IllegalArgumentException("Kích thước âm thanh không được vượt quá 10MB");
         }
     }
 
@@ -483,11 +483,11 @@ public class FirebaseStorageService {
      */
     public BulkMediaUpdateResponse uploadMediaAndUpdateVocabs(MultipartFile[] files) {
         if (bucket == null) {
-            throw new IllegalStateException("Firebase storage bucket is not configured");
+            throw new IllegalStateException("Firebase storage bucket chưa được cấu hình");
         }
 
         if (files == null || files.length == 0) {
-            throw new IllegalArgumentException("No files provided");
+            throw new IllegalArgumentException("Không có file nào được cung cấp");
         }
 
         log.info("Starting bulk media upload and vocab update for {} files", files.length);
@@ -606,7 +606,7 @@ public class FirebaseStorageService {
      */
     public CleanupReport cleanupUnusedFiles(String folder, boolean dryRun) {
         if (bucket == null) {
-            throw new IllegalStateException("Firebase storage bucket is not configured");
+            throw new IllegalStateException("Firebase storage bucket chưa được cấu hình");
         }
 
         log.info("Starting cleanup for folder: {} (dryRun: {})", folder, dryRun);

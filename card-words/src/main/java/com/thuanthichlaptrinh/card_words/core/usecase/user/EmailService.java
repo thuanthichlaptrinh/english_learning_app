@@ -357,7 +357,7 @@ public class EmailService {
 
         } catch (Exception e) {
             log.error("❌ Failed to send streak reminder email to {}: {}", toEmail, e.getMessage());
-            throw new RuntimeException("Cannot send streak reminder email", e);
+            throw new RuntimeException("Không thể gửi email nhắc nhở streak", e);
         }
     }
 

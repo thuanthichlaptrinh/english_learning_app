@@ -34,7 +34,7 @@ public class DotenvConfig implements ApplicationContextInitializer<ConfigurableA
                     .addFirst(new MapPropertySource("dotenvProperties", dotenvMap));
 
         } catch (Exception e) {
-            log.warn("Could not load .env file: {}", e.getMessage());
+            log.warn("Không thể tải tệp .env: {}", e.getMessage());
         }
     }
 }

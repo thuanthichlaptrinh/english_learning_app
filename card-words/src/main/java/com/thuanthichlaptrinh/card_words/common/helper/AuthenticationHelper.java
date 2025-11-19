@@ -26,28 +26,28 @@ public class AuthenticationHelper {
      */
     public UUID getCurrentUserId(Authentication authentication) {
         if (authentication == null || authentication.getPrincipal() == null) {
-            log.error("Authentication or principal is null");
-            throw new RuntimeException("Unable to get user ID: not authenticated");
+            log.error("Xác thực hoặc principal là null");
+            throw new RuntimeException("Không thể lấy user ID: chưa xác thực");
         }
 
         Object principal = authentication.getPrincipal();
 
         if (!(principal instanceof UserDetails)) {
-            log.error("Principal is not an instance of UserDetails: {}", principal.getClass().getName());
-            throw new RuntimeException("Unable to get user ID: invalid principal type");
+            log.error("Principal không phải là UserDetails: {}", principal.getClass().getName());
+            throw new RuntimeException("Không thể lấy user ID: loại principal không hợp lệ");
         }
 
         UserDetails userDetails = (UserDetails) principal;
 
         if (!(userDetails instanceof User)) {
-            log.error("UserDetails is not an instance of User: {}", userDetails.getClass().getName());
-            throw new RuntimeException("Unable to get user ID: invalid user type");
+            log.error("UserDetails không phải là User: {}", userDetails.getClass().getName());
+            throw new RuntimeException("Không thể lấy user ID: loại user không hợp lệ");
         }
 
         User user = (User) userDetails;
         UUID userId = user.getId();
 
-        log.debug("Extracted user ID from authentication: {}", userId);
+        log.debug("Đã lấy user ID từ xác thực: {}", userId);
         return userId;
     }
 
@@ -60,26 +60,26 @@ public class AuthenticationHelper {
      */
     public User getCurrentUser(Authentication authentication) {
         if (authentication == null || authentication.getPrincipal() == null) {
-            log.error("Authentication or principal is null");
-            throw new RuntimeException("Unable to get user: not authenticated");
+            log.error("Xác thực hoặc principal là null");
+            throw new RuntimeException("Không thể lấy user: chưa xác thực");
         }
 
         Object principal = authentication.getPrincipal();
 
         if (!(principal instanceof UserDetails)) {
-            log.error("Principal is not an instance of UserDetails: {}", principal.getClass().getName());
-            throw new RuntimeException("Unable to get user: invalid principal type");
+            log.error("Principal không phải là UserDetails: {}", principal.getClass().getName());
+            throw new RuntimeException("Không thể lấy user: loại principal không hợp lệ");
         }
 
         UserDetails userDetails = (UserDetails) principal;
 
         if (!(userDetails instanceof User)) {
-            log.error("UserDetails is not an instance of User: {}", userDetails.getClass().getName());
-            throw new RuntimeException("Unable to get user: invalid user type");
+            log.error("UserDetails không phải là User: {}", userDetails.getClass().getName());
+            throw new RuntimeException("Không thể lấy user: loại user không hợp lệ");
         }
 
         User user = (User) userDetails;
-        log.debug("Extracted user from authentication: email={}, id={}", user.getEmail(), user.getId());
+        log.debug("Đã lấy user từ xác thực: email={}, id={}", user.getEmail(), user.getId());
         return user;
     }
 
