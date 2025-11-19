@@ -137,15 +137,11 @@ public class VocabAdminController {
         @Operation(summary = "Thêm hàng loạt từ vựng", description = "Thêm nhiều từ vựng cùng lúc vào hệ thống.", security = @SecurityRequirement(name = "Bearer Authentication"))
         public ResponseEntity<ApiResponse<BulkImportResponse>> bulkImportVocabs(
                         @Valid @RequestBody BulkCreateVocabRequest request) {
-                // Debug log
-                System.out.println("=== DEBUG BULK IMPORT ===");
-                System.out.println("Request received: " + request);
-                System.out.println(
-                                "Vocabs list: " + (request.getVocabs() != null ? request.getVocabs().size() : "NULL"));
-                if (request.getVocabs() != null && !request.getVocabs().isEmpty()) {
-                        System.out.println("First vocab: " + request.getVocabs().get(0));
+                log.debug("Processing bulk import request with {} vocabs",
+                                request.getVocabs() != null ? request.getVocabs().size() : 0);
+                if (log.isTraceEnabled() && request.getVocabs() != null && !request.getVocabs().isEmpty()) {
+                        log.trace("First vocab in bulk import: {}", request.getVocabs().get(0));
                 }
-                System.out.println("========================");
 
                 BulkImportResponse response = vocabService.bulkCreateVocabs(request);
 

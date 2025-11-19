@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -168,6 +170,11 @@ public class VocabService {
         return vocabMapper.toVocabResponse(vocab);
     }
 
+    /**
+     * Lấy thông tin từ vựng theo ID
+     * Cache kết quả để tránh query DB nhiều lần cho cùng 1 vocab
+     */
+    @Cacheable(value = "vocab", key = "#id")
     public VocabResponse getVocabById(UUID id) {
         log.info("Lấy thông tin từ vựng với ID: {}", id);
 
@@ -177,6 +184,11 @@ public class VocabService {
         return vocabMapper.toVocabResponse(vocab);
     }
 
+    /**
+     * Lấy thông tin từ vựng theo word
+     * Cache theo word để tránh query nhiều lần
+     */
+    @Cacheable(value = "vocab", key = "#word.toLowerCase()")
     public VocabResponse getVocabByWord(String word) {
         log.info("Lấy thông tin từ vựng: {}", word);
 
@@ -208,6 +220,7 @@ public class VocabService {
     }
 
     @Transactional
+    @CacheEvict(value = "vocab", key = "#id")
     public void deleteVocab(UUID id) {
         log.info("Xóa từ vựng với ID: {}", id);
 

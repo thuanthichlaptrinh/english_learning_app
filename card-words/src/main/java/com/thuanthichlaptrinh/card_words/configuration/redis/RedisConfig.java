@@ -35,145 +35,157 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class RedisConfig {
 
-    private final RedisConnectionFactory redisConnectionFactory;
+        private final RedisConnectionFactory redisConnectionFactory;
 
-    /**
-     * Custom ObjectMapper for Redis serialization ONLY
-     * Handles Java 8 date/time types and polymorphic types
-     * NOTE: This ObjectMapper is ONLY used for Redis, not for HTTP requests
-     */
-    private ObjectMapper createRedisObjectMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
+        /**
+         * Custom ObjectMapper for Redis serialization ONLY
+         * Handles Java 8 date/time types and polymorphic types
+         * NOTE: This ObjectMapper is ONLY used for Redis, not for HTTP requests
+         */
+        private ObjectMapper createRedisObjectMapper() {
+                ObjectMapper objectMapper = new ObjectMapper();
 
-        // Register JavaTimeModule for LocalDateTime, LocalDate, etc.
-        objectMapper.registerModule(new JavaTimeModule());
+                // Register JavaTimeModule for LocalDateTime, LocalDate, etc.
+                objectMapper.registerModule(new JavaTimeModule());
 
-        // Enable polymorphic type handling for Redis cache objects
-        // This allows storing different object types in Redis with type information
-        objectMapper.activateDefaultTyping(
-                BasicPolymorphicTypeValidator.builder()
-                        .allowIfBaseType(Object.class)
-                        .build(),
-                ObjectMapper.DefaultTyping.NON_FINAL,
-                JsonTypeInfo.As.PROPERTY);
+                // Enable polymorphic type handling for Redis cache objects
+                // This allows storing different object types in Redis with type information
+                objectMapper.activateDefaultTyping(
+                                BasicPolymorphicTypeValidator.builder()
+                                                .allowIfBaseType(Object.class)
+                                                .build(),
+                                ObjectMapper.DefaultTyping.NON_FINAL,
+                                JsonTypeInfo.As.PROPERTY);
 
-        return objectMapper;
-    }
+                return objectMapper;
+        }
 
-    /**
-     * Primary RedisTemplate for general purpose
-     * Key: String, Value: Object (JSON)
-     */
-    @Bean
-    @Primary
-    public RedisTemplate<String, Object> redisTemplate() {
-        RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(redisConnectionFactory);
+        /**
+         * Primary RedisTemplate for general purpose
+         * Key: String, Value: Object (JSON)
+         */
+        @Bean
+        @Primary
+        public RedisTemplate<String, Object> redisTemplate() {
+                RedisTemplate<String, Object> template = new RedisTemplate<>();
+                template.setConnectionFactory(redisConnectionFactory);
 
-        // Use String serializer for keys
-        StringRedisSerializer stringSerializer = new StringRedisSerializer();
-        template.setKeySerializer(stringSerializer);
-        template.setHashKeySerializer(stringSerializer);
+                // Use String serializer for keys
+                StringRedisSerializer stringSerializer = new StringRedisSerializer();
+                template.setKeySerializer(stringSerializer);
+                template.setHashKeySerializer(stringSerializer);
 
-        // Use JSON serializer for values
-        GenericJackson2JsonRedisSerializer jsonSerializer = new GenericJackson2JsonRedisSerializer(
-                createRedisObjectMapper());
-        template.setValueSerializer(jsonSerializer);
-        template.setHashValueSerializer(jsonSerializer);
+                // Use JSON serializer for values
+                GenericJackson2JsonRedisSerializer jsonSerializer = new GenericJackson2JsonRedisSerializer(
+                                createRedisObjectMapper());
+                template.setValueSerializer(jsonSerializer);
+                template.setHashValueSerializer(jsonSerializer);
 
-        template.afterPropertiesSet();
+                template.afterPropertiesSet();
 
-        log.info("✅ Primary RedisTemplate initialized");
-        return template;
-    }
+                log.info("✅ Primary RedisTemplate initialized");
+                return template;
+        }
 
-    /**
-     * Note: stringRedisTemplate is already provided by Spring Boot
-     * Auto-configuration
-     * We don't need to create it here - just @Autowire StringRedisTemplate where
-     * needed
-     */
+        /**
+         * Note: stringRedisTemplate is already provided by Spring Boot
+         * Auto-configuration
+         * We don't need to create it here - just @Autowire StringRedisTemplate where
+         * needed
+         */
 
-    /**
-     * RedisTemplate for Long values
-     * Useful for timestamps, counters
-     */
-    @Bean
-    public RedisTemplate<String, Long> longRedisTemplate() {
-        RedisTemplate<String, Long> template = new RedisTemplate<>();
-        template.setConnectionFactory(redisConnectionFactory);
+        /**
+         * RedisTemplate for Long values
+         * Useful for timestamps, counters
+         */
+        @Bean
+        public RedisTemplate<String, Long> longRedisTemplate() {
+                RedisTemplate<String, Long> template = new RedisTemplate<>();
+                template.setConnectionFactory(redisConnectionFactory);
 
-        StringRedisSerializer stringSerializer = new StringRedisSerializer();
-        template.setKeySerializer(stringSerializer);
+                StringRedisSerializer stringSerializer = new StringRedisSerializer();
+                template.setKeySerializer(stringSerializer);
 
-        GenericJackson2JsonRedisSerializer jsonSerializer = new GenericJackson2JsonRedisSerializer(
-                createRedisObjectMapper());
-        template.setValueSerializer(jsonSerializer);
+                GenericJackson2JsonRedisSerializer jsonSerializer = new GenericJackson2JsonRedisSerializer(
+                                createRedisObjectMapper());
+                template.setValueSerializer(jsonSerializer);
 
-        template.afterPropertiesSet();
+                template.afterPropertiesSet();
 
-        log.info("✅ Long RedisTemplate initialized");
-        return template;
-    }
+                log.info("✅ Long RedisTemplate initialized");
+                return template;
+        }
 
-    /**
-     * Cache Manager with custom TTL per cache name
-     */
-    @Bean
-    public CacheManager cacheManager() {
-        // Default cache configuration (1 hour)
-        RedisCacheConfiguration defaultConfig = RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofHours(1))
-                .serializeKeysWith(
-                        RedisSerializationContext.SerializationPair.fromSerializer(
-                                new StringRedisSerializer()))
-                .serializeValuesWith(
-                        RedisSerializationContext.SerializationPair.fromSerializer(
-                                new GenericJackson2JsonRedisSerializer(createRedisObjectMapper())))
-                .disableCachingNullValues();
+        /**
+         * Cache Manager with custom TTL per cache name
+         */
+        @Bean
+        public CacheManager cacheManager() {
+                // Default cache configuration (1 hour)
+                RedisCacheConfiguration defaultConfig = RedisCacheConfiguration.defaultCacheConfig()
+                                .entryTtl(Duration.ofHours(1))
+                                .serializeKeysWith(
+                                                RedisSerializationContext.SerializationPair.fromSerializer(
+                                                                new StringRedisSerializer()))
+                                .serializeValuesWith(
+                                                RedisSerializationContext.SerializationPair.fromSerializer(
+                                                                new GenericJackson2JsonRedisSerializer(
+                                                                                createRedisObjectMapper())))
+                                .disableCachingNullValues();
 
-        // Custom TTL for specific caches
-        Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
+                // Custom TTL for specific caches
+                Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
 
-        // Game Sessions - 30 minutes
-        cacheConfigurations.put("gameSessions",
-                defaultConfig.entryTtl(Duration.ofMinutes(30)));
+                // Game Sessions - 30 minutes
+                cacheConfigurations.put("gameSessions",
+                                defaultConfig.entryTtl(Duration.ofMinutes(30)));
 
-        // Vocabularies - 24 hours
-        cacheConfigurations.put("vocabularies",
-                defaultConfig.entryTtl(Duration.ofHours(24)));
+                // Vocabularies - 24 hours
+                cacheConfigurations.put("vocabularies",
+                                defaultConfig.entryTtl(Duration.ofHours(24)));
 
-        // User Stats - 10 minutes
-        cacheConfigurations.put("userStats",
-                defaultConfig.entryTtl(Duration.ofMinutes(10)));
+                // Individual vocab - 24 hours (used by
+                // VocabService.getVocabById/getVocabByWord)
+                cacheConfigurations.put("vocab",
+                                defaultConfig.entryTtl(Duration.ofHours(24)));
 
-        // Leaderboards - 5 minutes
-        cacheConfigurations.put("leaderboards",
-                defaultConfig.entryTtl(Duration.ofMinutes(5)));
+                // User Stats - 10 minutes
+                cacheConfigurations.put("userStats",
+                                defaultConfig.entryTtl(Duration.ofMinutes(10)));
 
-        // Topics & Types - 12 hours
-        cacheConfigurations.put("topics",
-                defaultConfig.entryTtl(Duration.ofHours(12)));
-        cacheConfigurations.put("types",
-                defaultConfig.entryTtl(Duration.ofHours(12)));
+                // Leaderboards - 5 minutes
+                cacheConfigurations.put("leaderboards",
+                                defaultConfig.entryTtl(Duration.ofMinutes(5)));
 
-        // Auth tokens - 7 days
-        cacheConfigurations.put("authTokens",
-                defaultConfig.entryTtl(Duration.ofDays(7)));
+                // Topics - 12 hours (list of all topics)
+                cacheConfigurations.put("topics",
+                                defaultConfig.entryTtl(Duration.ofHours(12)));
 
-        // Rate limiting - 5 minutes
-        cacheConfigurations.put("rateLimits",
-                defaultConfig.entryTtl(Duration.ofMinutes(5)));
+                // Individual topic - 12 hours (used by TopicService.getTopicById)
+                cacheConfigurations.put("topic",
+                                defaultConfig.entryTtl(Duration.ofHours(12)));
 
-        RedisCacheManager cacheManager = RedisCacheManager.builder(redisConnectionFactory)
-                .cacheDefaults(defaultConfig)
-                .withInitialCacheConfigurations(cacheConfigurations)
-                .transactionAware()
-                .build();
+                // Types - 12 hours
+                cacheConfigurations.put("types",
+                                defaultConfig.entryTtl(Duration.ofHours(12)));
 
-        log.info("✅ Redis CacheManager initialized with {} custom cache configurations",
-                cacheConfigurations.size());
+                // Auth tokens - 7 days
+                cacheConfigurations.put("authTokens",
+                                defaultConfig.entryTtl(Duration.ofDays(7)));
 
-        return cacheManager;
-    }
+                // Rate limiting - 5 minutes
+                cacheConfigurations.put("rateLimits",
+                                defaultConfig.entryTtl(Duration.ofMinutes(5)));
+
+                RedisCacheManager cacheManager = RedisCacheManager.builder(redisConnectionFactory)
+                                .cacheDefaults(defaultConfig)
+                                .withInitialCacheConfigurations(cacheConfigurations)
+                                .transactionAware()
+                                .build();
+
+                log.info("✅ Redis CacheManager initialized with {} custom cache configurations",
+                                cacheConfigurations.size());
+
+                return cacheManager;
+        }
 }

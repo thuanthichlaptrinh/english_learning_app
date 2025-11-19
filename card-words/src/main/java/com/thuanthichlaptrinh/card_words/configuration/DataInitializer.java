@@ -14,7 +14,9 @@ import com.thuanthichlaptrinh.card_words.dataprovider.repository.UserRepository;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class DataInitializer {
@@ -48,7 +50,7 @@ public class DataInitializer {
                             .description(description)
                             .build();
                     roleRepository.save(role);
-                    System.out.println("Đã tạo role: " + roleName);
+                    log.info("Created role: {}", roleName);
                 });
     }
 

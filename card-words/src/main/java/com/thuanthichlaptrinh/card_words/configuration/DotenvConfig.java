@@ -1,6 +1,8 @@
 package com.thuanthichlaptrinh.card_words.configuration;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -10,6 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DotenvConfig implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+
+    private static final Logger log = LoggerFactory.getLogger(DotenvConfig.class);
 
     @Override
     public void initialize(ConfigurableApplicationContext applicationContext) {
@@ -30,7 +34,7 @@ public class DotenvConfig implements ApplicationContextInitializer<ConfigurableA
                     .addFirst(new MapPropertySource("dotenvProperties", dotenvMap));
 
         } catch (Exception e) {
-            System.err.println("Warning: Could not load .env file: " + e.getMessage());
+            log.warn("Could not load .env file: {}", e.getMessage());
         }
     }
 }

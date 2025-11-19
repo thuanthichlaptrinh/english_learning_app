@@ -1,5 +1,6 @@
 package com.thuanthichlaptrinh.card_words.entrypoint.rest.v1.user;
 
+import com.thuanthichlaptrinh.card_words.common.helper.AuthenticationHelper;
 import com.thuanthichlaptrinh.card_words.core.usecase.user.GameHistoryService;
 import com.thuanthichlaptrinh.card_words.core.usecase.user.QuickQuizService;
 import com.thuanthichlaptrinh.card_words.core.usecase.user.UserGameSettingService;
@@ -35,6 +36,7 @@ public class QuickQuizController {
         private final QuickQuizService quickQuizService;
         private final GameHistoryService gameHistoryService;
         private final UserGameSettingService userGameSettingService;
+        private final AuthenticationHelper authHelper;
 
         @PostMapping("/start")
         @Operation(summary = "Bắt đầu game Quick Quiz", description = "Tạo phiên chơi mới với câu hỏi Multiple Choice (4 đáp án). Mỗi câu có 3 giây để trả lời.\n\n"
@@ -48,7 +50,7 @@ public class QuickQuizController {
                         @Valid @RequestBody QuickQuizStartRequest request,
                         Authentication authentication) {
 
-                UUID userId = getUserIdFromAuth(authentication);
+                UUID userId = authHelper.getCurrentUserId(authentication);
                 QuickQuizSessionResponse response = quickQuizService.startGame(request, userId);
 
                 return ResponseEntity.status(HttpStatus.CREATED)
@@ -70,7 +72,7 @@ public class QuickQuizController {
         public ResponseEntity<ApiResponse<QuickQuizSessionResponse>> startGameAuto(
                         Authentication authentication) {
 
-                UUID userId = getUserIdFromAuth(authentication);
+                UUID userId = authHelper.getCurrentUserId(authentication);
 
                 // Lấy settings từ database hoặc dùng defaults
                 Integer totalQuestions = userGameSettingService.getQuickQuizTotalQuestions(userId);
@@ -97,7 +99,7 @@ public class QuickQuizController {
                         @Valid @RequestBody QuickQuizAnswerRequest request,
                         Authentication authentication) {
 
-                UUID userId = getUserIdFromAuth(authentication);
+                UUID userId = authHelper.getCurrentUserId(authentication);
                 QuickQuizAnswerResponse response = quickQuizService.submitAnswer(request, userId);
 
                 String message = response.getIsCorrect()
@@ -115,7 +117,7 @@ public class QuickQuizController {
                         @Valid @RequestBody QuickQuizAnswerRequest request,
                         Authentication authentication) {
 
-                UUID userId = getUserIdFromAuth(authentication);
+                UUID userId = authHelper.getCurrentUserId(authentication);
                 QuickQuizAnswerResponse response = quickQuizService.skipQuestion(request, userId);
 
                 return ResponseEntity.ok(ApiResponse.success("⏭ Đã bỏ qua câu hỏi (timeout)", response));
@@ -127,7 +129,7 @@ public class QuickQuizController {
                         @PathVariable Long sessionId,
                         Authentication authentication) {
 
-                UUID userId = getUserIdFromAuth(authentication);
+                UUID userId = authHelper.getCurrentUserId(authentication);
                 QuickQuizSessionResponse response = quickQuizService.getSessionResults(sessionId, userId);
 
                 return ResponseEntity.ok(ApiResponse.success("Lấy kết quả thành công", response));
@@ -167,7 +169,7 @@ public class QuickQuizController {
                         Authentication authentication,
                         @Parameter(description = "Số lượng top players (default: 100)") @RequestParam(defaultValue = "100") int limit) {
 
-                UUID userId = getUserIdFromAuth(authentication);
+                UUID userId = authHelper.getCurrentUserId(authentication);
                 // Game ID for Quick Quiz is 1 (you may need to adjust this)
                 Long gameId = 1L;
                 List<LeaderboardEntryResponse> response = gameHistoryService.getGameLeaderboard(gameId, userId, limit);
@@ -175,17 +177,5 @@ public class QuickQuizController {
                 return ResponseEntity.ok(ApiResponse.success(
                                 "Lấy bảng xếp hạng thành công. Top " + response.size() + " players",
                                 response));
-        }
-
-        // Helper method to extract user ID from authentication
-        private UUID getUserIdFromAuth(Authentication authentication) {
-                if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
-                        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-                        // Assuming your UserDetails implementation has getId() method
-                        if (userDetails instanceof User) {
-                                return ((User) userDetails).getId();
-                        }
-                }
-                throw new RuntimeException("Unable to get user ID from authentication");
         }
 }

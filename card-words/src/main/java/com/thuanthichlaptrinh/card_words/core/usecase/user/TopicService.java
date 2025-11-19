@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,9 +53,11 @@ public class TopicService {
 
     /**
      * Lấy danh sách tất cả chủ đề với tiến độ học của user
+     * Cache kết quả để tránh query DB nhiều lần
      * 
      * @param userId ID của user đang đăng nhập, có thể null nếu chưa đăng nhập
      */
+    @Cacheable(value = "topics", key = "#userId != null ? #userId : 'anonymous'")
     public List<TopicResponse> getAllTopics(UUID userId) {
         log.info("Lấy danh sách tất cả chủ đề cho user: {}", userId);
 
@@ -64,10 +68,12 @@ public class TopicService {
 
     /**
      * Lấy thông tin chi tiết một chủ đề với tiến độ học của user
+     * Cache theo topic ID và user ID
      * 
      * @param id     ID của topic
      * @param userId ID của user đang đăng nhập, có thể null nếu chưa đăng nhập
      */
+    @Cacheable(value = "topic", key = "#id + '_' + (#userId != null ? #userId : 'anonymous')")
     public TopicResponse getTopicById(Long id, UUID userId) {
         log.info("Lấy thông tin chủ đề: {} cho user: {}", id, userId);
 
@@ -78,6 +84,7 @@ public class TopicService {
     }
 
     @Transactional
+    @CacheEvict(value = { "topics", "topic" }, allEntries = true)
     public void deleteTopic(Long id) {
         log.info("Xóa chủ đề: {}", id);
 
