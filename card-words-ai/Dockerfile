@@ -4,26 +4,21 @@ FROM python:3.11-slim as base
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies and update pip
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
     libgomp1 \
     curl \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install Poetry
-RUN pip install --no-cache-dir poetry==1.7.0
-
-# Configure Poetry to not create virtual environments
-RUN poetry config virtualenvs.create false && \
-    poetry config virtualenvs.in-project false
+    && rm -rf /var/lib/apt/lists/* \
+    && pip install --no-cache-dir --upgrade pip setuptools wheel
 
 # Copy dependency files
-COPY pyproject.toml ./
+COPY requirements.txt ./
 
-# Install dependencies (Poetry will generate lock file if missing)
-RUN poetry install --no-dev --no-interaction --no-ansi --no-root
+# Install Python dependencies with increased timeout
+ENV PIP_DEFAULT_TIMEOUT=300
+RUN pip install --no-cache-dir --timeout=300 -r requirements.txt
 
 # Copy application code
 COPY app/ ./app/
