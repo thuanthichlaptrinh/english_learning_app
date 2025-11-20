@@ -37,6 +37,7 @@ public class GameAdminService {
     private final GameSessionDetailRepository gameSessionDetailRepository;
     private final GameAdminMapper gameAdminMapper;
 
+    @Transactional(readOnly = true)
     public List<GameAdminResponse> getAllGames() {
         log.info("Admin: Lấy danh sách game");
 
@@ -46,6 +47,7 @@ public class GameAdminService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public GameAdminResponse getGameById(Long id) {
         log.info("Admin: Lấy thông tin game ID: {}", id);
 
@@ -55,6 +57,7 @@ public class GameAdminService {
         return gameAdminMapper.toGameAdminResponse(game);
     }
 
+    @Transactional(readOnly = true)
     public Page<GameSessionResponse> getGameSessions(Long gameId, int page, int size) {
         log.info("Admin: Lấy danh sách session của game ID: {}", gameId);
 
@@ -68,6 +71,7 @@ public class GameAdminService {
         return sessions.map(gameAdminMapper::toGameSessionResponse);
     }
 
+    @Transactional(readOnly = true)
     public GameSessionDetailResponse getSessionDetail(Long sessionId) {
         log.info("Admin: Lấy chi tiết session ID: {}", sessionId);
 
@@ -96,7 +100,7 @@ public class GameAdminService {
                 .build();
     }
 
-    // Thống kê game
+    @Transactional(readOnly = true)
     public GameStatisticsResponse getGameStatistics(Long gameId) {
         log.info("Admin: Lấy thống kê game ID: {}", gameId);
 
@@ -130,7 +134,7 @@ public class GameAdminService {
         gameSessionRepository.deleteById(sessionId);
     }
 
-    // Tổng quan thống kê tất cả game
+    @Transactional(readOnly = true)
     public OverallGameStatisticsResponse getOverallStatistics() {
         log.info("Admin: Lấy tổng quan thống kê tất cả game");
 
