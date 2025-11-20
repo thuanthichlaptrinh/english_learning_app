@@ -9,11 +9,14 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.thuanthichlaptrinh.card_words.core.usecase.user.TypeService;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateTypeRequest;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.UpdateTypeRequest;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.UpdateMultipleTypesRequest;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.ApiResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.TypeResponse;
 
@@ -69,4 +72,29 @@ public class TypeAdminController {
         typeService.deleteType(id);
         return ResponseEntity.ok(ApiResponse.success("Xóa loại từ thành công", null));
     }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "[Admin] Cập nhật loại từ", description = "Cập nhật thông tin một loại từ theo ID\n\n" +
+            "**URL**: `PUT http://localhost:8080/api/v1/admin/types/{id}`\n\n" +
+            "**Example**: `PUT http://localhost:8080/api/v1/admin/types/1`\n\n" +
+            "**Body**: `{\"name\": \"adjective\"}`", security = @SecurityRequirement(name = "Bearer Authentication"))
+    public ResponseEntity<ApiResponse<TypeResponse>> updateType(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateTypeRequest request) {
+        TypeResponse response = typeService.updateType(id, request);
+        return ResponseEntity.ok(ApiResponse.success("Cập nhật loại từ thành công", response));
+    }
+
+    @PutMapping("/batch")
+    @Operation(summary = "[Admin] Cập nhật nhiều loại từ", description = "Cập nhật thông tin nhiều loại từ cùng lúc\n\n"
+            +
+            "**URL**: `PUT http://localhost:8080/api/v1/admin/types/batch`\n\n" +
+            "**Body**: \n```json\n{\n  \"types\": [\n    {\"id\": 1, \"name\": \"noun\"},\n    {\"id\": 2, \"name\": \"verb\"},\n    {\"id\": 3, \"name\": \"adjective\"}\n  ]\n}\n```", security = @SecurityRequirement(name = "Bearer Authentication"))
+    public ResponseEntity<ApiResponse<List<TypeResponse>>> updateMultipleTypes(
+            @Valid @RequestBody UpdateMultipleTypesRequest request) {
+        List<TypeResponse> responses = typeService.updateMultipleTypes(request);
+        return ResponseEntity.ok(ApiResponse.success(
+                "Cập nhật " + responses.size() + " loại từ thành công", responses));
+    }
+
 }
