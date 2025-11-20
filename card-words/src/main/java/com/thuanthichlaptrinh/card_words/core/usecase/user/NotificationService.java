@@ -7,6 +7,7 @@ import com.thuanthichlaptrinh.card_words.dataprovider.repository.NotificationRep
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.UserRepository;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.NotificationFilterRequest;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.NotificationCategoryResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.NotificationResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.NotificationSummaryResponse;
 import lombok.RequiredArgsConstructor;
@@ -154,6 +155,9 @@ public class NotificationService {
     public NotificationResponse createNotification(CreateNotificationRequest request) {
         log.info("Tạo notification cho user: {}", request.getUserId());
 
+        // Validate type
+        request.validateType();
+
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new ErrorException("Không tìm thấy người dùng"));
 
@@ -185,6 +189,9 @@ public class NotificationService {
     public void createNotificationForAll(CreateNotificationRequest request) {
         log.info("Tạo notification cho tất cả users");
 
+        // Validate type
+        request.validateType();
+
         List<User> users = userRepository.findAll();
 
         for (User user : users) {
@@ -207,6 +214,225 @@ public class NotificationService {
         }
 
         log.info("✅ Sent real-time notifications to {} users via WebSocket", users.size());
+    }
+
+    /**
+     * Get notification categories with counts for a user
+     */
+    public List<NotificationCategoryResponse> getCategories(UUID userId) {
+        log.info("Lấy danh sách categories với số lượng cho user: {}", userId);
+
+        List<NotificationCategoryResponse> categories = new java.util.ArrayList<>();
+
+        // All Notifications
+        Pageable pageable = PageRequest.of(0, Integer.MAX_VALUE);
+        long totalCount = notificationRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable)
+                .getTotalElements();
+        categories.add(NotificationCategoryResponse.builder()
+                .category("All Notifications")
+                .count(totalCount)
+                .type(null)
+                .build());
+
+        // Unread
+        long unreadCount = notificationRepository.countByUserIdAndIsReadFalse(userId);
+        categories.add(NotificationCategoryResponse.builder()
+                .category("Unread")
+                .count(unreadCount)
+                .type(null)
+                .build());
+
+        // Study Progress
+        long studyProgressCount = notificationRepository.countByUserIdAndType(userId, "study_progress");
+        categories.add(NotificationCategoryResponse.builder()
+                .category("Study Progress")
+                .count(studyProgressCount)
+                .type("study_progress")
+                .build());
+
+        // Vocabulary Reminders
+        long vocabReminderCount = notificationRepository.countByUserIdAndType(userId, "vocab_reminder");
+        categories.add(NotificationCategoryResponse.builder()
+                .category("Vocabulary Reminders")
+                .count(vocabReminderCount)
+                .type("vocab_reminder")
+                .build());
+
+        // Streak Reminders
+        long streakReminderCount = notificationRepository.countByUserIdAndType(userId, "streak_reminder");
+        categories.add(NotificationCategoryResponse.builder()
+                .category("Streak Reminders")
+                .count(streakReminderCount)
+                .type("streak_reminder")
+                .build());
+
+        // Streak Milestones
+        long streakMilestoneCount = notificationRepository.countByUserIdAndType(userId, "streak_milestone");
+        categories.add(NotificationCategoryResponse.builder()
+                .category("Streak Milestones")
+                .count(streakMilestoneCount)
+                .type("streak_milestone")
+                .build());
+
+        // Game Achievements
+        long gameAchievementCount = notificationRepository.countByUserIdAndType(userId, "game_achievement");
+        categories.add(NotificationCategoryResponse.builder()
+                .category("Game Achievements")
+                .count(gameAchievementCount)
+                .type("game_achievement")
+                .build());
+
+        // Achievements
+        long achievementCount = notificationRepository.countByUserIdAndType(userId, "achievement");
+        categories.add(NotificationCategoryResponse.builder()
+                .category("Achievements")
+                .count(achievementCount)
+                .type("achievement")
+                .build());
+
+        // New Features
+        long newFeatureCount = notificationRepository.countByUserIdAndType(userId, "new_feature");
+        categories.add(NotificationCategoryResponse.builder()
+                .category("New Features")
+                .count(newFeatureCount)
+                .type("new_feature")
+                .build());
+
+        // System Alerts
+        long systemAlertCount = notificationRepository.countByUserIdAndType(userId, "system_alert");
+        categories.add(NotificationCategoryResponse.builder()
+                .category("System Alerts")
+                .count(systemAlertCount)
+                .type("system_alert")
+                .build());
+
+        return categories;
+    }
+
+    /**
+     * Get admin summary (Total, Unread, Read)
+     */
+    public List<NotificationCategoryResponse> getAdminSummary() {
+        log.info("Admin: Lấy tổng quan hệ thống");
+
+        List<NotificationCategoryResponse> summary = new java.util.ArrayList<>();
+
+        // Total
+        long totalCount = notificationRepository.count();
+        summary.add(NotificationCategoryResponse.builder()
+                .category("Total")
+                .count(totalCount)
+                .type(null)
+                .build());
+
+        // Unread
+        long unreadCount = notificationRepository.countByIsReadFalse();
+        summary.add(NotificationCategoryResponse.builder()
+                .category("Unread")
+                .count(unreadCount)
+                .type(null)
+                .build());
+
+        // Read
+        long readCount = totalCount - unreadCount;
+        summary.add(NotificationCategoryResponse.builder()
+                .category("Read")
+                .count(readCount)
+                .type(null)
+                .build());
+
+        return summary;
+    }
+
+    /**
+     * Get all notification categories with counts (Admin)
+     */
+    public List<NotificationCategoryResponse> getAllCategories() {
+        log.info("Admin: Lấy danh sách categories với số lượng");
+
+        List<NotificationCategoryResponse> categories = new java.util.ArrayList<>();
+
+        // All Notifications
+        long totalCount = notificationRepository.count();
+        categories.add(NotificationCategoryResponse.builder()
+                .category("All Notifications")
+                .count(totalCount)
+                .type(null)
+                .build());
+
+        // Unread
+        long unreadCount = notificationRepository.countByIsReadFalse();
+        categories.add(NotificationCategoryResponse.builder()
+                .category("Unread")
+                .count(unreadCount)
+                .type(null)
+                .build());
+
+        // Study Progress
+        long studyProgressCount = notificationRepository.countByType("study_progress");
+        categories.add(NotificationCategoryResponse.builder()
+                .category("Study Progress")
+                .count(studyProgressCount)
+                .type("study_progress")
+                .build());
+
+        // Vocabulary Reminders
+        long vocabReminderCount = notificationRepository.countByType("vocab_reminder");
+        categories.add(NotificationCategoryResponse.builder()
+                .category("Vocabulary Reminders")
+                .count(vocabReminderCount)
+                .type("vocab_reminder")
+                .build());
+
+        // Streak Reminders
+        long streakReminderCount = notificationRepository.countByType("streak_reminder");
+        categories.add(NotificationCategoryResponse.builder()
+                .category("Streak Reminders")
+                .count(streakReminderCount)
+                .type("streak_reminder")
+                .build());
+
+        // Streak Milestones
+        long streakMilestoneCount = notificationRepository.countByType("streak_milestone");
+        categories.add(NotificationCategoryResponse.builder()
+                .category("Streak Milestones")
+                .count(streakMilestoneCount)
+                .type("streak_milestone")
+                .build());
+
+        // Game Achievements
+        long gameAchievementCount = notificationRepository.countByType("game_achievement");
+        categories.add(NotificationCategoryResponse.builder()
+                .category("Game Achievements")
+                .count(gameAchievementCount)
+                .type("game_achievement")
+                .build());
+
+        // Achievements
+        long achievementCount = notificationRepository.countByType("achievement");
+        categories.add(NotificationCategoryResponse.builder()
+                .category("Achievements")
+                .count(achievementCount)
+                .type("achievement")
+                .build());
+
+        // New Features
+        long newFeatureCount = notificationRepository.countByType("new_feature");
+        categories.add(NotificationCategoryResponse.builder()
+                .category("New Features")
+                .count(newFeatureCount)
+                .type("new_feature")
+                .build());
+
+        // System Alerts
+        long systemAlertCount = notificationRepository.countByType("system_alert");
+        categories.add(NotificationCategoryResponse.builder()
+                .category("System Alerts")
+                .count(systemAlertCount)
+                .type("system_alert")
+                .build());
+
+        return categories;
     }
 
     private NotificationResponse toResponse(Notification notification) {

@@ -64,4 +64,10 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 
         // Get recent notifications
         List<Notification> findTop10ByUserIdOrderByCreatedAtDesc(UUID userId);
+
+        // Admin: Count all unread
+        long countByIsReadFalse();
+
+        // Admin: Count by type
+        long countByType(String type);
 }

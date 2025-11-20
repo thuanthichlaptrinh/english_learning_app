@@ -1,5 +1,6 @@
 package com.thuanthichlaptrinh.card_words.entrypoint.dto.request;
 
+import com.thuanthichlaptrinh.card_words.common.constants.NotificationConstants;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -25,5 +26,15 @@ public class CreateNotificationRequest {
     private String content;
 
     @Size(max = 50)
-    private String type; // vocab_reminder, new_feature, achievement, system_alert, study_progress
+    private String type; // Must be one of NotificationConstants.VALID_TYPES
+
+    /**
+     * Validate type if provided
+     */
+    public void validateType() {
+        if (type != null && !type.isEmpty() && !NotificationConstants.VALID_TYPES.contains(type)) {
+            throw new IllegalArgumentException(
+                    "Invalid notification type: " + type + ". Valid types: " + NotificationConstants.VALID_TYPES);
+        }
+    }
 }
