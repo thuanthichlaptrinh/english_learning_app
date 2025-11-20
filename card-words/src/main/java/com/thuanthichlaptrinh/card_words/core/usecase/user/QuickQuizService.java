@@ -84,6 +84,10 @@ public class QuickQuizService {
     @Transactional
     public QuickQuizSessionResponse startGame(QuickQuizStartRequest request, UUID userId) {
         log.info("Starting Quick Quiz game for user: {}, totalQuestions: {}", userId, request.getTotalQuestions());
+
+        // ⭐ Validate request parameters
+        validateQuickQuizRequest(request);
+
         // 1. Check rate limit
         checkRateLimit(userId);
         // 2. Load game entity
@@ -247,6 +251,20 @@ public class QuickQuizService {
     // ==================== PRIVATE HELPER METHODS ====================
 
     // ===== Helper methods for startGame() =====
+
+    // Validate QuickQuiz request parameters
+    private void validateQuickQuizRequest(QuickQuizStartRequest request) {
+        Integer totalQuestions = request.getTotalQuestions();
+        Integer timePerQuestion = request.getTimePerQuestion();
+
+        if (totalQuestions != null && (totalQuestions < 2 || totalQuestions > 40)) {
+            throw new ErrorException("Số câu hỏi phải trong khoảng 2-40");
+        }
+
+        if (timePerQuestion != null && (timePerQuestion < 3 || timePerQuestion > 60)) {
+            throw new ErrorException("Thời gian mỗi câu phải trong khoảng 3-60 giây");
+        }
+    }
 
     // 1. Load Quick Quiz game entity
     private Game loadQuickQuizGame() {

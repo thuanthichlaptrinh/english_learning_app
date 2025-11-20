@@ -139,16 +139,16 @@ public class OfflineSyncService {
                 try {
                     if (isDuplicateSession(userId, sessionReq)) {
                         skippedDuplicates++;
-                        log.debug("Skipped duplicate session: {}", sessionReq.getClientSessionId());
+                        log.debug("Skipped duplicate session: {}", sessionReq.getSessionId());
                         continue;
                     }
 
                     GameSession savedSession = saveGameSessionOnly(userId, sessionReq);
-                    sessionMap.put(sessionReq.getClientSessionId(), savedSession);
+                    sessionMap.put(sessionReq.getSessionId(), savedSession);
                     syncedSessions++;
                 } catch (Exception e) {
-                    log.error("Failed to sync session: {}", sessionReq.getClientSessionId(), e);
-                    errors.add("Session " + sessionReq.getClientSessionId() + ": " + e.getMessage());
+                    log.error("Failed to sync session: {}", sessionReq.getSessionId(), e);
+                    errors.add("Session " + sessionReq.getSessionId() + ": " + e.getMessage());
                 }
             }
         }
@@ -157,10 +157,10 @@ public class OfflineSyncService {
         if (request.getGameSessionDetails() != null) {
             for (OfflineGameDetailRequest detail : request.getGameSessionDetails()) {
                 try {
-                    GameSession session = sessionMap.get(detail.getClientSessionId());
+                    GameSession session = sessionMap.get(detail.getSessionId());
                     if (session == null) {
-                        log.warn("Session not found for detail with clientSessionId: {}", detail.getClientSessionId());
-                        errors.add("Detail for session " + detail.getClientSessionId() + ": Session not found");
+                        log.warn("Session not found for detail with sessionId: {}", detail.getSessionId());
+                        errors.add("Detail for session " + detail.getSessionId() + ": Session not found");
                         continue;
                     }
 
@@ -215,7 +215,7 @@ public class OfflineSyncService {
                     syncedCount++;
                 }
             } catch (Exception e) {
-                log.error("Failed to sync session: {}", sessionReq.getClientSessionId(), e);
+                log.error("Failed to sync session: {}", sessionReq.getSessionId(), e);
             }
         }
 

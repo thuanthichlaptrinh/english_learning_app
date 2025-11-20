@@ -13,13 +13,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class QuickQuizStartRequest {
 
-    @Min(value = 5, message = "Số câu hỏi tối thiểu là 5")
-    @Max(value = 50, message = "Số câu hỏi tối đa là 50")
+    @Min(value = 2, message = "Số câu hỏi tối thiểu là 2")
+    @Max(value = 40, message = "Số câu hỏi tối đa là 40")
     @Builder.Default
     private Integer totalQuestions = 10;
 
-    @Min(value = 1, message = "Thời gian tối thiểu là 1 giây")
-    @Max(value = 10, message = "Thời gian tối đa là 10 giây")
+    @Min(value = 3, message = "Thời gian tối thiểu là 3 giây")
+    @Max(value = 60, message = "Thời gian tối đa là 60 giây")
     @Builder.Default
     private Integer timePerQuestion = 3;
 

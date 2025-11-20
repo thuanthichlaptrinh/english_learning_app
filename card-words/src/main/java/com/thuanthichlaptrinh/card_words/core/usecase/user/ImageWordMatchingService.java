@@ -61,6 +61,11 @@ public class ImageWordMatchingService {
                                 ? request.getTotalPairs()
                                 : DEFAULT_PAIRS;
 
+                // ⭐ Validate totalPairs range
+                if (totalPairs < 2 || totalPairs > 5) {
+                        throw new ErrorException("Số cặp phải trong khoảng 2-5");
+                }
+
                 // Get or create game
                 Game game = getOrCreateGame();
 

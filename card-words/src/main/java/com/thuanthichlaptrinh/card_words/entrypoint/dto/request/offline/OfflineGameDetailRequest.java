@@ -12,12 +12,12 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OfflineGameDetailRequest {
-    private String clientSessionId; // Link to OfflineGameSessionRequest
+    private String sessionId; // Link to OfflineGameSessionRequest
     private UUID vocabId;
     private Integer questionNumber;
     private String userAnswer;
     private String correctAnswer;
     private Boolean isCorrect;
     private Integer timeTaken; // milliseconds
-    private Integer pointsEarned;
+    // private Integer pointsEarned;
 }

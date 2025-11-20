@@ -27,6 +27,9 @@ public class UserGameSettingService {
     public GameSettingResponse updateGameSetting(UUID userId, UpdateGameSettingRequest request) {
         log.info("Updating game settings for user: {}", userId);
 
+        // ⭐ Optional: Double-check validation
+        validateGameSettings(request);
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ErrorException("User không tồn tại"));
 
@@ -122,5 +125,31 @@ public class UserGameSettingService {
                 .map(User::getCurrentLevel)
                 .map(CEFRLevel::name)
                 .orElse(null);
+    }
+
+    /**
+     * Validate game settings (double-check)
+     */
+    private void validateGameSettings(UpdateGameSettingRequest request) {
+        if (request.getQuickQuizTotalQuestions() != null) {
+            if (request.getQuickQuizTotalQuestions() < 2 || request.getQuickQuizTotalQuestions() > 40) {
+                throw new ErrorException("Quick Quiz total questions phải trong khoảng 2-40");
+            }
+        }
+        if (request.getQuickQuizTimePerQuestion() != null) {
+            if (request.getQuickQuizTimePerQuestion() < 3 || request.getQuickQuizTimePerQuestion() > 60) {
+                throw new ErrorException("Quick Quiz time per question phải trong khoảng 3-60 giây");
+            }
+        }
+        if (request.getImageWordTotalPairs() != null) {
+            if (request.getImageWordTotalPairs() < 2 || request.getImageWordTotalPairs() > 5) {
+                throw new ErrorException("Image Word total pairs phải trong khoảng 2-5");
+            }
+        }
+        if (request.getWordDefinitionTotalPairs() != null) {
+            if (request.getWordDefinitionTotalPairs() < 2 || request.getWordDefinitionTotalPairs() > 5) {
+                throw new ErrorException("Word Definition total pairs phải trong khoảng 2-5");
+            }
+        }
     }
 }

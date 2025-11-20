@@ -63,6 +63,11 @@ public class WordDefinitionMatchingService {
                 ? request.getTotalPairs()
                 : DEFAULT_PAIRS;
 
+        // ⭐ Validate totalPairs range
+        if (totalPairs < 2 || totalPairs > 5) {
+            throw new ErrorException("Số cặp phải trong khoảng 2-5");
+        }
+
         Game game = getOrCreateGame();
 
         // Get random vocabs (không cần filter image)

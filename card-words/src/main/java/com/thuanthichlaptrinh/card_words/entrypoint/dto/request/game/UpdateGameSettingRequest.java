@@ -14,21 +14,21 @@ import lombok.NoArgsConstructor;
 public class UpdateGameSettingRequest {
 
     // Quick Quiz settings
-    @Min(value = 5, message = "Số câu hỏi tối thiểu là 5")
-    @Max(value = 50, message = "Số câu hỏi tối đa là 50")
+    @Min(value = 2, message = "Số câu hỏi tối thiểu là 2")
+    @Max(value = 40, message = "Số câu hỏi tối đa là 40")
     private Integer quickQuizTotalQuestions;
 
-    @Min(value = 1, message = "Thời gian tối thiểu là 1 giây")
-    @Max(value = 10, message = "Thời gian tối đa là 10 giây")
+    @Min(value = 3, message = "Thời gian tối thiểu là 3 giây")
+    @Max(value = 60, message = "Thời gian tối đa là 60 giây")
     private Integer quickQuizTimePerQuestion;
 
     // Image Word Matching settings
-    @Min(value = 3, message = "Số cặp tối thiểu là 3")
-    @Max(value = 20, message = "Số cặp tối đa là 20")
+    @Min(value = 2, message = "Số cặp tối thiểu là 2")
+    @Max(value = 5, message = "Số cặp tối đa là 5")
     private Integer imageWordTotalPairs;
 
     // Word Definition Matching settings
-    @Min(value = 3, message = "Số cặp tối thiểu là 3")
-    @Max(value = 20, message = "Số cặp tối đa là 20")
+    @Min(value = 2, message = "Số cặp tối thiểu là 2")
+    @Max(value = 5, message = "Số cặp tối đa là 5")
     private Integer wordDefinitionTotalPairs;
 }

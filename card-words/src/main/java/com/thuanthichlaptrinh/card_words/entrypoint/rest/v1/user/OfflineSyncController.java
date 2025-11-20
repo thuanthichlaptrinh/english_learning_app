@@ -139,7 +139,7 @@ public class OfflineSyncController {
                         +
                         "1. **gameSessions** - Danh sách các lần chơi game (3 sessions)\n" +
                         "2. **gameSessionDetails** - Chi tiết từng câu hỏi (15 details = 3×5 câu)\n" +
-                        "3. **vocabProgress** - Tiến trình học từ vựng (optional)\n\n" +
+                        "3. **userVocabProgress** - Tiến trình học từ vựng (optional)\n\n" +
                         "**Processing flow:**\n" +
                         "- Step 1: Lưu game sessions\n" +
                         "- Step 2: Lưu game session details → **Tự động cập nhật user_vocab_progress**\n" +
@@ -147,7 +147,7 @@ public class OfflineSyncController {
                         "  - isCorrect = false → timesWrong++\n" +
                         "  - Áp dụng SM-2 algorithm (Spaced Repetition)\n" +
                         "  - Update status: UNKNOWN → KNOWN → MASTERED\n" +
-                        "- Step 3: Merge với vocabProgress manual updates (nếu có)\n\n" +
+                        "- Step 3: Merge với userVocabProgress manual updates (nếu có)\n\n" +
                         "**Response:**\n" +
                         "```json\n" +
                         "{\n" +

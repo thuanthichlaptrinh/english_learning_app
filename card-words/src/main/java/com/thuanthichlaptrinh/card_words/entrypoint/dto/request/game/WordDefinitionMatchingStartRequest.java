@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class WordDefinitionMatchingStartRequest {
 
-    @Min(value = 3, message = "Số cặp tối thiểu là 3")
-    @Max(value = 20, message = "Số cặp tối đa là 20")
+    @Min(value = 2, message = "Số cặp tối thiểu là 2")
+    @Max(value = 5, message = "Số cặp tối đa là 5")
     @Builder.Default
     private Integer totalPairs = 5;
 
