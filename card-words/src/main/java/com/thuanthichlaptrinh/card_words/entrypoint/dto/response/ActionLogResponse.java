@@ -16,14 +16,12 @@ public class ActionLogResponse {
 
     private Long id;
     private UUID userId;
-    private String userEmail;
-    private String userName;
     private String actionType;
     private String actionCategory;
     private String resourceType;
-    private String resourceId;
     private String description;
     private String status;
     private String ipAddress;
     private LocalDateTime createdAt;
+
 }
