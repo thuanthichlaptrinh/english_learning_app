@@ -14,6 +14,7 @@ import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.ReviewResultRes
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.ReviewVocabResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -216,16 +217,17 @@ public class LearnVocabService {
      * Ghi nhận kết quả ôn tập và cập nhật progress
      */
     @Transactional
+    @CacheEvict(value = { "topics", "topic" }, allEntries = true)
     public ReviewResultResponse submitReview(User user, ReviewVocabRequest request) {
         log.info("Submitting review for user: {}, vocab: {}, isCorrect: {}",
                 user.getId(), request.getVocabId(), request.getIsCorrect());
 
-        // Get or create progress
+        // Lấy hoặc tạo tiến độ
         UserVocabProgress progress = userVocabProgressRepository
                 .findByUserIdAndVocabId(user.getId(), request.getVocabId())
                 .orElseGet(() -> createNewProgress(user, request.getVocabId()));
 
-        // Update progress based on result
+        // Cập nhật tiến độ dựa trên kết quả
         if (Boolean.TRUE.equals(request.getIsCorrect())) {
             progress.setTimesCorrect(progress.getTimesCorrect() + 1);
             // User click "Đã thuộc" → Set status = KNOWN (nếu chưa phải MASTERED)
@@ -250,7 +252,7 @@ public class LearnVocabService {
 
         // Save
         progress = userVocabProgressRepository.save(progress);
-        // Record streak activity
+
         try {
             streakService.recordActivity(user);
             log.info("Streak activity recorded for user: {}", user.getId());
@@ -275,40 +277,50 @@ public class LearnVocabService {
     }
 
     /**
-     * Lấy thống kê từ vựng - CHỈ dựa vào STATUS (không dùng nextReviewDate)
+     * Lấy thống kê từ vựng theo STATUS:
+     * - NEW: Từ chưa có trong bảng user_vocab_progress
+     * - LEARNING: Từ có status = NEW hoặc UNKNOWN
+     * - KNOWN: Từ đã thuộc (user click "Đã thuộc")
+     * - MASTERED: Từ thành thạo
      */
     @Transactional(readOnly = true)
     public ReviewStatsResponse getReviewStats(User user, String topicName) {
         long totalVocabs;
-        long newVocabs;
-        long learningVocabs;
-        long masteredVocabs;
+        long newVocabs; // Từ chưa có trong bảng
+        long learningVocabs; // NEW + UNKNOWN
+        long knownVocabs; // KNOWN
+        long masteredVocabs; // MASTERED
 
         if (topicName != null && !topicName.trim().isEmpty()) {
-            // Stats by topic - Lấy TẤT CẢ từ trong topic (cả đã học và chưa học)
+            // Stats by topic
             // Đếm từ chưa học (không có trong user_vocab_progress)
             List<Vocab> unlearnedVocabs = userVocabProgressRepository.findUnlearnedVocabsByTopic(
                     user.getId(), topicName);
             newVocabs = unlearnedVocabs.size();
 
-            // Đếm từ đang học (KNOWN + UNKNOWN) trong topic
+            // Đếm từ cần ôn (NEW + UNKNOWN) trong topic
             List<UserVocabProgress> learningList = userVocabProgressRepository.findLearningVocabsByTopic(
                     user.getId(), topicName);
             learningVocabs = learningList.size();
 
-            // Đếm MASTERED trong topic (cần query riêng vì findLearningVocabsByTopic chỉ
-            // lấy KNOWN/UNKNOWN)
+            // Đếm KNOWN và MASTERED trong topic
             List<UserVocabProgress> allProgress = userVocabProgressRepository.findByUserIdWithVocab(user.getId());
+            knownVocabs = allProgress.stream()
+                    .filter(p -> VocabStatus.KNOWN.equals(p.getStatus()))
+                    .filter(p -> p.getVocab().getTopic() != null
+                            && p.getVocab().getTopic().getName().equalsIgnoreCase(topicName))
+                    .count();
+
             masteredVocabs = allProgress.stream()
                     .filter(p -> VocabStatus.MASTERED.equals(p.getStatus()))
                     .filter(p -> p.getVocab().getTopic() != null
                             && p.getVocab().getTopic().getName().equalsIgnoreCase(topicName))
                     .count();
 
-            // Tổng = Từ mới + Từ đang học + Từ thành thạo
-            totalVocabs = newVocabs + learningVocabs + masteredVocabs;
+            // Tổng = Từ mới + Từ cần ôn + Từ đã thuộc + Từ thành thạo
+            totalVocabs = newVocabs + learningVocabs + knownVocabs + masteredVocabs;
         } else {
-            // Overall stats - Đơn giản hơn
+            // Overall stats
             long totalVocabsInDb = vocabRepository.count();
 
             // Đếm từ đã có trong user_vocab_progress
@@ -317,11 +329,12 @@ public class LearnVocabService {
             // Từ mới = Tổng trong DB - Từ đã học
             newVocabs = totalVocabsInDb - learnedCount;
 
-            // learningVocabs = KNOWN + UNKNOWN
-            long knownVocabs = userVocabProgressRepository.countByUserIdAndStatus(user.getId(), VocabStatus.KNOWN);
+            // learningVocabs = NEW + UNKNOWN
+            long newStatusVocabs = userVocabProgressRepository.countByUserIdAndStatus(user.getId(), VocabStatus.NEW);
             long unknownVocabs = userVocabProgressRepository.countByUserIdAndStatus(user.getId(), VocabStatus.UNKNOWN);
-            learningVocabs = knownVocabs + unknownVocabs;
+            learningVocabs = newStatusVocabs + unknownVocabs;
 
+            knownVocabs = userVocabProgressRepository.countByUserIdAndStatus(user.getId(), VocabStatus.KNOWN);
             masteredVocabs = userVocabProgressRepository.countByUserIdAndStatus(user.getId(), VocabStatus.MASTERED);
 
             totalVocabs = totalVocabsInDb;
@@ -345,7 +358,7 @@ public class LearnVocabService {
         return UserVocabProgress.builder()
                 .user(user)
                 .vocab(vocab)
-                .status(VocabStatus.KNOWN) // Mặc định là KNOWN khi user click "Đã thuộc" lần đầu
+                .status(VocabStatus.NEW) // Khởi tạo với NEW, sẽ chuyển sang KNOWN/UNKNOWN khi submit
                 .efFactor(2.5)
                 .intervalDays(1)
                 .repetition(0)
@@ -696,6 +709,120 @@ public class LearnVocabService {
         return PagedReviewVocabResponse.builder()
                 .vocabs(vocabs)
                 .meta(meta)
+                .build();
+    }
+
+    /**
+     * Lấy từ vựng để học theo topic ID
+     * Tương tự như getVocabsForLearningByTopic nhưng sử dụng Long ID thay vì tên
+     * topic
+     */
+    @Transactional(readOnly = true)
+    public PagedReviewVocabResponse getVocabsForLearningByTopicId(User user, Long topicId, Integer page,
+            Integer size) {
+        log.info("Getting vocabs for learning by topic ID - user: {}, topicId: {}, page: {}, size: {}",
+                user.getId(), topicId, page, size);
+
+        // Convert 1-based page to 0-based for PageRequest
+        int zeroBasedPage = Math.max(0, page - 1);
+
+        // Đếm tổng số từ trước để validate page
+        long totalProgressElements = userVocabProgressRepository.countNewOrUnknownVocabsByTopicId(user.getId(),
+                topicId);
+        long totalUnlearnedElements = userVocabProgressRepository.countUnlearnedVocabsByTopicId(user.getId(), topicId);
+        long totalElements = totalProgressElements + totalUnlearnedElements;
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+
+        // Nếu page vượt quá totalPages, trả về trang rỗng
+        if (zeroBasedPage >= totalPages && totalPages > 0) {
+            log.warn("Page {} exceeds total pages {} for topic ID {}. Returning empty page.", page, totalPages,
+                    topicId);
+            ReviewStatsResponse stats = getReviewStatsByTopicId(user, topicId);
+
+            PagedReviewVocabResponse.PageMetadata meta = PagedReviewVocabResponse.PageMetadata.builder()
+                    .page(page)
+                    .pageSize(size)
+                    .totalItems(totalElements)
+                    .totalPages(totalPages)
+                    .hasNext(false)
+                    .hasPrev(page > 1)
+                    .newVocabs(stats.getNewVocabs())
+                    .learningVocabs(stats.getLearningVocabs())
+                    .masteredVocabs(stats.getMasteredVocabs())
+                    .dueVocabs(0)
+                    .build();
+
+            return PagedReviewVocabResponse.builder()
+                    .vocabs(new ArrayList<>())
+                    .meta(meta)
+                    .build();
+        }
+
+        Pageable pageable = PageRequest.of(zeroBasedPage, size);
+
+        // 1. Lấy từ có status = NEW hoặc UNKNOWN theo topic (ưu tiên UNKNOWN trước)
+        Page<UserVocabProgress> progressPage = userVocabProgressRepository.findNewOrUnknownVocabsByTopicIdPaged(
+                user.getId(), topicId, pageable);
+
+        // 2. Nếu không đủ, lấy thêm từ chưa học trong topic
+        Page<Vocab> unlearnedPage = null;
+        if (progressPage.getContent().size() < size) {
+            int remaining = size - progressPage.getContent().size();
+            Pageable newPageable = PageRequest.of(0, remaining);
+            unlearnedPage = userVocabProgressRepository.findUnlearnedVocabsByTopicIdPaged(
+                    user.getId(), topicId, newPageable);
+        }
+
+        // 3. Map to response
+        List<ReviewVocabResponse> vocabs = new ArrayList<>();
+
+        // Thêm từ có status NEW/UNKNOWN
+        progressPage.getContent().stream()
+                .map(this::mapToReviewVocabResponse)
+                .forEach(vocabs::add);
+
+        // Sau đó thêm từ chưa học
+        if (unlearnedPage != null && !unlearnedPage.isEmpty()) {
+            unlearnedPage.getContent().forEach(vocab -> vocabs.add(mapVocabToReviewResponse(vocab)));
+        }
+
+        // Get stats
+        ReviewStatsResponse stats = getReviewStatsByTopicId(user, topicId);
+
+        PagedReviewVocabResponse.PageMetadata meta = PagedReviewVocabResponse.PageMetadata.builder()
+                .page(page)
+                .pageSize(size)
+                .totalItems(totalElements)
+                .totalPages(totalPages)
+                .hasNext(zeroBasedPage < totalPages - 1)
+                .hasPrev(page > 1)
+                .newVocabs(stats.getNewVocabs())
+                .learningVocabs(stats.getLearningVocabs())
+                .masteredVocabs(stats.getMasteredVocabs())
+                .dueVocabs(0)
+                .build();
+
+        return PagedReviewVocabResponse.builder()
+                .vocabs(vocabs)
+                .meta(meta)
+                .build();
+    }
+
+    /**
+     * Helper method to get review stats by topic ID
+     */
+    private ReviewStatsResponse getReviewStatsByTopicId(User user, Long topicId) {
+        long newVocabs = userVocabProgressRepository.countByUserIdAndVocabTopicIdAndStatus(
+                user.getId(), topicId, VocabStatus.NEW);
+        long unknownVocabs = userVocabProgressRepository.countByUserIdAndVocabTopicIdAndStatus(
+                user.getId(), topicId, VocabStatus.UNKNOWN);
+        long masteredVocabs = userVocabProgressRepository.countByUserIdAndVocabTopicIdAndStatus(
+                user.getId(), topicId, VocabStatus.MASTERED);
+
+        return ReviewStatsResponse.builder()
+                .newVocabs((int) newVocabs)
+                .learningVocabs((int) (newVocabs + unknownVocabs))
+                .masteredVocabs((int) masteredVocabs)
                 .build();
     }
 }

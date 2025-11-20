@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -148,6 +149,7 @@ public class VocabProgressAdminService {
 
     // Xóa một bản ghi tiến độ học từ vựng
     @Transactional
+    @CacheEvict(value = { "topics", "topic" }, allEntries = true)
     public void deleteProgress(UUID id) {
         log.info("Admin: Deleting progress record: {}", id);
 
@@ -160,6 +162,7 @@ public class VocabProgressAdminService {
 
     // Reset toàn bộ tiến độ của một user
     @Transactional
+    @CacheEvict(value = { "topics", "topic" }, allEntries = true)
     public void resetUserProgress(UUID userId) {
         log.info("Admin: Resetting all progress for user: {}", userId);
 

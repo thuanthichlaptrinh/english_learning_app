@@ -109,6 +109,7 @@ public class VocabService {
     }
 
     @Transactional
+    @CacheEvict(value = { "topics", "topic", "vocab" }, allEntries = true)
     public VocabResponse createVocab(CreateVocabRequest request) {
         log.info("Tạo từ vựng mới: {}", request.getWord());
 
@@ -220,7 +221,7 @@ public class VocabService {
     }
 
     @Transactional
-    @CacheEvict(value = "vocab", key = "#id")
+    @CacheEvict(value = { "topics", "topic", "vocab" }, allEntries = true)
     public void deleteVocab(UUID id) {
         log.info("Xóa từ vựng với ID: {}", id);
 
@@ -233,6 +234,7 @@ public class VocabService {
     }
 
     @Transactional
+    @CacheEvict(value = { "topics", "topic", "vocab" }, allEntries = true)
     public VocabResponse updateVocab(UUID id, UpdateVocabRequest request) {
         log.info("Cập nhật từ vựng với ID: {}", id);
 
@@ -322,6 +324,7 @@ public class VocabService {
     }
 
     @Transactional
+    @CacheEvict(value = { "topics", "topic", "vocab" }, allEntries = true)
     public VocabResponse updateVocabByWord(String word, UpdateVocabRequest request) {
         log.info("Cập nhật từ vựng theo từ: {}", word);
 

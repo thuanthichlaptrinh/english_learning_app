@@ -11,6 +11,7 @@ import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.BulkTopicOperat
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.TopicResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,6 +33,7 @@ public class TopicService {
      * Create new topic with optional image
      */
     @Transactional
+    @CacheEvict(value = { "topics", "topic" }, allEntries = true)
     public TopicResponse createTopic(CreateTopicRequest request, MultipartFile image) {
         log.info("Creating new topic: {}", request.getName());
 
@@ -69,6 +71,7 @@ public class TopicService {
      * Update existing topic with optional image
      */
     @Transactional
+    @CacheEvict(value = { "topics", "topic" }, allEntries = true)
     public TopicResponse updateTopic(Long topicId, UpdateTopicRequest request, MultipartFile image) {
         log.info("Updating topic ID: {}", topicId);
 
@@ -140,6 +143,7 @@ public class TopicService {
      * Delete topic
      */
     @Transactional
+    @CacheEvict(value = { "topics", "topic" }, allEntries = true)
     public void deleteTopic(Long topicId) {
         log.info("Deleting topic ID: {}", topicId);
 
@@ -176,6 +180,7 @@ public class TopicService {
      * Bulk create topics
      */
     @Transactional
+    @CacheEvict(value = { "topics", "topic" }, allEntries = true)
     public BulkTopicOperationResponse bulkCreateTopics(BulkCreateTopicsRequest request) {
         log.info("Bulk creating {} topics", request.getTopics().size());
 
@@ -239,6 +244,7 @@ public class TopicService {
      * Bulk update topics
      */
     @Transactional
+    @CacheEvict(value = { "topics", "topic" }, allEntries = true)
     public BulkTopicOperationResponse bulkUpdateTopics(BulkUpdateTopicsRequest request) {
         log.info("Bulk updating {} topics", request.getTopics().size());
 

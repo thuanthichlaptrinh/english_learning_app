@@ -62,7 +62,7 @@ public class AuthController {
                 if (!rateLimitResult.isAllowed()) {
                         log.warn("Register rate limit exceeded for email: {}", request.getEmail());
                         throw new ErrorException(
-                                        String.format("Too many registration attempts. Please try again in %d seconds.",
+                                        String.format("Quá nhiều lần đăng ký. Vui lòng thử lại sau %d giây.",
                                                         rateLimitResult.getResetInSeconds()));
                 }
 
@@ -84,7 +84,7 @@ public class AuthController {
                 if (!rateLimitResult.isAllowed()) {
                         log.warn("Login rate limit exceeded for email: {}", request.getEmail());
                         throw new ErrorException(
-                                        String.format("Too many login attempts. Please try again in %d minutes.",
+                                        String.format("Quá nhiều lần đăng nhập. Vui lòng thử lại sau %d phút.",
                                                         rateLimitResult.getResetInSeconds() / 60));
                 }
 
@@ -113,7 +113,7 @@ public class AuthController {
                 if (!rateLimitResult.isAllowed()) {
                         log.warn("Forgot password rate limit exceeded for email: {}", request.getEmail());
                         throw new ErrorException(
-                                        String.format("Too many password reset requests. Please try again in %d minutes.",
+                                        String.format("Quá nhiều yêu cầu đặt lại mật khẩu. Vui lòng thử lại sau %d phút.",
                                                         rateLimitResult.getResetInSeconds() / 60));
                 }
 

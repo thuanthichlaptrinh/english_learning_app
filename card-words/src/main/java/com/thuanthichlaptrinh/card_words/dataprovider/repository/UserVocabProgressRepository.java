@@ -2,6 +2,9 @@ package com.thuanthichlaptrinh.card_words.dataprovider.repository;
 
 import com.thuanthichlaptrinh.card_words.common.enums.VocabStatus;
 import com.thuanthichlaptrinh.card_words.core.domain.UserVocabProgress;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -104,6 +107,17 @@ public interface UserVocabProgressRepository extends JpaRepository<UserVocabProg
                         @Param("topicName") String topicName,
                         org.springframework.data.domain.Pageable pageable);
 
+        // Lấy từ chưa học theo topicId (không có trong user_vocab_progress)
+        @Query("SELECT v FROM Vocab v " +
+                        "WHERE v.topic.id = :topicId " +
+                        "AND v.id NOT IN (SELECT uvp.vocab.id FROM UserVocabProgress uvp WHERE uvp.user.id = :userId) "
+                        +
+                        "ORDER BY v.word ASC")
+        org.springframework.data.domain.Page<com.thuanthichlaptrinh.card_words.core.domain.Vocab> findUnlearnedVocabsByTopicIdPaged(
+                        @Param("userId") UUID userId,
+                        @Param("topicId") Long topicId,
+                        org.springframework.data.domain.Pageable pageable);
+
         @Query("SELECT v FROM Vocab v " +
                         "WHERE v.id NOT IN (SELECT uvp.vocab.id FROM UserVocabProgress uvp WHERE uvp.user.id = :userId) "
                         +
@@ -113,23 +127,35 @@ public interface UserVocabProgressRepository extends JpaRepository<UserVocabProg
                         org.springframework.data.domain.Pageable pageable);
 
         // Queries for LEARNING vocabs (based on STATUS only - for learn-vocabs API)
-        // Lấy từ đang học (KNOWN hoặc UNKNOWN) theo topic - KHÔNG dùng nextReviewDate
+        // Lấy từ cần ôn (NEW + UNKNOWN) theo topic
         @Query("SELECT uvp FROM UserVocabProgress uvp " +
                         "LEFT JOIN FETCH uvp.vocab v " +
                         "WHERE uvp.user.id = :userId " +
                         "AND LOWER(v.topic.name) = LOWER(:topicName) " +
-                        "AND (uvp.status = 'KNOWN' OR uvp.status = 'UNKNOWN') " +
+                        "AND (uvp.status = 'NEW' OR uvp.status = 'UNKNOWN') " +
                         "ORDER BY uvp.updatedAt DESC")
         org.springframework.data.domain.Page<UserVocabProgress> findLearningVocabsByTopicPaged(
                         @Param("userId") UUID userId,
                         @Param("topicName") String topicName,
                         org.springframework.data.domain.Pageable pageable);
 
-        // Lấy tất cả từ đang học (KNOWN hoặc UNKNOWN) - KHÔNG dùng nextReviewDate
+        // Lấy từ cần ôn (NEW + UNKNOWN) theo topicId
         @Query("SELECT uvp FROM UserVocabProgress uvp " +
                         "LEFT JOIN FETCH uvp.vocab v " +
                         "WHERE uvp.user.id = :userId " +
-                        "AND (uvp.status = 'KNOWN' OR uvp.status = 'UNKNOWN') " +
+                        "AND v.topic.id = :topicId " +
+                        "AND (uvp.status = 'NEW' OR uvp.status = 'UNKNOWN') " +
+                        "ORDER BY uvp.updatedAt DESC")
+        org.springframework.data.domain.Page<UserVocabProgress> findLearningVocabsByTopicIdPaged(
+                        @Param("userId") UUID userId,
+                        @Param("topicId") UUID topicId,
+                        org.springframework.data.domain.Pageable pageable);
+
+        // Lấy tất cả từ cần ôn (NEW + UNKNOWN)
+        @Query("SELECT uvp FROM UserVocabProgress uvp " +
+                        "LEFT JOIN FETCH uvp.vocab v " +
+                        "WHERE uvp.user.id = :userId " +
+                        "AND (uvp.status = 'NEW' OR uvp.status = 'UNKNOWN') " +
                         "ORDER BY uvp.updatedAt DESC")
         org.springframework.data.domain.Page<UserVocabProgress> findLearningVocabsPaged(
                         @Param("userId") UUID userId,
@@ -193,21 +219,20 @@ public interface UserVocabProgressRepository extends JpaRepository<UserVocabProg
                         @Param("userId") UUID userId,
                         @Param("date") LocalDate date);
 
-        // Get learning vocabs (KNOWN or UNKNOWN) - non-paged
+        // Get learning vocabs (NEW or UNKNOWN) - non-paged
         @Query("SELECT uvp FROM UserVocabProgress uvp " +
                         "LEFT JOIN FETCH uvp.vocab v " +
                         "WHERE uvp.user.id = :userId " +
-                        "AND (uvp.status = 'KNOWN' OR uvp.status = 'UNKNOWN') " +
+                        "AND (uvp.status = 'NEW' OR uvp.status = 'UNKNOWN') " +
                         "ORDER BY uvp.updatedAt DESC")
         List<UserVocabProgress> findLearningVocabs(@Param("userId") UUID userId);
 
-        // Get learning vocabs by topic (KNOWN or UNKNOWN) - non-paged
-        // Get learning vocabs by topic (KNOWN or UNKNOWN) - non-paged
+        // Get learning vocabs by topic (NEW or UNKNOWN) - non-paged
         @Query("SELECT uvp FROM UserVocabProgress uvp " +
                         "LEFT JOIN FETCH uvp.vocab v " +
                         "WHERE uvp.user.id = :userId " +
                         "AND LOWER(v.topic.name) = LOWER(:topicName) " +
-                        "AND (uvp.status = 'KNOWN' OR uvp.status = 'UNKNOWN') " +
+                        "AND (uvp.status = 'NEW' OR uvp.status = 'UNKNOWN') " +
                         "ORDER BY uvp.updatedAt DESC")
         List<UserVocabProgress> findLearningVocabsByTopic(
                         @Param("userId") UUID userId,
@@ -285,6 +310,36 @@ public interface UserVocabProgressRepository extends JpaRepository<UserVocabProg
                         "WHERE LOWER(v.topic.name) = LOWER(:topicName) " +
                         "AND v.id NOT IN (SELECT uvp.vocab.id FROM UserVocabProgress uvp WHERE uvp.user.id = :userId)")
         long countUnlearnedVocabsByTopic(@Param("userId") UUID userId, @Param("topicName") String topicName);
+
+        // Count methods for topic ID
+        @Query("SELECT COUNT(uvp) FROM UserVocabProgress uvp " +
+                        "JOIN uvp.vocab v " +
+                        "WHERE uvp.user.id = :userId " +
+                        "AND v.topic.id = :topicId " +
+                        "AND (uvp.status = 'NEW' OR uvp.status = 'UNKNOWN')")
+        long countNewOrUnknownVocabsByTopicId(@Param("userId") UUID userId, @Param("topicId") Long topicId);
+
+        @Query("SELECT COUNT(v) FROM Vocab v " +
+                        "WHERE v.topic.id = :topicId " +
+                        "AND v.id NOT IN (SELECT uvp.vocab.id FROM UserVocabProgress uvp WHERE uvp.user.id = :userId)")
+        long countUnlearnedVocabsByTopicId(@Param("userId") UUID userId, @Param("topicId") Long topicId);
+
+        // Find NEW or UNKNOWN vocabs by topic ID (paginated)
+        @Query("SELECT uvp FROM UserVocabProgress uvp " +
+                        "JOIN FETCH uvp.vocab v " +
+                        "WHERE uvp.user.id = :userId " +
+                        "AND v.topic.id = :topicId " +
+                        "AND (uvp.status = 'NEW' OR uvp.status = 'UNKNOWN') " +
+                        "ORDER BY " +
+                        "CASE WHEN uvp.status = 'UNKNOWN' THEN 0 ELSE 1 END, " +
+                        "uvp.updatedAt DESC")
+        Page<UserVocabProgress> findNewOrUnknownVocabsByTopicIdPaged(
+                        @Param("userId") UUID userId,
+                        @Param("topicId") Long topicId,
+                        Pageable pageable);
+
+        // Count by user, topic ID, and status
+        long countByUserIdAndVocabTopicIdAndStatus(UUID userId, Long topicId, VocabStatus status);
 
         // === QUERIES FOR TOPIC PROGRESS CALCULATION ===
         // Đếm số từ vựng đã thuộc (KNOWN hoặc MASTERED) của user theo topic

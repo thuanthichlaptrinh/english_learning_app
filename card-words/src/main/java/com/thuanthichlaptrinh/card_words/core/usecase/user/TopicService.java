@@ -28,6 +28,7 @@ public class TopicService {
     private final TopicProgressCalculator topicProgressCalculator;
 
     @Transactional
+    @CacheEvict(value = { "topics", "topic" }, allEntries = true)
     public TopicResponse createTopic(CreateTopicRequest request) {
         log.info("Tạo chủ đề mới: {}", request.getName());
 

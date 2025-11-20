@@ -90,6 +90,6 @@ public class ChatbotController {
         @GetMapping("/health")
         @Operation(summary = "Kiểm tra trạng thái chatbot", description = "Endpoint để kiểm tra chatbot có hoạt động hay không")
         public ResponseEntity<ApiResponse<String>> health() {
-                return ResponseEntity.ok(ApiResponse.success("Chatbot is running", "OK"));
+                return ResponseEntity.ok(ApiResponse.success("Chatbot đang chạy", "OK"));
         }
 }
