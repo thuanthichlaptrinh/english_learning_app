@@ -182,7 +182,13 @@ public class WordDefinitionMatchingService {
         }
 
         int timeBonus = (int) Math.round(cefrScore * bonusPercentage);
-        int totalScore = cefrScore + timeBonus;
+
+        // Calculate wrong penalty: mỗi lần sai trừ 2 điểm
+        int wrongAttempts = request.getWrongAttempts() != null ? request.getWrongAttempts() : 0;
+        int wrongPenalty = wrongAttempts * 2;
+
+        // Total score = CEFR score + time bonus - wrong penalty (tối thiểu = 0)
+        int totalScore = Math.max(0, cefrScore + timeBonus - wrongPenalty);
 
         double accuracy = ((double) correctMatches / sessionVocabs.size()) * 100;
 
@@ -197,8 +203,9 @@ public class WordDefinitionMatchingService {
         // Record streak activity AFTER transaction completes
         recordStreakActivitySafely(session.getUser());
 
-        log.info("Word-Definition Matching completed: sessionId={}, score={}, accuracy={}%",
-                session.getId(), totalScore, String.format("%.2f", accuracy));
+        log.info(
+                "Word-Definition Matching completed: sessionId={}, cefrScore={}, timeBonus={}, wrongPenalty={}, totalScore={}, accuracy={}%",
+                session.getId(), cefrScore, timeBonus, wrongPenalty, totalScore, String.format("%.2f", accuracy));
 
         return WordDefinitionMatchingResultResponse.builder()
                 .sessionId(session.getId())
@@ -207,6 +214,10 @@ public class WordDefinitionMatchingService {
                 .accuracy(accuracy)
                 .timeTaken(request.getTimeTaken())
                 .score(totalScore)
+                .cefrScore(cefrScore)
+                .timeBonus(timeBonus)
+                .wrongPenalty(wrongPenalty)
+                .wrongAttempts(wrongAttempts)
                 .vocabScores(vocabScores)
                 .build();
     }

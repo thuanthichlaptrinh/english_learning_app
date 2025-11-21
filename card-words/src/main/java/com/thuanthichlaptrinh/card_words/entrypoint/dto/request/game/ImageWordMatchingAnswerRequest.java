@@ -17,5 +17,8 @@ import java.util.UUID;
 public class ImageWordMatchingAnswerRequest {
     private UUID sessionId;
     private List<String> matchedVocabIds;
-    private Long timeTaken;
+    private Long timeTaken; // milliseconds
+
+    @Builder.Default
+    private Integer wrongAttempts = 0; // Số lần ghép sai trước khi submit
 }

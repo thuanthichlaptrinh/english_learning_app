@@ -19,7 +19,14 @@ public class ImageWordMatchingResultResponse {
     private Integer correctMatches;
     private Double accuracy;
     private Long timeTaken;
-    private Integer score;
+    private Integer score; // Tổng điểm = cefrScore + timeBonus - wrongPenalty
+
+    // Score breakdown
+    private Integer cefrScore; // Điểm CEFR cơ bản
+    private Integer timeBonus; // Thưởng thời gian
+    private Integer wrongPenalty; // Phạt số lần sai
+    private Integer wrongAttempts; // Số lần ghép sai
+
     private List<VocabScore> vocabScores;
 
     @Data

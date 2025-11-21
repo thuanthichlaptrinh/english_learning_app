@@ -24,4 +24,7 @@ public class WordDefinitionMatchingAnswerRequest {
 
     @NotNull(message = "Thời gian hoàn thành không được để trống")
     private Long timeTaken; // milliseconds
+
+    @Builder.Default
+    private Integer wrongAttempts = 0; // Số lần ghép sai trước khi submit
 }
