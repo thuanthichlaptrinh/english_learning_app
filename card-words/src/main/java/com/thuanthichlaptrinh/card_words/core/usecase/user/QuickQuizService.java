@@ -195,7 +195,7 @@ public class QuickQuizService {
     }
 
     @Transactional(readOnly = true)
-    public QuickQuizSessionResponse getSessionResults(Long sessionId, UUID userId) {
+    public QuickQuizSessionResponse getSessionResults(UUID sessionId, UUID userId) {
         log.info("Getting results for session: {}", sessionId);
 
         GameSession session = gameSessionRepository.findById(sessionId)
@@ -342,7 +342,7 @@ public class QuickQuizService {
     }
 
     // 6. Initialize session caches (questions, time limits, timestamps)
-    private void initializeSessionCaches(Long sessionId, List<QuestionData> allQuestions, int timePerQuestion) {
+    private void initializeSessionCaches(UUID sessionId, List<QuestionData> allQuestions, int timePerQuestion) {
         log.info("🚀 Initializing caches for session {}: {} questions, {} sec per question",
                 sessionId, allQuestions.size(), timePerQuestion);
 
@@ -408,7 +408,7 @@ public class QuickQuizService {
     }
 
     // 1. Validate and load session
-    private GameSession validateAndLoadSession(Long sessionId, UUID userId) {
+    private GameSession validateAndLoadSession(UUID sessionId, UUID userId) {
         GameSession session = gameSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new ErrorException("Không tìm thấy session game"));
 
@@ -424,7 +424,7 @@ public class QuickQuizService {
     }
 
     // 2. Get cached questions from Redis
-    private List<QuestionData> getCachedQuestions(Long sessionId) {
+    private List<QuestionData> getCachedQuestions(UUID sessionId) {
         List<QuestionData> cachedQuestions = gameSessionCacheService.getQuizQuestions(sessionId);
         if (cachedQuestions == null || cachedQuestions.isEmpty()) {
             throw new ErrorException("Không tìm thấy câu hỏi của session. Vui lòng bắt đầu game mới.");

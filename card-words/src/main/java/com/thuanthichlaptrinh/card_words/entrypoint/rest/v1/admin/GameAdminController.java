@@ -1,6 +1,7 @@
 package com.thuanthichlaptrinh.card_words.entrypoint.rest.v1.admin;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -70,8 +71,7 @@ public class GameAdminController {
                         "**URL**: `GET http://localhost:8080/api/v1/admin/games/sessions/{sessionId}`\n\n" +
                         "**Example**: `GET http://localhost:8080/api/v1/admin/games/sessions/123`")
         public ResponseEntity<ApiResponse<GameSessionDetailResponse>> getSessionDetail(
-                        @Parameter(description = "ID của session") @PathVariable Long sessionId) {
-
+                        @Parameter(description = "ID của session") @PathVariable UUID sessionId) {
                 GameSessionDetailResponse response = gameAdminService.getSessionDetail(sessionId);
                 return ResponseEntity.ok(ApiResponse.success("Lấy chi tiết session thành công", response));
         }
@@ -92,8 +92,7 @@ public class GameAdminController {
                         "**URL**: `DELETE http://localhost:8080/api/v1/admin/games/sessions/{sessionId}`\n\n" +
                         "**Example**: `DELETE http://localhost:8080/api/v1/admin/games/sessions/123`")
         public ResponseEntity<ApiResponse<Void>> deleteSession(
-                        @Parameter(description = "ID của session") @PathVariable Long sessionId) {
-
+                        @Parameter(description = "ID của session") @PathVariable UUID sessionId) {
                 gameAdminService.deleteSession(sessionId);
                 return ResponseEntity.ok(ApiResponse.success("Xóa session thành công", null));
         }

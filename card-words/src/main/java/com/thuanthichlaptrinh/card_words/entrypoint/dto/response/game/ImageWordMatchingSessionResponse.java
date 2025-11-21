@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.vocab.VocabResponse;
 
@@ -15,7 +16,7 @@ import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.vocab.VocabResp
 @AllArgsConstructor
 public class ImageWordMatchingSessionResponse {
 
-    private Long sessionId;
+    private UUID sessionId;
     private Integer totalPairs;
     private List<VocabResponse> vocabs;
     private String status; // IN_PROGRESS, COMPLETED

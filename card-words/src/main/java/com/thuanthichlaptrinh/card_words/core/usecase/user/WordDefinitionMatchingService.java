@@ -319,7 +319,7 @@ public class WordDefinitionMatchingService {
     }
 
     @Transactional(readOnly = true)
-    public WordDefinitionMatchingSessionResponse getSession(Long sessionId) {
+    public WordDefinitionMatchingSessionResponse getSession(UUID sessionId) {
         SessionData sessionData = gameSessionCacheService.getWordDefSession(sessionId, SessionData.class);
         if (sessionData == null) {
             throw new ErrorException("Session không tồn tại hoặc đã hết hạn");

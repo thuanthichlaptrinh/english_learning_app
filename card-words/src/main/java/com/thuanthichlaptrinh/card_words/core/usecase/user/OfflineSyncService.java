@@ -248,7 +248,7 @@ public class OfflineSyncService {
      * only
      */
     @Transactional
-    public int syncGameSessionDetails(UUID userId, Long sessionId, List<OfflineGameDetailRequest> details) {
+    public int syncGameSessionDetails(UUID userId, UUID sessionId, List<OfflineGameDetailRequest> details) {
         log.info("Syncing {} game session details for session: {}", details.size(), sessionId);
 
         // Verify session exists and belongs to user
@@ -429,14 +429,36 @@ public class OfflineSyncService {
         Optional<UserVocabProgress> existingProgress = userVocabProgressRepository.findByUserIdAndVocabId(userId,
                 request.getVocabId());
 
-        // Convert LocalDateTime to LocalDate
-        LocalDateTime lastReviewedDT = LocalDateTime.parse(request.getLastReviewedAt(),
-                DateTimeFormatter.ISO_DATE_TIME);
-        LocalDateTime nextReviewDT = LocalDateTime.parse(request.getNextReviewAt(),
-                DateTimeFormatter.ISO_DATE_TIME);
+        // Validate and parse dates - skip if invalid or "string"
+        if (request.getLastReviewedAt() == null || request.getLastReviewedAt().isEmpty()
+                || "string".equalsIgnoreCase(request.getLastReviewedAt().trim())
+                || request.getNextReviewAt() == null || request.getNextReviewAt().isEmpty()
+                || "string".equalsIgnoreCase(request.getNextReviewAt().trim())) {
+            log.warn("Skipping vocab progress sync for {} - invalid date format: lastReviewed={}, nextReview={}",
+                    request.getVocabId(), request.getLastReviewedAt(), request.getNextReviewAt());
+            return;
+        }
 
-        LocalDate lastReviewed = lastReviewedDT.toLocalDate();
-        LocalDate nextReview = nextReviewDT.toLocalDate();
+        // Convert LocalDateTime to LocalDate
+        LocalDate lastReviewed;
+        LocalDate nextReview;
+
+        try {
+            LocalDateTime lastReviewedDT = LocalDateTime.parse(request.getLastReviewedAt(),
+                    DateTimeFormatter.ISO_DATE_TIME);
+            LocalDateTime nextReviewDT = LocalDateTime.parse(request.getNextReviewAt(),
+                    DateTimeFormatter.ISO_DATE_TIME);
+
+            lastReviewed = lastReviewedDT.toLocalDate();
+            nextReview = nextReviewDT.toLocalDate();
+        } catch (Exception e) {
+            log.error("Failed to parse dates for vocab {}: lastReviewed={}, nextReview={}",
+                    request.getVocabId(), request.getLastReviewedAt(), request.getNextReviewAt(), e);
+            throw new IllegalArgumentException(
+                    String.format(
+                            "Định dạng ngày tháng không hợp lệ cho từ vựng %s. Định dạng ISO 8601 ​​(ví dụ: 2025-11-21T10:30:00)",
+                            request.getVocabId()));
+        }
 
         UserVocabProgress progress;
         if (existingProgress.isPresent()) {

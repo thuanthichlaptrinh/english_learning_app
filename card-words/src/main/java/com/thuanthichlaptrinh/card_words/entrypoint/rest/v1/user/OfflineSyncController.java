@@ -218,13 +218,13 @@ public class OfflineSyncController {
         }
 
         @PostMapping("/game-session-details")
-        @Operation(summary = "Upload game session details riêng lẻ", description = "Upload chi tiết câu hỏi của một game session (fallback nếu batch sync fail).\n\n"
+        @Operation(summary = "Upload game session details riêng lẻ", description = "Upload chi tiết câu hỏi của một game session (fallback nếu batch sync fail).\\n\\n"
                         +
-                        "**Use case:** Upload details cho session đã tồn tại, hoặc upload details riêng\n\n" +
+                        "**Use case:** Upload details cho session đã tồn tại, hoặc upload details riêng\\n\\n" +
                         "**Note:** Nên dùng `/sync/batch` hoặc `/game-sessions` (đã bao gồm details) thay vì endpoint này")
         public ResponseEntity<ApiResponse<String>> uploadGameSessionDetails(
                         Authentication authentication,
-                        @Parameter(description = "ID của game session", required = true) @RequestParam Long sessionId,
+                        @Parameter(description = "ID của game session", required = true) @RequestParam UUID sessionId,
                         @RequestBody List<OfflineGameDetailRequest> details) {
 
                 UUID userId = authHelper.getCurrentUserId(authentication);

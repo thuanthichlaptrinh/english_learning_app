@@ -350,7 +350,7 @@ public class ImageWordMatchingService {
         }
 
         // Get session by ID
-        public ImageWordMatchingSessionResponse getSession(Long sessionId) {
+    public ImageWordMatchingSessionResponse getSession(UUID sessionId) {
                 log.info("Getting session: {}", sessionId);
 
                 GameSession session = gameSessionRepository.findById(sessionId)
@@ -587,3 +587,4 @@ public class ImageWordMatchingService {
                 }
         }
 }
+

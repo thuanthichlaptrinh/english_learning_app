@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -16,7 +17,7 @@ import java.util.List;
 public class WordDefinitionMatchingAnswerRequest {
 
     @NotNull(message = "Session ID không được để trống")
-    private Long sessionId;
+    private UUID sessionId;
 
     @NotEmpty(message = "Danh sách vocab IDs đã ghép không được để trống")
     private List<String> matchedVocabIds;

@@ -30,7 +30,7 @@ public class GameSessionCacheService {
     // ==================== QUICK QUIZ ====================
 
     // Cache questions for Quick Quiz session
-    public void cacheQuizQuestions(Long sessionId, List<QuestionData> questions) {
+    public void cacheQuizQuestions(UUID sessionId, List<QuestionData> questions) {
         try {
             String key = RedisKeyConstants.buildKey(RedisKeyConstants.QUIZ_SESSION_QUESTIONS, sessionId);
             log.info("🔑 Attempting to cache questions with key: {}", key);
@@ -46,7 +46,7 @@ public class GameSessionCacheService {
     }
 
     // Get cached questions for Quick Quiz session
-    public List<QuestionData> getQuizQuestions(Long sessionId) {
+    public List<QuestionData> getQuizQuestions(UUID sessionId) {
         try {
             String key = RedisKeyConstants.buildKey(RedisKeyConstants.QUIZ_SESSION_QUESTIONS, sessionId);
             String json = redisService.getAsString(key);
@@ -66,7 +66,7 @@ public class GameSessionCacheService {
         }
     }
 
-    public void cacheQuestionStartTime(Long sessionId, int questionNumber, LocalDateTime startTime) {
+    public void cacheQuestionStartTime(UUID sessionId, int questionNumber, LocalDateTime startTime) {
         String key = RedisKeyConstants.buildKey(
                 RedisKeyConstants.QUIZ_SESSION_QUESTION_START,
                 sessionId,
@@ -75,7 +75,7 @@ public class GameSessionCacheService {
         log.debug("✅ Cached start time for session {} question {}", sessionId, questionNumber);
     }
 
-    public LocalDateTime getQuestionStartTime(Long sessionId, int questionNumber) {
+    public LocalDateTime getQuestionStartTime(UUID sessionId, int questionNumber) {
         String key = RedisKeyConstants.buildKey(
                 RedisKeyConstants.QUIZ_SESSION_QUESTION_START,
                 sessionId,
@@ -83,7 +83,7 @@ public class GameSessionCacheService {
         return redisService.get(key, LocalDateTime.class);
     }
 
-    public void cacheSessionTimeLimit(Long sessionId, int timeLimitMs) {
+    public void cacheSessionTimeLimit(UUID sessionId, int timeLimitMs) {
         try {
             String key = RedisKeyConstants.buildKey(RedisKeyConstants.QUIZ_SESSION_TIMELIMIT, sessionId);
             log.info("🔑 Attempting to cache time limit with key: {}, value: {}", key, timeLimitMs);
@@ -94,12 +94,12 @@ public class GameSessionCacheService {
         }
     }
 
-    public Integer getSessionTimeLimit(Long sessionId) {
+    public Integer getSessionTimeLimit(UUID sessionId) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.QUIZ_SESSION_TIMELIMIT, sessionId);
         return redisService.get(key, Integer.class);
     }
 
-    public void deleteQuizSessionCache(Long sessionId) {
+    public void deleteQuizSessionCache(UUID sessionId) {
         List<String> keys = new ArrayList<>();
         keys.add(RedisKeyConstants.buildKey(RedisKeyConstants.QUIZ_SESSION_QUESTIONS, sessionId));
         keys.add(RedisKeyConstants.buildKey(RedisKeyConstants.QUIZ_SESSION_TIMELIMIT, sessionId));
@@ -119,7 +119,7 @@ public class GameSessionCacheService {
 
     // ==================== IMAGE WORD MATCHING ====================
 
-    public void cacheImageMatchingSession(Long sessionId, Object sessionData) {
+    public void cacheImageMatchingSession(UUID sessionId, Object sessionData) {
         try {
             String key = RedisKeyConstants.buildKey(RedisKeyConstants.IMAGE_MATCHING_SESSION, sessionId);
             log.info("🔑 Attempting to cache image-matching session with key: {}", key);
@@ -136,7 +136,7 @@ public class GameSessionCacheService {
         }
     }
 
-    public <T> T getImageMatchingSession(Long sessionId, Class<T> clazz) {
+    public <T> T getImageMatchingSession(UUID sessionId, Class<T> clazz) {
         try {
             String key = RedisKeyConstants.buildKey(RedisKeyConstants.IMAGE_MATCHING_SESSION, sessionId);
             String json = redisService.getAsString(key);
@@ -152,25 +152,25 @@ public class GameSessionCacheService {
         }
     }
 
-    public void deleteImageMatchingSession(Long sessionId) {
+    public void deleteImageMatchingSession(UUID sessionId) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.IMAGE_MATCHING_SESSION, sessionId);
         redisService.delete(key);
         log.info("✅ Deleted image matching session cache: {}", sessionId);
     }
 
-    public void setUserActiveImageMatching(UUID userId, Long sessionId) {
+    public void setUserActiveImageMatching(UUID userId, UUID sessionId) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.IMAGE_MATCHING_USER_ACTIVE, userId);
         redisService.set(key, sessionId, SESSION_TTL);
     }
 
-    public Long getUserActiveImageMatching(UUID userId) {
+    public UUID getUserActiveImageMatching(UUID userId) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.IMAGE_MATCHING_USER_ACTIVE, userId);
-        return redisService.get(key, Long.class);
+        return redisService.get(key, UUID.class);
     }
 
     // ==================== WORD DEFINITION MATCHING ====================
 
-    public void cacheWordDefSession(Long sessionId, Object sessionData) {
+    public void cacheWordDefSession(UUID sessionId, Object sessionData) {
         try {
             String key = RedisKeyConstants.buildKey(RedisKeyConstants.WORD_DEF_SESSION, sessionId);
             log.info("🔑 Attempting to cache word-def session with key: {}", key);
@@ -187,7 +187,7 @@ public class GameSessionCacheService {
         }
     }
 
-    public <T> T getWordDefSession(Long sessionId, Class<T> clazz) {
+    public <T> T getWordDefSession(UUID sessionId, Class<T> clazz) {
         try {
             String key = RedisKeyConstants.buildKey(RedisKeyConstants.WORD_DEF_SESSION, sessionId);
             String json = redisService.getAsString(key);
@@ -203,20 +203,20 @@ public class GameSessionCacheService {
         }
     }
 
-    public void deleteWordDefSession(Long sessionId) {
+    public void deleteWordDefSession(UUID sessionId) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.WORD_DEF_SESSION, sessionId);
         redisService.delete(key);
         log.info("✅ Deleted word definition session cache: {}", sessionId);
     }
 
-    public void setUserActiveWordDef(UUID userId, Long sessionId) {
+    public void setUserActiveWordDef(UUID userId, UUID sessionId) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.WORD_DEF_USER_ACTIVE, userId);
         redisService.set(key, sessionId, SESSION_TTL);
     }
 
-    public Long getUserActiveWordDef(UUID userId) {
+    public UUID getUserActiveWordDef(UUID userId) {
         String key = RedisKeyConstants.buildKey(RedisKeyConstants.WORD_DEF_USER_ACTIVE, userId);
-        return redisService.get(key, Long.class);
+        return redisService.get(key, UUID.class);
     }
 
     // ==================== RATE LIMITING ====================

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -13,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ImageWordMatchingResultResponse {
 
-    private Long sessionId;
+    private UUID sessionId;
     private Integer totalPairs;
     private Integer correctMatches;
     private Double accuracy;

@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface GameSessionRepository extends JpaRepository<GameSession, Long> {
+public interface GameSessionRepository extends JpaRepository<GameSession, UUID> {
 
     List<GameSession> findByUserIdOrderByStartedAtDesc(UUID userId);
 

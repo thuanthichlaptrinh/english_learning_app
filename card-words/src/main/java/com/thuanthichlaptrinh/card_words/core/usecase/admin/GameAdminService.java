@@ -1,6 +1,7 @@
 package com.thuanthichlaptrinh.card_words.core.usecase.admin;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -72,7 +73,7 @@ public class GameAdminService {
     }
 
     @Transactional(readOnly = true)
-    public GameSessionDetailResponse getSessionDetail(Long sessionId) {
+    public GameSessionDetailResponse getSessionDetail(UUID sessionId) {
         log.info("Admin: Lấy chi tiết session ID: {}", sessionId);
 
         GameSession session = gameSessionRepository.findById(sessionId)
@@ -124,7 +125,7 @@ public class GameAdminService {
     }
 
     @Transactional
-    public void deleteSession(Long sessionId) {
+    public void deleteSession(UUID sessionId) {
         log.info("Admin: Xóa session ID: {}", sessionId);
 
         if (!gameSessionRepository.existsById(sessionId)) {

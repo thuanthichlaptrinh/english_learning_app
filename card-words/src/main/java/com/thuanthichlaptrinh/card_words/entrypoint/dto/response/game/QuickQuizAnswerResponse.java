@@ -4,13 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.UUID;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class QuickQuizAnswerResponse {
-    private Long sessionId;
+    private UUID sessionId;
     private Integer questionNumber;
     private Boolean isCorrect;
     private Integer correctAnswerIndex; // Index of correct answer (0, 1, hoặc 2)

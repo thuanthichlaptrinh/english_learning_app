@@ -124,9 +124,8 @@ public class QuickQuizController {
         @GetMapping("/session/{sessionId}")
         @Operation(summary = "Xem kết quả game", description = "Lấy thông tin chi tiết và kết quả của phiên chơi.", security = @SecurityRequirement(name = "Bearer Authentication"))
         public ResponseEntity<ApiResponse<QuickQuizSessionResponse>> getSessionResults(
-                        @PathVariable Long sessionId,
+                        @PathVariable UUID sessionId,
                         Authentication authentication) {
-
                 UUID userId = authHelper.getCurrentUserId(authentication);
                 QuickQuizSessionResponse response = quickQuizService.getSessionResults(sessionId, userId);
 

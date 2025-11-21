@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -14,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 public class QuickQuizSessionResponse {
 
-    private Long sessionId;
+    private UUID sessionId;
     private String gameType;
     private String status; // "IN_PROGRESS", "COMPLETED"
 

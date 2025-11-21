@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -13,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class QuickQuizAnswerRequest {
 
     @NotNull(message = "Session ID không được để trống")
-    private Long sessionId;
+    private UUID sessionId;
 
     @NotNull(message = "Question number không được để trống")
     private Integer questionNumber;

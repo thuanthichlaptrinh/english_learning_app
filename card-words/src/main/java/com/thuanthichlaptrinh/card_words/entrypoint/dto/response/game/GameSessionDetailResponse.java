@@ -2,6 +2,7 @@ package com.thuanthichlaptrinh.card_words.entrypoint.dto.response.game;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GameSessionDetailResponse {
-    private Long sessionId;
+    private UUID sessionId;
     private String gameName;
     private String userName;
     private String userEmail;

@@ -12,15 +12,15 @@ import java.util.UUID;
 @Repository
 public interface GameSessionDetailRepository extends JpaRepository<GameSessionDetail, Long> {
 
-    List<GameSessionDetail> findBySessionIdOrderById(Long sessionId);
+    List<GameSessionDetail> findBySessionIdOrderById(UUID sessionId);
 
     @Query("SELECT gsd FROM GameSessionDetail gsd WHERE gsd.session.id = :sessionId AND gsd.vocab.id = :vocabId")
-    List<GameSessionDetail> findBySessionIdAndVocabId(@Param("sessionId") Long sessionId,
+    List<GameSessionDetail> findBySessionIdAndVocabId(@Param("sessionId") UUID sessionId,
             @Param("vocabId") UUID vocabId);
 
-    long countBySessionIdAndIsCorrect(Long sessionId, Boolean isCorrect);
+    long countBySessionIdAndIsCorrect(UUID sessionId, Boolean isCorrect);
 
     // Admin method
-    List<GameSessionDetail> findBySessionId(Long sessionId);
+    List<GameSessionDetail> findBySessionId(UUID sessionId);
 
 }

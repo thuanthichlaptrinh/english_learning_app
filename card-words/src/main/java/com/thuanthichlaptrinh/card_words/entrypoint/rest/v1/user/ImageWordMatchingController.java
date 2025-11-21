@@ -116,7 +116,7 @@ public class ImageWordMatchingController {
         @PreAuthorize("isAuthenticated()")
         @Operation(summary = "Lấy thông tin session", description = "Lấy thông tin chi tiết của session hiện tại")
         public ResponseEntity<ImageWordMatchingSessionResponse> getSession(
-                        @PathVariable Long sessionId) {
+                        @PathVariable UUID sessionId) {
                 log.info("API: Get session info - sessionId: {}", sessionId);
 
                 ImageWordMatchingSessionResponse response = imageWordMatchingService.getSession(sessionId);

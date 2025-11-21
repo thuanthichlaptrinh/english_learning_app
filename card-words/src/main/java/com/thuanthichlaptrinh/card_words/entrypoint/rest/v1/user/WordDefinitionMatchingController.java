@@ -115,9 +115,8 @@ public class WordDefinitionMatchingController {
         @PreAuthorize("isAuthenticated()")
         @Operation(summary = "Lấy thông tin session", description = "Lấy thông tin chi tiết của session hiện tại")
         public ResponseEntity<WordDefinitionMatchingSessionResponse> getSession(
-                        @PathVariable Long sessionId) {
+                        @PathVariable UUID sessionId) {
                 log.info("API: Get session info - sessionId: {}", sessionId);
-
                 WordDefinitionMatchingSessionResponse response = wordDefinitionMatchingService.getSession(sessionId);
                 return ResponseEntity.ok(response);
         }
