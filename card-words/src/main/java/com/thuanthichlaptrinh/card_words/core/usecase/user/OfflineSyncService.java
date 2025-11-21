@@ -491,23 +491,108 @@ public class OfflineSyncService {
         log.debug("Synced vocab progress: {}", request.getVocabId());
     }
 
+    /**
+     * Smart merge strategy for UserVocabProgress update
+     * 
+     * Rules:
+     * 1. timesCorrect & timesWrong: Lấy MAX (ngăn ngừa mất dữ liệu khi ngoại tuyến
+     * xung đột)
+     * 2. status: Sử dụng client nếu nó thể hiện mức độ thành thạo cao hơn
+     * 3. lastReviewed: Sử dụng ngày gần nhất
+     * 4. nextReviewDate: Sử dụng client (tính toán mới hơn)
+     * 5. efFactor: Sử dụng client nếu repetition > server (thể hiện mức độ học tập
+     * gần đây hơn)
+     * 6. repetition: Lấy MAX (luyện tập càng nhiều càng tốt)
+     * 7. intervalDays: Sử dụng client (tính toán lại dựa trên lần đánh giá gần
+     * nhất)
+     */
     private void updateProgress(UserVocabProgress progress, OfflineVocabProgressRequest request,
             LocalDate lastReviewed, LocalDate nextReview) {
-        progress.setStatus(request.getStatus());
-        progress.setLastReviewed(lastReviewed);
-        progress.setNextReviewDate(nextReview);
-        progress.setEfFactor(request.getEaseFactor());
-        progress.setRepetition(request.getRepetitions());
-        progress.setIntervalDays(request.getInterval());
 
-        // Merge timesCorrect and timesWrong (client data takes precedence if provided)
+        // 1. Status: Upgrade to higher mastery level only
+        VocabStatus currentStatus = progress.getStatus();
+        VocabStatus newStatus = request.getStatus();
+
+        if (shouldUpgradeStatus(currentStatus, newStatus)) {
+            progress.setStatus(newStatus);
+            log.debug("Upgraded status from {} to {} for vocab {}", currentStatus, newStatus, request.getVocabId());
+        } else {
+            log.debug("Keeping current status {} (client: {}) for vocab {}", currentStatus, newStatus,
+                    request.getVocabId());
+        }
+
+        // 2. lastReviewed: Always use latest date
+        if (progress.getLastReviewed() == null || lastReviewed.isAfter(progress.getLastReviewed())) {
+            progress.setLastReviewed(lastReviewed);
+        }
+
+        // 3. nextReviewDate: Use client data (represents latest calculation)
+        progress.setNextReviewDate(nextReview);
+
+        // 4. Repetition: Take MAX (more practice = better retention)
+        int currentRepetition = progress.getRepetition() != null ? progress.getRepetition() : 0;
+        int newRepetition = request.getRepetitions() != null ? request.getRepetitions() : 0;
+        progress.setRepetition(Math.max(currentRepetition, newRepetition));
+
+        // 5. efFactor: Use client if they have more repetitions (newer learning data)
+        if (newRepetition >= currentRepetition && request.getEaseFactor() != null) {
+            progress.setEfFactor(request.getEaseFactor());
+        }
+
+        // 6. intervalDays: Use client (represents latest SM-2 calculation)
+        if (request.getInterval() != null) {
+            progress.setIntervalDays(request.getInterval());
+        }
+
+        // 7. timesCorrect: Take MAX to prevent data loss
         if (request.getTimesCorrect() != null) {
-            // Use max to prevent data loss from concurrent updates
-            progress.setTimesCorrect(Math.max(progress.getTimesCorrect(), request.getTimesCorrect()));
+            int currentCorrect = progress.getTimesCorrect() != null ? progress.getTimesCorrect() : 0;
+            int newCorrect = request.getTimesCorrect();
+            int maxCorrect = Math.max(currentCorrect, newCorrect);
+            progress.setTimesCorrect(maxCorrect);
+
+            if (newCorrect > currentCorrect) {
+                log.debug("Updated timesCorrect from {} to {} for vocab {}", currentCorrect, newCorrect,
+                        request.getVocabId());
+            }
         }
+
+        // 8. timesWrong: Take MAX to prevent data loss
         if (request.getTimesWrong() != null) {
-            progress.setTimesWrong(Math.max(progress.getTimesWrong(), request.getTimesWrong()));
+            int currentWrong = progress.getTimesWrong() != null ? progress.getTimesWrong() : 0;
+            int newWrong = request.getTimesWrong();
+            int maxWrong = Math.max(currentWrong, newWrong);
+            progress.setTimesWrong(maxWrong);
+
+            if (newWrong > currentWrong) {
+                log.debug("Updated timesWrong from {} to {} for vocab {}", currentWrong, newWrong,
+                        request.getVocabId());
+            }
         }
+    }
+
+    /**
+     * Check if status should be upgraded based on mastery level
+     * 
+     * Mastery hierarchy: NEW < UNKNOWN < KNOWN < MASTERED
+     */
+    private boolean shouldUpgradeStatus(VocabStatus current, VocabStatus newStatus) {
+        if (current == null || newStatus == null) {
+            return newStatus != null;
+        }
+
+        // Define mastery levels
+        Map<VocabStatus, Integer> masteryLevel = Map.of(
+                VocabStatus.NEW, 0,
+                VocabStatus.UNKNOWN, 1,
+                VocabStatus.KNOWN, 2,
+                VocabStatus.MASTERED, 3);
+
+        int currentLevel = masteryLevel.getOrDefault(current, 0);
+        int newLevel = masteryLevel.getOrDefault(newStatus, 0);
+
+        // Only upgrade, never downgrade
+        return newLevel > currentLevel;
     }
 
     private void syncGameSessionDetail(GameSession session, OfflineGameDetailRequest detail) {
