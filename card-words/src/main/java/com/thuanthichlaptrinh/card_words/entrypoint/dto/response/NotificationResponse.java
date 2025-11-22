@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -19,4 +20,9 @@ public class NotificationResponse {
     private String type;
     private Boolean isRead;
     private LocalDateTime createdAt;
+
+    // Admin metadata (optional for user-facing APIs)
+    private UUID userId;
+    private String userName;
+    private String userEmail;
 }

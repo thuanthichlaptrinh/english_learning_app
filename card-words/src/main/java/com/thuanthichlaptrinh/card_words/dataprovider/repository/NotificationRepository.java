@@ -38,6 +38,25 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
                         @Param("type") String type,
                         Pageable pageable);
 
+        @Query("SELECT n FROM Notification n WHERE n.user.id IN :userIds AND " +
+                        "(:isRead IS NULL OR n.isRead = :isRead) AND " +
+                        "(:type IS NULL OR n.type = :type) " +
+                        "ORDER BY n.createdAt DESC")
+        Page<Notification> findByUserIdsAndFilters(
+                        @Param("userIds") List<UUID> userIds,
+                        @Param("isRead") Boolean isRead,
+                        @Param("type") String type,
+                        Pageable pageable);
+
+        @Query("SELECT n FROM Notification n WHERE " +
+                        "(:isRead IS NULL OR n.isRead = :isRead) AND " +
+                        "(:type IS NULL OR n.type = :type) " +
+                        "ORDER BY n.createdAt DESC")
+        Page<Notification> findAllByFilters(
+                        @Param("isRead") Boolean isRead,
+                        @Param("type") String type,
+                        Pageable pageable);
+
         // Count unread
         long countByUserIdAndIsReadFalse(UUID userId);
 

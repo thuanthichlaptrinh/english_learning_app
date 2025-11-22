@@ -20,7 +20,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -34,7 +36,8 @@ public class NotificationService {
     /**
      * Get notifications for a user with filters
      */
-    public Page<NotificationResponse> getNotifications(UUID userId, NotificationFilterRequest request) {
+        @Transactional(readOnly = true)
+        public Page<NotificationResponse> getNotifications(UUID userId, NotificationFilterRequest request) {
         log.info("Lấy danh sách notifications cho user: {}", userId);
 
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
@@ -47,6 +50,63 @@ public class NotificationService {
 
         return notifications.map(this::toResponse);
     }
+
+        /**
+         * Admin: Get notifications of a specific user
+         */
+        @Transactional(readOnly = true)
+        public Page<NotificationResponse> getUserNotificationsAsAdmin(UUID userId, NotificationFilterRequest request) {
+                validateUserExists(userId);
+                return getNotifications(userId, request);
+        }
+
+        /**
+         * Admin: Get notifications of multiple users in a single paginated feed
+         */
+        @Transactional(readOnly = true)
+        public Page<NotificationResponse> getNotificationsForUsers(List<UUID> userIds, NotificationFilterRequest request) {
+                if (userIds == null || userIds.isEmpty()) {
+                        throw new ErrorException("Danh sách userId không được để trống");
+                }
+
+                List<UUID> distinctIds = userIds.stream()
+                        .filter(Objects::nonNull)
+                        .distinct()
+                        .collect(Collectors.toList());
+
+                if (distinctIds.isEmpty()) {
+                        throw new ErrorException("Danh sách userId không hợp lệ");
+                }
+
+                List<User> users = userRepository.findAllById(distinctIds);
+                if (users.size() != distinctIds.size()) {
+                        throw new ErrorException("Một hoặc nhiều userId không tồn tại trong hệ thống");
+                }
+
+                log.info("Admin: Lấy notifications cho {} users", distinctIds.size());
+
+                Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
+                Page<Notification> notifications = notificationRepository.findByUserIdsAndFilters(
+                                distinctIds,
+                                request.getIsRead(),
+                                request.getType(),
+                                pageable);
+
+                return notifications.map(this::toResponse);
+        }
+
+        /**
+         * Admin: Get notifications across the whole system
+         */
+        @Transactional(readOnly = true)
+        public Page<NotificationResponse> getAllNotifications(NotificationFilterRequest request) {
+                Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
+                Page<Notification> notifications = notificationRepository.findAllByFilters(
+                                request.getIsRead(),
+                                request.getType(),
+                                pageable);
+                return notifications.map(this::toResponse);
+        }
 
     /**
      * Get notification summary
@@ -443,6 +503,15 @@ public class NotificationService {
                 .type(notification.getType())
                 .isRead(notification.getIsRead())
                 .createdAt(notification.getCreatedAt())
+                                .userId(notification.getUser() != null ? notification.getUser().getId() : null)
+                                .userName(notification.getUser() != null ? notification.getUser().getName() : null)
+                                .userEmail(notification.getUser() != null ? notification.getUser().getEmail() : null)
                 .build();
     }
+
+        private void validateUserExists(UUID userId) {
+                if (!userRepository.existsById(userId)) {
+                        throw new ErrorException("Không tìm thấy người dùng với ID: " + userId);
+                }
+        }
 }
