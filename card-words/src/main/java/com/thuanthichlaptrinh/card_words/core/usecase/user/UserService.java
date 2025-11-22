@@ -71,6 +71,11 @@ public class UserService {
                 .gender(user.getGender())
                 .dateOfBirth(user.getDateOfBirth())
                 .currentLevel(user.getCurrentLevel())
+            .currentStreak(user.getCurrentStreak())
+            .longestStreak(user.getLongestStreak())
+            .totalStudyDays(user.getTotalStudyDays())
+            .lastActivityDate(user.getLastActivityDate())
+            .status(user.getStatus())
                 .build();
     }
 
@@ -87,6 +92,11 @@ public class UserService {
                 .gender(user.getGender())
                 .dateOfBirth(user.getDateOfBirth())
                 .currentLevel(user.getCurrentLevel())
+            .currentStreak(user.getCurrentStreak())
+            .longestStreak(user.getLongestStreak())
+            .totalStudyDays(user.getTotalStudyDays())
+            .lastActivityDate(user.getLastActivityDate())
+            .status(user.getStatus())
                 .build();
     }
 
