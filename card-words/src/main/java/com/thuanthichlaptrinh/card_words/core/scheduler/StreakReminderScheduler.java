@@ -1,5 +1,6 @@
 package com.thuanthichlaptrinh.card_words.core.scheduler;
 
+import com.thuanthichlaptrinh.card_words.common.constants.NotificationConstants;
 import com.thuanthichlaptrinh.card_words.core.domain.User;
 import com.thuanthichlaptrinh.card_words.core.domain.UserVocabProgress;
 import com.thuanthichlaptrinh.card_words.core.usecase.user.EmailService;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 
 /**
  * Scheduled task để gửi nhắc nhở streak hàng ngày
- * Chạy vào 7:00 AM mỗi ngày để nhắc users duy trì streak
+ * Chạy vào 7:00 AM và 19:00 PM mỗi ngày để nhắc users duy trì streak
  */
 @Slf4j
 @Component
@@ -141,7 +142,7 @@ public class StreakReminderScheduler {
                     .title("🔥 Đừng để chuỗi học bị gãy!")
                     .content(String.format(
                             "Bạn đang có chuỗi %d ngày. Luyện tập ngay hôm nay để duy trì phong độ nhé!", streak))
-                    .type("vocab_reminder")
+                    .type(NotificationConstants.STREAK_REMINDER)
                     .build();
 
             notificationService.createNotification(notificationRequest);
@@ -189,7 +190,7 @@ public class StreakReminderScheduler {
                     .userId(user.getId())
                     .title("⚠️ Chuỗi học của bạn đã bị gián đoạn")
                     .content("Bạn đã bỏ lỡ buổi học hôm qua. Hãy quay lại ôn tập để khởi động lại chuỗi mới ngay hôm nay!")
-                    .type("streak_break")
+                    .type(NotificationConstants.STREAK_BREAK)
                     .build();
 
             notificationService.createNotification(notificationRequest);

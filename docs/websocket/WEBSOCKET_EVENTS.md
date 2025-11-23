@@ -153,6 +153,41 @@ stompClient.subscribe('/user/queue/notifications/batch-deleted', (message) => {
 
 ---
 
+### **6️⃣ `/topic/admin/user-registrations` - Admin broadcast khi có user mới**
+
+**Trigger:** Mỗi lần user đăng ký tài khoản thành công.
+
+**Event Data:**
+
+```json
+{
+    "message": "🎉 Đã có thêm Nguyễn Văn A vừa đăng ký tài khoản",
+    "totalUsers": 1250,
+    "recentUserName": "Nguyễn Văn A",
+    "recentUserEmail": "new.user@example.com",
+    "registeredAt": "2025-11-23T07:05:12"
+}
+```
+
+**Client Action (Admin Dashboard):**
+
+-   Hiện toast hoặc banner realtime ghi nhận user mới.
+-   Cập nhật widget thống kê tổng số người dùng (`totalUsers`).
+-   Option: phát âm thanh / highlight bảng user để admin kiểm duyệt nhanh.
+
+```javascript
+stompClient.subscribe('/topic/admin/user-registrations', (message) => {
+    const event = JSON.parse(message.body);
+    renderAdminToast(event.message, event.totalUsers);
+    updateUserCounter(event.totalUsers);
+    prependRecentUser(event.recentUserName, event.recentUserEmail, event.registeredAt);
+});
+```
+
+> ⚠️ Chỉ admin (ROLE_ADMIN) nên subscribe kênh này. Hãy kiểm tra JWT chứa role trước khi render UI.
+
+---
+
 ## 🔌 **Complete Client Implementation**
 
 ### **React Hook Example:**
@@ -352,13 +387,14 @@ class NotificationWebSocketService {
 
 ## 📊 **WebSocket Events Summary**
 
-| Event                | Destination                               | Data Type              | Trigger                         |
-| -------------------- | ----------------------------------------- | ---------------------- | ------------------------------- |
-| **New Notification** | `/user/queue/notifications`               | `NotificationResponse` | Create notification API         |
-| **Mark as Read**     | `/user/queue/notifications/read`          | `number`               | PUT `/notifications/{id}/read`  |
-| **Mark All Read**    | `/user/queue/notifications/read-all`      | `number`               | PUT `/notifications/read-all`   |
-| **Delete**           | `/user/queue/notifications/deleted`       | `number`               | DELETE `/notifications/{id}`    |
-| **Batch Delete**     | `/user/queue/notifications/batch-deleted` | `number[]`             | DELETE `/notifications?ids=...` |
+| Event                | Destination                               | Data Type                    | Trigger                         |
+| -------------------- | ----------------------------------------- | ---------------------------- | ------------------------------- |
+| **New Notification** | `/user/queue/notifications`               | `NotificationResponse`       | Create notification API         |
+| **Mark as Read**     | `/user/queue/notifications/read`          | `number`                     | PUT `/notifications/{id}/read`  |
+| **Mark All Read**    | `/user/queue/notifications/read-all`      | `number`                     | PUT `/notifications/read-all`   |
+| **Delete**           | `/user/queue/notifications/deleted`       | `number`                     | DELETE `/notifications/{id}`    |
+| **Batch Delete**     | `/user/queue/notifications/batch-deleted` | `number[]`                   | DELETE `/notifications?ids=...` |
+| **New User (Admin)** | `/topic/admin/user-registrations`         | `AdminUserRegistrationEvent` | User register success           |
 
 ---
 

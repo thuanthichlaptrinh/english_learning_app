@@ -36,7 +36,7 @@ public class NotificationController {
                         "**URL**: `GET http://localhost:8080/api/v1/notifications`\n\n" +
                         "**Query Parameters:**\n" +
                         "- isRead: Lọc theo trạng thái đã đọc (true/false)\n" +
-                        "- type: Lọc theo loại thông báo (vocab_reminder, new_feature, achievement, system_alert, study_progress)\n"
+                        "- type: Lọc theo loại thông báo (vocab_reminder, study_progress, streak_reminder, streak_milestone, streak_break, game_achievement, achievement, new_feature, system_alert)\n"
                         +
                         "- page: Số trang (default 0)\n" +
                         "- size: Kích thước trang (default 10)\n\n" +

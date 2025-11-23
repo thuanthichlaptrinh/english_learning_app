@@ -8,11 +8,12 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +33,7 @@ import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.auth.Authenticat
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.auth.ForgotPasswordRequest;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.auth.RefreshTokenRequest;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.auth.RegisterRequest;
+import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.admin.AdminUserRegistrationEvent;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.auth.AuthenticationResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.auth.ForgotPasswordResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.auth.RegisterResponse;
@@ -53,6 +55,9 @@ public class AuthenticationService {
     private final TokenRepository tokenRepository;
     private final EmailService emailService;
     private final UserCacheService userCacheService; // ← Thêm cache service
+    private final SimpMessagingTemplate messagingTemplate;
+
+    private static final String ADMIN_REG_TOPIC = "/topic/admin/user-registrations";
 
     private static final String ROLE_USER = PredefinedRole.USER;
     private static final Pattern EMAIL_PATTERN = Pattern.compile(PatternConstants.EMAIL_REGEX);
@@ -98,6 +103,7 @@ public class AuthenticationService {
 
         // ✅ Cache user ngay sau khi đăng ký
         cacheUserData(user);
+        notifyAdminUserRegistration(user);
 
         try {
             emailService.sendWelcomeEmailWithPassword(user.getEmail(), user.getName(), generatedPassword);
@@ -265,6 +271,24 @@ public class AuthenticationService {
         emailService.sendActivationEmail(user.getEmail(), user.getName(), newActivationKey);
 
         return "Email kích hoạt đã được gửi lại. Vui lòng kiểm tra hộp thư.";
+    }
+
+    private void notifyAdminUserRegistration(User user) {
+        try {
+            long totalUsers = userRepository.count();
+            AdminUserRegistrationEvent event = AdminUserRegistrationEvent.builder()
+                    .message(String.format("🎉 Đã có thêm %s vừa đăng ký tài khoản", user.getName()))
+                    .recentUserName(user.getName())
+                    .recentUserEmail(user.getEmail())
+                    .totalUsers(totalUsers)
+                    .registeredAt(LocalDateTime.now())
+                    .build();
+
+            messagingTemplate.convertAndSend(ADMIN_REG_TOPIC, event);
+            log.info("📣 Sent admin registration event for user {}", user.getEmail());
+        } catch (Exception ex) {
+            log.warn("Không thể push admin registration event: {}", ex.getMessage());
+        }
     }
 
     private void saveUserToken(User user, String accessToken, String refreshToken) {

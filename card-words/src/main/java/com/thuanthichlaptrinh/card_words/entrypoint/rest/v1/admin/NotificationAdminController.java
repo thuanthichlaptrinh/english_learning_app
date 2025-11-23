@@ -111,7 +111,7 @@ public class NotificationAdminController {
                         "  \"type\": \"vocab_reminder\"\n" +
                         "}\n" +
                         "```\n\n" +
-                        "**Types:** vocab_reminder, new_feature, achievement, system_alert, study_progress")
+                        "**Types:** vocab_reminder, study_progress, streak_reminder, streak_milestone, streak_break, game_achievement, achievement, new_feature, system_alert")
         public ResponseEntity<ApiResponse<NotificationResponse>> createNotification(
                         @Valid @RequestBody CreateNotificationRequest request) {
 

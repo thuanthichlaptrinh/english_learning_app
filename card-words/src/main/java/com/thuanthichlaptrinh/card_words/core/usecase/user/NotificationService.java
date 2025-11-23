@@ -1,5 +1,6 @@
 package com.thuanthichlaptrinh.card_words.core.usecase.user;
 
+import com.thuanthichlaptrinh.card_words.common.constants.NotificationConstants;
 import com.thuanthichlaptrinh.card_words.common.exceptions.ErrorException;
 import com.thuanthichlaptrinh.card_words.core.domain.Notification;
 import com.thuanthichlaptrinh.card_words.core.domain.User;
@@ -366,6 +367,14 @@ public class NotificationService {
                 .type("system_alert")
                 .build());
 
+        // Streak Break Alerts
+        long streakBreakCount = notificationRepository.countByUserIdAndType(userId, NotificationConstants.STREAK_BREAK);
+        categories.add(NotificationCategoryResponse.builder()
+                .category("Streak Break Alerts")
+                .count(streakBreakCount)
+                .type(NotificationConstants.STREAK_BREAK)
+                .build());
+
         return categories;
     }
 
@@ -490,6 +499,14 @@ public class NotificationService {
                 .category("System Alerts")
                 .count(systemAlertCount)
                 .type("system_alert")
+                .build());
+
+        // Streak Break Alerts
+        long streakBreakCount = notificationRepository.countByType(NotificationConstants.STREAK_BREAK);
+        categories.add(NotificationCategoryResponse.builder()
+                .category("Streak Break Alerts")
+                .count(streakBreakCount)
+                .type(NotificationConstants.STREAK_BREAK)
                 .build());
 
         return categories;

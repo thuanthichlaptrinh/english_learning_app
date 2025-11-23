@@ -13,6 +13,7 @@ public class NotificationConstants {
     public static final String STREAK_REMINDER = "streak_reminder"; // 🔥 Nhắc nhở streak
     public static final String STREAK_MILESTONE = "streak_milestone"; // ⭐ Cột mốc streak (3, 7, 30 ngày)
     public static final String GAME_ACHIEVEMENT = "game_achievement"; // 🎮 Thành tích trong game
+    public static final String STREAK_BREAK = "streak_break"; // ⛔️ Cảnh báo chuỗi học bị gián đoạn
 
     // All valid notification types
     public static final List<String> VALID_TYPES = List.of(
@@ -23,7 +24,8 @@ public class NotificationConstants {
             STUDY_PROGRESS,
             STREAK_REMINDER,
             STREAK_MILESTONE,
-            GAME_ACHIEVEMENT);
+            GAME_ACHIEVEMENT,
+            STREAK_BREAK);
 
     // Filter categories for UI (if needed)
     public static final List<String> FILTER_CATEGORIES = List.of(
@@ -35,7 +37,8 @@ public class NotificationConstants {
             "Game Achievements",
             "Achievements",
             "New Features",
-            "System Alerts");
+            "System Alerts",
+            "Streak Break Alerts");
 
     private NotificationConstants() {
         // Prevent instantiation
