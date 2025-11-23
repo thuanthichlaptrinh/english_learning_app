@@ -428,6 +428,7 @@ Open `test-websocket-events.html` in your browser:
 | `/user/queue/notifications/read-all`      | Mark all read     | User marks all notifications read    |
 | `/user/queue/notifications/deleted`       | Single delete     | User deletes notification            |
 | `/user/queue/notifications/batch-deleted` | Batch delete      | User deletes multiple notifications  |
+| `/topic/admin/user-registrations`         | Admin broadcast   | Any successful user registration     |
 
 #### Auto-triggered Notifications
 
@@ -445,15 +446,16 @@ Open `test-websocket-events.html` in your browser:
 
 📧 **Daily Reminders** (Dual delivery)
 
--   Scheduled at 9:00 AM
+-   Scheduled 2 lần/ngày: 07:00 & 19:00 (kèm cảnh báo gãy chuỗi lúc 07:00)
 -   Email + WebSocket notification
--   Smart targeting (users with streaks ≥ 3 days)
+-   Smart targeting (users với streak hiện tại ≥ 3 ngày)
 
 📢 **Admin Broadcasts** (Push to all users)
 
 -   System announcements
 -   Platform updates
 -   Maintenance notices
+-   Realtime signup feed qua `/topic/admin/user-registrations` giúp dashboard cập nhật tổng user
 
 #### Performance Benefits
 
