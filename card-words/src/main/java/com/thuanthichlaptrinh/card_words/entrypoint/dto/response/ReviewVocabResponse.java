@@ -36,6 +36,9 @@ public class ReviewVocabResponse {
     @Schema(description = "Câu ví dụ")
     private String exampleSentence;
 
+    @Schema(description = "Nguồn hoặc ghi công cho nội dung từ vựng")
+    private String credit;
+
     @Schema(description = "Cấp độ CEFR (A1, A2, B1, B2, C1, C2)")
     private String cefr;
 
