@@ -24,6 +24,7 @@ public class FlashcardResponse {
     private String exampleSentence;
     private String img;
     private String audio;
+    private String cefr;
 
     // Progress info
     private LocalDate lastReviewed;

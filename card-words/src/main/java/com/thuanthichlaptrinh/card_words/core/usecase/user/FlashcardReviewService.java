@@ -252,6 +252,7 @@ public class FlashcardReviewService {
                 .exampleSentence(vocab.getExampleSentence())
                 .img(vocab.getImg())
                 .audio(vocab.getAudio())
+                .cefr(vocab.getCefr())
                 .lastReviewed(progress.getLastReviewed())
                 .nextReviewDate(progress.getNextReviewDate())
                 .timesCorrect(progress.getTimesCorrect())
