@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -162,7 +163,7 @@ public class StreakReminderScheduler {
         }
     }
 
-    private Set<LocalDate> loadStudyDates(Long userId) {
+    private Set<LocalDate> loadStudyDates(UUID userId) {
         List<UserVocabProgress> progressList = userVocabProgressRepository.findByUserIdWithVocab(userId);
 
         if (progressList.isEmpty()) {
