@@ -1,8 +1,11 @@
 package com.thuanthichlaptrinh.card_words.core.usecase.user;
 
 import com.thuanthichlaptrinh.card_words.common.enums.VocabStatus;
+import com.thuanthichlaptrinh.card_words.common.exceptions.ErrorException;
+import com.thuanthichlaptrinh.card_words.core.domain.User;
 import com.thuanthichlaptrinh.card_words.core.domain.UserVocabProgress;
 import com.thuanthichlaptrinh.card_words.core.mapper.UserVocabProgressMapper;
+import com.thuanthichlaptrinh.card_words.dataprovider.repository.UserRepository;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.UserVocabProgressRepository;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.DailyVocabStatsResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.user.UserVocabProgressResponse;
@@ -17,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.TextStyle;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,6 +30,7 @@ import java.util.stream.Collectors;
 public class UserVocabProgressService {
 
     private final UserVocabProgressRepository userVocabProgressRepository;
+    private final UserRepository userRepository;
     private final UserVocabProgressMapper userVocabProgressMapper;
 
     // Get all vocabs learned by user
@@ -81,12 +86,34 @@ public class UserVocabProgressService {
         Double overallAccuracy = totalAttempts > 0 ? (totalCorrect * 100.0 / totalAttempts) : 0.0;
 
         Long totalLearned = userVocabProgressRepository.countLearnedVocabs(userId);
+
         Long mastered = userVocabProgressRepository.countByUserIdAndStatus(userId, VocabStatus.MASTERED);
-        // learning = KNOWN + UNKNOWN (chưa đạt MASTERED)
         Long known = userVocabProgressRepository.countByUserIdAndStatus(userId, VocabStatus.KNOWN);
         Long unknown = userVocabProgressRepository.countByUserIdAndStatus(userId, VocabStatus.UNKNOWN);
-        Long learning = known + unknown;
-        Long vocabsNew = userVocabProgressRepository.countByUserIdAndStatus(userId, VocabStatus.NEW);
+        Long newStatus = userVocabProgressRepository.countByUserIdAndStatus(userId, VocabStatus.NEW);
+
+        if (mastered == null)
+            mastered = 0L;
+        if (known == null)
+            known = 0L;
+        if (unknown == null)
+            unknown = 0L;
+        if (newStatus == null)
+            newStatus = 0L;
+
+        long learning = newStatus + known + unknown;
+        long untrackedVocabs = userVocabProgressRepository.countAllUnlearnedVocabs(userId);
+        long vocabsNew = newStatus + untrackedVocabs;
+
+        long totalTrackedVocabs = learning + mastered;
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ErrorException("Không tìm thấy người dùng"));
+
+        LocalDate signupDate = user.getCreatedAt().toLocalDate();
+        long totalDaysParticipated = Math.max(1, ChronoUnit.DAYS.between(signupDate, LocalDate.now()) + 1);
+        double dailyAverage = totalTrackedVocabs == 0 ? 0.0
+            : Math.ceil((double) totalTrackedVocabs / totalDaysParticipated);
 
         List<UserVocabProgress> dueVocabs = userVocabProgressRepository.findDueForReview(userId, LocalDate.now());
 
@@ -100,6 +127,7 @@ public class UserVocabProgressService {
                 .vocabsLearning(learning)
                 .vocabsNew(vocabsNew)
                 .vocabsDueForReview((long) dueVocabs.size())
+                .dailyAverage(dailyAverage)
                 .build();
     }
 

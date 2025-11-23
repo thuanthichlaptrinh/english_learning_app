@@ -16,7 +16,8 @@ public class UserVocabStatsResponse {
     private Long totalAttempts;
     private Double overallAccuracy; // %
     private Long vocabsMastered; // status = "MASTERED"
-    private Long vocabsLearning; // status = "LEARNING"
-    private Long vocabsNew; // status = "NEW"
+    private Long vocabsLearning; // status = "NEW, KNOWN, UNKNOWN"
+    private Long vocabsNew; // status = "NEW", và những từ nằm ngoài bảng UserVocabProgress
     private Long vocabsDueForReview;
+    private Double dailyAverage; // tổng số từ đã học (status = "NEW, KNOWN, UNKNOWN, MASTERED") / số ngày tham gia học
 }
