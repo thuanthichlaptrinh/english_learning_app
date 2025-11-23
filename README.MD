@@ -187,6 +187,16 @@ docker-compose exec postgres pg_isready -U postgres
 | **PgAdmin**         | http://localhost:5050                 | admin@cardwords.com / admin |
 | **Redis Insight**   | http://localhost:5540                 | -                           |
 
+#### WebSocket URL Matrix
+
+| Context                   | URL                           | Notes                                                                                                        |
+| ------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Local development         | `ws://localhost:8080/ws`      | Default when running Spring Boot via Maven or Docker port mapping                                            |
+| Docker Compose networking | `ws://card-words-api:8080/ws` | Use this service name when another container (frontend, AI, etc.) needs to subscribe inside the same network |
+| Production (HTTPS)        | `wss://<your-domain>/ws`      | Replace with the public domain behind your load balancer / reverse proxy; TLS termination required           |
+
+> 🔐 Always send `Authorization: Bearer <JWT>` in the STOMP CONNECT headers regardless of environment.
+
 ### Quick API Test
 
 #### 1. Register User
@@ -337,6 +347,7 @@ Open `test-websocket-events.html` in your browser:
 -   Swagger UI: `/swagger-ui.html`
 -   OpenAPI Spec: `/v3/api-docs`
 -   WebSocket Guide: `docs/WEBSOCKET_EVENTS.md`
+-   Notification playbook: `docs/websocket/WEBSOCKET_NOTIFICATION_PLAYBOOK.md`
 -   Notification API: `docs/NOTIFICATION_API_COMPLETE.md`
 
 ---
@@ -1086,6 +1097,7 @@ stompClient.subscribe('/user/queue/notifications/batch-deleted', callback);
 
 -   Complete guide: `docs/WEBSOCKET_EVENTS.md`
 -   Client examples: `docs/WEBSOCKET_CLIENT_GUIDE.md`
+-   Notification playbook: `docs/websocket/WEBSOCKET_NOTIFICATION_PLAYBOOK.md`
 -   Quick test: `test-websocket-events.html`
 
 ---

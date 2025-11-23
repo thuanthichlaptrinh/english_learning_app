@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 
 /**
  * Scheduled task để gửi nhắc nhở streak hàng ngày
- * Chạy vào 9:00 AM mỗi ngày để nhắc users duy trì streak
+ * Chạy vào 7:00 AM mỗi ngày để nhắc users duy trì streak
  */
 @Slf4j
 @Component
@@ -34,12 +35,12 @@ public class StreakReminderScheduler {
     private final EmailService emailService;
 
     /**
-     * Chạy hàng ngày lúc 9:00 AM
-     * Gửi email và notification cho users:
+     * Chạy hàng ngày lúc 07:00 và 19:00
+     * Gửi email & notification cho users:
      * - Đã học hôm qua nhưng chưa học hôm nay
      * - Đang có streak >= 3 ngày (đáng để giữ)
      */
-    @Scheduled(cron = "0 0 9 * * *") // 9:00 AM every day
+    @Scheduled(cron = "0 0 7,19 * * *") // 07:00 và 19:00 hằng ngày
     @Transactional(readOnly = true)
     public void sendStreakReminders() {
         log.info("🔔 Starting streak reminder job...");
@@ -54,8 +55,9 @@ public class StreakReminderScheduler {
 
             for (User user : allUsers) {
                 try {
+                    Set<LocalDate> studyDates = loadStudyDates(user.getId());
                     // Kiểm tra xem user có cần nhắc nhở không
-                    if (shouldSendReminder(user, today, yesterday)) {
+                    if (shouldSendReminder(user, today, yesterday, studyDates)) {
                         sendStreakReminderToUser(user);
                         remindersSent++;
                     }
@@ -78,18 +80,10 @@ public class StreakReminderScheduler {
      * 2. Chưa học hôm nay
      * 3. Streak hiện tại >= 3 ngày (đáng để giữ)
      */
-    private boolean shouldSendReminder(User user, LocalDate today, LocalDate yesterday) {
-        // Lấy lịch sử học tập
-        List<UserVocabProgress> progressList = userVocabProgressRepository.findByUserIdWithVocab(user.getId());
-
-        if (progressList.isEmpty()) {
+    private boolean shouldSendReminder(User user, LocalDate today, LocalDate yesterday, Set<LocalDate> studyDates) {
+        if (studyDates.isEmpty()) {
             return false; // User chưa học lần nào
         }
-
-        // Extract ngày học
-        Set<LocalDate> studyDates = progressList.stream()
-                .map(p -> p.getCreatedAt().toLocalDate())
-                .collect(Collectors.toCollection(TreeSet::new));
 
         // Kiểm tra điều kiện
         boolean studiedYesterday = studyDates.contains(yesterday);
@@ -98,6 +92,40 @@ public class StreakReminderScheduler {
 
         // Chỉ nhắc nếu: học hôm qua, chưa học hôm nay, streak >= 3
         return studiedYesterday && !studiedToday && currentStreak >= 3;
+    }
+
+    /**
+     * Gửi thông báo nhắc người dùng khi chuỗi đã bị dừng (chỉ chạy 07:00 mỗi ngày)
+     */
+    @Scheduled(cron = "0 0 7 * * *")
+    @Transactional(readOnly = true)
+    public void sendStreakStopAlerts() {
+        log.info("🛑 Starting streak stop alert job...");
+
+        try {
+            LocalDate today = LocalDate.now();
+            LocalDate yesterday = today.minusDays(1);
+            LocalDate dayBeforeYesterday = today.minusDays(2);
+
+            List<User> allUsers = userRepository.findAll();
+            int alertsSent = 0;
+
+            for (User user : allUsers) {
+                try {
+                    Set<LocalDate> studyDates = loadStudyDates(user.getId());
+                    if (shouldSendStopAlert(studyDates, yesterday, dayBeforeYesterday)) {
+                        sendStreakStopNotification(user);
+                        alertsSent++;
+                    }
+                } catch (Exception e) {
+                    log.error("❌ Failed to send stop alert to user {}: {}", user.getId(), e.getMessage());
+                }
+            }
+
+            log.info("✅ Streak stop alert job completed. Sent {} alerts", alertsSent);
+        } catch (Exception e) {
+            log.error("❌ Streak stop alert job failed: {}", e.getMessage(), e);
+        }
     }
 
     /**
@@ -110,9 +138,9 @@ public class StreakReminderScheduler {
         try {
             CreateNotificationRequest notificationRequest = CreateNotificationRequest.builder()
                     .userId(user.getId())
-                    .title("🔥 Don't Break Your Streak!")
+                    .title("🔥 Đừng để chuỗi học bị gãy!")
                     .content(String.format(
-                            "You're on a %d-day streak! Practice today to keep your learning momentum going.", streak))
+                            "Bạn đang có chuỗi %d ngày. Luyện tập ngay hôm nay để duy trì phong độ nhé!", streak))
                     .type("vocab_reminder")
                     .build();
 
@@ -130,6 +158,44 @@ public class StreakReminderScheduler {
 
         } catch (Exception e) {
             log.error("❌ Failed to send email to {}: {}", user.getEmail(), e.getMessage());
+        }
+    }
+
+    private Set<LocalDate> loadStudyDates(Long userId) {
+        List<UserVocabProgress> progressList = userVocabProgressRepository.findByUserIdWithVocab(userId);
+
+        if (progressList.isEmpty()) {
+            return Collections.emptySet();
+        }
+
+        return progressList.stream()
+                .map(progress -> progress.getCreatedAt().toLocalDate())
+                .collect(Collectors.toCollection(TreeSet::new));
+    }
+
+    private boolean shouldSendStopAlert(Set<LocalDate> studyDates, LocalDate yesterday, LocalDate dayBeforeYesterday) {
+        if (studyDates.isEmpty()) {
+            return false;
+        }
+
+        boolean missedYesterday = !studyDates.contains(yesterday);
+        boolean studiedDayBefore = studyDates.contains(dayBeforeYesterday);
+        return missedYesterday && studiedDayBefore;
+    }
+
+    private void sendStreakStopNotification(User user) {
+        try {
+            CreateNotificationRequest notificationRequest = CreateNotificationRequest.builder()
+                    .userId(user.getId())
+                    .title("⚠️ Chuỗi học của bạn đã bị gián đoạn")
+                    .content("Bạn đã bỏ lỡ buổi học hôm qua. Hãy quay lại ôn tập để khởi động lại chuỗi mới ngay hôm nay!")
+                    .type("streak_break")
+                    .build();
+
+            notificationService.createNotification(notificationRequest);
+            log.info("🛑 Streak break notification sent to user: {}", user.getEmail());
+        } catch (Exception e) {
+            log.error("❌ Failed to create streak break notification for user {}: {}", user.getId(), e.getMessage());
         }
     }
 }
