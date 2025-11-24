@@ -26,6 +26,7 @@ public class LeaderboardService {
     private final LeaderboardCacheService leaderboardCacheService;
     private final UserRepository userRepository;
     private final GameSessionRepository gameSessionRepository;
+    private final NotificationService notificationService;
 
     /**
      * Get Quick Quiz global leaderboard
@@ -150,23 +151,33 @@ public class LeaderboardService {
     public void updateUserScore(UUID userId, String gameType, double score) {
         log.info("📈 Updating leaderboard score: userId={}, game={}, score={}", userId, gameType, score);
 
+        // Get old rank before update
+        Long oldRank = null;
         switch (gameType.toLowerCase()) {
             case "quickquiz":
             case "quick-quiz":
+                oldRank = leaderboardCacheService.getQuizGlobalRank(userId);
                 leaderboardCacheService.updateQuizGlobalScore(userId, score);
                 leaderboardCacheService.updateQuizDailyScore(userId, score);
                 leaderboardCacheService.updateQuizWeeklyScore(userId, score);
                 break;
             case "imagematching":
             case "image-matching":
+                oldRank = leaderboardCacheService.getUserRank(com.thuanthichlaptrinh.card_words.common.constants.RedisKeyConstants.LEADERBOARD_IMAGE_GLOBAL, userId);
                 leaderboardCacheService.updateImageMatchingScore(userId, score);
                 break;
             case "worddef":
             case "word-definition":
+                oldRank = leaderboardCacheService.getUserRank(com.thuanthichlaptrinh.card_words.common.constants.RedisKeyConstants.LEADERBOARD_WORDDEF_GLOBAL, userId);
                 leaderboardCacheService.updateWordDefScore(userId, score);
                 break;
             default:
                 log.warn("⚠️ Unknown game type: {}", gameType);
+        }
+
+        // Get new rank after update and send notification if improved
+        if (oldRank != null) {
+            checkAndNotifyLeaderboardRank(userId, gameType, oldRank);
         }
 
         log.info("✅ Leaderboard updated successfully");
@@ -272,5 +283,89 @@ public class LeaderboardService {
         }
 
         return responses;
+    }
+
+    /**
+     * Check and notify user if they achieved top rank in leaderboard
+     */
+    private void checkAndNotifyLeaderboardRank(UUID userId, String gameType, Long oldRank) {
+        try {
+            Long newRank = null;
+            
+            switch (gameType.toLowerCase()) {
+                case "quickquiz":
+                case "quick-quiz":
+                    newRank = leaderboardCacheService.getQuizGlobalRank(userId);
+                    break;
+                case "imagematching":
+                case "image-matching":
+                    newRank = leaderboardCacheService.getUserRank(com.thuanthichlaptrinh.card_words.common.constants.RedisKeyConstants.LEADERBOARD_IMAGE_GLOBAL, userId);
+                    break;
+                case "worddef":
+                case "word-definition":
+                    newRank = leaderboardCacheService.getUserRank(com.thuanthichlaptrinh.card_words.common.constants.RedisKeyConstants.LEADERBOARD_WORDDEF_GLOBAL, userId);
+                    break;
+            }
+
+            if (newRank == null) return;
+
+            // Convert 0-based rank to 1-based
+            int rank = newRank.intValue() + 1;
+            int oldRankInt = oldRank.intValue() + 1;
+
+            // Send notification if reached top positions and improved
+            if (rank < oldRankInt) {
+                User user = userRepository.findById(userId).orElse(null);
+                if (user == null) return;
+
+                String gameDisplayName = getGameDisplayName(gameType);
+                String title = null;
+                String content = null;
+
+                if (rank == 1) {
+                    title = "👑 #1 Trên Bảng Xếp Hạng!";
+                    content = String.format("Chúc mừng! Bạn đã vươn lên vị trí #1 trong %s! Bạn là người giỏi nhất!", gameDisplayName);
+                } else if (rank <= 3) {
+                    title = String.format("🥇 Top %d!", rank);
+                    content = String.format("Tuyệt vời! Bạn đã lọt vào Top %d trong %s! Tiếp tục phấn đấu!", rank, gameDisplayName);
+                } else if (rank <= 10) {
+                    title = "🏆 Top 10!";
+                    content = String.format("Xuất sắc! Bạn đã vào Top 10 trong %s (Hạng #%d)!", gameDisplayName, rank);
+                }
+
+                if (title != null && content != null) {
+                    com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = 
+                        com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest.builder()
+                            .userId(userId)
+                            .title(title)
+                            .content(content)
+                            .type("achievement")
+                            .build();
+                    notificationService.createNotification(request);
+                    log.info("✅ Leaderboard rank notification sent: userId={}, rank={}, game={}", userId, rank, gameType);
+                }
+            }
+        } catch (Exception e) {
+            log.error("❌ Failed to check/notify leaderboard rank: {}", e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Get display name for game type
+     */
+    private String getGameDisplayName(String gameType) {
+        switch (gameType.toLowerCase()) {
+            case "quickquiz":
+            case "quick-quiz":
+                return "Quick Quiz";
+            case "imagematching":
+            case "image-matching":
+                return "Image Word Matching";
+            case "worddef":
+            case "word-definition":
+                return "Word Definition Matching";
+            default:
+                return gameType;
+        }
     }
 }

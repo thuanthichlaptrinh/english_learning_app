@@ -56,6 +56,7 @@ public class AuthenticationService {
     private final EmailService emailService;
     private final UserCacheService userCacheService; // ← Thêm cache service
     private final SimpMessagingTemplate messagingTemplate;
+    private final NotificationService notificationService;
 
     private static final String ADMIN_REG_TOPIC = "/topic/admin/user-registrations";
 
@@ -104,6 +105,9 @@ public class AuthenticationService {
         // ✅ Cache user ngay sau khi đăng ký
         cacheUserData(user);
         notifyAdminUserRegistration(user);
+
+        // 🔔 Send welcome notification
+        sendWelcomeNotification(user);
 
         try {
             emailService.sendWelcomeEmailWithPassword(user.getEmail(), user.getName(), generatedPassword);
@@ -444,6 +448,25 @@ public class AuthenticationService {
         } catch (Exception e) {
             log.error("❌ Error caching user data for {}: {}", user.getEmail(), e.getMessage());
             // Don't throw - caching failure shouldn't break authentication
+        }
+    }
+
+    /**
+     * Send welcome notification to new user
+     */
+    private void sendWelcomeNotification(User user) {
+        try {
+            com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = 
+                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest.builder()
+                    .userId(user.getId())
+                    .title("🎉 Chào Mừng Đến Card Words!")
+                    .content(String.format("Xin chào %s! Chúc bạn có trải nghiệm học tập thú vị. Hãy bắt đầu xây dựng streak của bạn ngay hôm nay!", user.getName()))
+                    .type("system_alert")
+                    .build();
+            notificationService.createNotification(request);
+            log.info("✅ Welcome notification sent to user: {}", user.getId());
+        } catch (Exception e) {
+            log.error("❌ Failed to send welcome notification: {}", e.getMessage(), e);
         }
     }
 

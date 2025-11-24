@@ -28,6 +28,7 @@ public class FlashcardReviewService {
 
     private final UserVocabProgressRepository userVocabProgressRepository;
     private final VocabRepository vocabRepository;
+    private final NotificationService notificationService;
 
     // Get all flashcards due for review today
     @Transactional(readOnly = true)
@@ -122,6 +123,9 @@ public class FlashcardReviewService {
 
         // Save updated progress
         progress = userVocabProgressRepository.save(progress);
+
+        // Send notification for review completion
+        sendFlashcardReviewNotification(user, request.getQuality(), progress);
 
         // Get remaining due cards
         int remainingDue = userVocabProgressRepository
@@ -262,5 +266,28 @@ public class FlashcardReviewService {
                 .intervalDays(progress.getIntervalDays())
                 .status(progress.getStatus())
                 .build();
+    }
+
+    /**
+     * Send notification for flashcard review performance
+     */
+    private void sendFlashcardReviewNotification(User user, int quality, UserVocabProgress progress) {
+        try {
+            // Send notification for excellent performance (quality 3 or higher)
+            if (quality >= 3) {
+                String qualityText = quality == 5 ? "Hoàn Hảo" : "Xuất Sắc";
+                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = 
+                    com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest.builder()
+                        .userId(user.getId())
+                        .title(String.format("🌟 %s!", qualityText))
+                        .content(String.format("Bạn đã nhớ từ '%s' rất tốt! Độ khó hiện tại: %.2f", 
+                            progress.getVocab().getWord(), progress.getEfFactor()))
+                        .type("flashcard_review")
+                        .build();
+                notificationService.createNotification(request);
+            }
+        } catch (Exception e) {
+            log.error("❌ Failed to send flashcard review notification: {}", e.getMessage(), e);
+        }
     }
 }

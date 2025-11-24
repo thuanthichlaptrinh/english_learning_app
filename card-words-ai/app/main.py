@@ -10,12 +10,14 @@ from datetime import datetime
 from contextlib import asynccontextmanager
 import structlog
 import os
+import numpy as np
 
 from app.config import settings
 from app.db.database_service import DatabaseService
 from app.core.services.cache_service import CacheService
 from app.core.services.smart_review_service import SmartReviewService
 from app.core.ml.xgboost_model import XGBoostVocabModel
+from app.core.ml.random_forest_model import RandomForestVocabModel
 from app.middleware.auth import verify_jwt_token, verify_admin_api_key, verify_internal_api_key
 from app.schemas.requests import PredictRequest, RetrainRequest, InvalidateCacheRequest
 from app.schemas.responses import (
@@ -36,14 +38,16 @@ logger = structlog.get_logger()
 # Global services
 db_service: DatabaseService = None
 cache_service: CacheService = None
-model: XGBoostVocabModel = None
+xgboost_model: XGBoostVocabModel = None
+rf_model: RandomForestVocabModel = None
+model = None  # Active model (either xgboost_model or rf_model)
 smart_review_service: SmartReviewService = None
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Lifespan context manager for startup and shutdown"""
-    global db_service, cache_service, model, smart_review_service
+    global db_service, cache_service, xgboost_model, rf_model, model, smart_review_service
     
     # Startup
     logger.info("service_starting", version=settings.MODEL_VERSION)
@@ -52,24 +56,49 @@ async def lifespan(app: FastAPI):
     db_service = DatabaseService()
     cache_service = CacheService()
     
-    # Initialize and load model
-    model = XGBoostVocabModel(
+    # Initialize XGBoost model
+    xgboost_model = XGBoostVocabModel(
         model_path=settings.MODEL_PATH,
         scaler_path=settings.SCALER_PATH,
         version=settings.MODEL_VERSION
     )
     
-    # Try to load model if exists
+    # Initialize Random Forest model
+    rf_model = RandomForestVocabModel(
+        model_path=settings.RF_MODEL_PATH,
+        scaler_path=settings.RF_SCALER_PATH,
+        version=settings.RF_MODEL_VERSION
+    )
+    
+    # Try to load XGBoost model if exists
     if os.path.exists(settings.MODEL_PATH):
         try:
-            model.load_model()
-            logger.info("model_loaded_successfully", version=settings.MODEL_VERSION)
+            xgboost_model.load_model()
+            logger.info("xgboost_model_loaded_successfully", version=settings.MODEL_VERSION)
         except Exception as e:
-            logger.warning("model_load_failed", error=str(e))
+            logger.warning("xgboost_model_load_failed", error=str(e))
     else:
-        logger.warning("model_file_not_found", path=settings.MODEL_PATH)
+        logger.warning("xgboost_model_file_not_found", path=settings.MODEL_PATH)
     
-    # Initialize smart review service
+    # Try to load Random Forest model if exists
+    if os.path.exists(settings.RF_MODEL_PATH):
+        try:
+            rf_model.load_model()
+            logger.info("rf_model_loaded_successfully", version=settings.RF_MODEL_VERSION)
+        except Exception as e:
+            logger.warning("rf_model_load_failed", error=str(e))
+    else:
+        logger.warning("rf_model_file_not_found", path=settings.RF_MODEL_PATH)
+    
+    # Set active model based on configuration
+    if settings.ACTIVE_MODEL_TYPE == "random_forest":
+        model = rf_model
+        logger.info("active_model_set", model_type="random_forest")
+    else:
+        model = xgboost_model
+        logger.info("active_model_set", model_type="xgboost")
+    
+    # Initialize smart review service with active model
     smart_review_service = SmartReviewService(
         model=model,
         db_service=db_service,
@@ -146,14 +175,19 @@ async def health_check():
     """Health check endpoint"""
     db_healthy = await db_service.health_check()
     redis_healthy = await cache_service.health_check()
-    model_loaded = model.is_loaded if model else False
+    xgboost_loaded = xgboost_model.is_loaded if xgboost_model else False
+    rf_loaded = rf_model.is_loaded if rf_model else False
+    active_model_loaded = model.is_loaded if model else False
     
-    status = "healthy" if all([db_healthy, redis_healthy, model_loaded]) else "unhealthy"
+    status = "healthy" if all([db_healthy, redis_healthy, active_model_loaded]) else "unhealthy"
     
     return {
         "status": status,
         "service": "card-words-ai",
-        "model_loaded": model_loaded,
+        "model_loaded": active_model_loaded,
+        "active_model_type": settings.ACTIVE_MODEL_TYPE,
+        "xgboost_loaded": xgboost_loaded,
+        "rf_loaded": rf_loaded,
         "database_connected": db_healthy,
         "redis_connected": redis_healthy,
         "timestamp": datetime.now().isoformat()
@@ -223,13 +257,20 @@ async def retrain_model(
     _: bool = Depends(verify_admin_api_key)
 ):
     """
-    Retrain XGBoost model with latest data
+    Retrain XGBoost or Random Forest model with latest data
     
     Requires admin API key
     """
     import time
     
-    logger.info("retrain_started", force=request.force)
+    model_type = request.model_type.lower()
+    if model_type not in ["xgboost", "random_forest"]:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid model_type: {model_type}. Must be 'xgboost' or 'random_forest'"
+        )
+    
+    logger.info("retrain_started", force=request.force, model_type=model_type)
     start_time = time.time()
     
     try:
@@ -242,37 +283,61 @@ async def retrain_model(
                 detail=f"Insufficient data for training: {len(progress_list)} samples"
             )
         
+        # Select model to train
+        if model_type == "random_forest":
+            target_model = rf_model
+            model_path = settings.RF_MODEL_PATH
+        else:
+            target_model = xgboost_model
+            model_path = settings.MODEL_PATH
+        
         # Backup old model if exists
-        if os.path.exists(settings.MODEL_PATH):
-            backup_path = settings.MODEL_PATH + ".backup"
-            os.rename(settings.MODEL_PATH, backup_path)
-            logger.info("model_backed_up", backup_path=backup_path)
+        if os.path.exists(model_path):
+            backup_path = model_path + ".backup"
+            os.rename(model_path, backup_path)
+            logger.info("model_backed_up", backup_path=backup_path, model_type=model_type)
         
         # Train model
-        metrics = model.train(progress_list)
+        metrics = target_model.train(progress_list)
+        
+        # Convert any NaN/Inf values to None for JSON serialization
+        cleaned_metrics = {}
+        for key, value in metrics.items():
+            if isinstance(value, dict):
+                # Handle nested dict (feature_importances)
+                cleaned_metrics[key] = {
+                    k: None if (isinstance(v, float) and (np.isnan(v) or np.isinf(v))) else v
+                    for k, v in value.items()
+                }
+            elif isinstance(value, float):
+                cleaned_metrics[key] = None if (np.isnan(value) or np.isinf(value)) else value
+            else:
+                cleaned_metrics[key] = value
         
         # Save model
-        model.save_model()
+        target_model.save_model()
         
         training_time = time.time() - start_time
         
         logger.info(
             "retrain_completed",
-            metrics=metrics,
+            model_type=model_type,
+            metrics=cleaned_metrics,
             training_time_seconds=training_time,
             samples=len(progress_list)
         )
         
         return {
             "success": True,
-            "model_version": settings.MODEL_VERSION,
-            "metrics": metrics,
+            "model_type": model_type,
+            "model_version": target_model.version,
+            "metrics": cleaned_metrics,
             "training_time_seconds": training_time,
             "samples_trained": len(progress_list)
         }
     
     except Exception as e:
-        logger.error("retrain_failed", error=str(e), exc_info=True)
+        logger.error("retrain_failed", model_type=model_type, error=str(e), exc_info=True)
         raise HTTPException(status_code=500, detail=f"Training failed: {str(e)}")
 
 

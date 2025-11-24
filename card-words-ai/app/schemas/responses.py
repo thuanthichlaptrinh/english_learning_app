@@ -28,8 +28,9 @@ class PredictResponse(BaseModel):
 class RetrainResponse(BaseModel):
     """Response schema for retrain endpoint"""
     success: bool
+    model_type: str = Field(..., description="Model type that was trained")
     model_version: str
-    metrics: Dict[str, float]
+    metrics: Dict[str, Any]  # Changed to Any to support None values and nested dicts
     training_time_seconds: float
     samples_trained: int
 
@@ -47,6 +48,9 @@ class HealthResponse(BaseModel):
     status: str
     service: str
     model_loaded: bool
+    active_model_type: Optional[str] = None
+    xgboost_loaded: Optional[bool] = None
+    rf_loaded: Optional[bool] = None
     database_connected: bool
     redis_connected: bool
     timestamp: str

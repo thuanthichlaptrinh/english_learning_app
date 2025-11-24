@@ -11,6 +11,7 @@ class PredictRequest(BaseModel):
 class RetrainRequest(BaseModel):
     """Request schema for retrain endpoint"""
     force: bool = Field(False, description="Force retrain even if recent")
+    model_type: str = Field("xgboost", description="Model type to train: 'xgboost' or 'random_forest'")
 
 
 class InvalidateCacheRequest(BaseModel):

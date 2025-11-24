@@ -169,10 +169,18 @@ services:
             # Redis (for caching predictions)
             - REDIS_URL=redis://${REDIS_HOST}:${REDIS_PORT}/${REDIS_AI_DB}
 
-            # Model Configuration
+            # Model Configuration - XGBoost
             - MODEL_PATH=/app/models/xgboost_model_v1.pkl
             - SCALER_PATH=/app/models/scaler_v1.pkl
             - MODEL_VERSION=v1.0.0
+
+            # Model Configuration - Random Forest
+            - RF_MODEL_PATH=/app/models/random_forest_model_v1.pkl
+            - RF_SCALER_PATH=/app/models/rf_scaler_v1.pkl
+            - RF_MODEL_VERSION=v1.0.0
+
+            # Active Model Selection
+            - ACTIVE_MODEL_TYPE=${ACTIVE_MODEL_TYPE}
 
             # API Configuration
             - API_HOST=${API_HOST}

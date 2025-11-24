@@ -341,6 +341,9 @@ public interface UserVocabProgressRepository extends JpaRepository<UserVocabProg
         // Count by user, topic ID, and status
         long countByUserIdAndVocabTopicIdAndStatus(UUID userId, Long topicId, VocabStatus status);
 
+        // Count reviewed vocabs by user and date
+        long countByUserIdAndLastReviewed(UUID userId, LocalDate lastReviewed);
+
         // === QUERIES FOR TOPIC PROGRESS CALCULATION ===
         // Đếm số từ vựng đã thuộc (KNOWN hoặc MASTERED) của user theo topic
         @Query("SELECT COUNT(uvp) FROM UserVocabProgress uvp " +

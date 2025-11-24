@@ -80,6 +80,42 @@ Thông báo về tiến trình học tập
 -   Title: "Weekly Progress Report"
 -   Content: "You've studied 50 new words this week..."
 
+### 6. game_achievement
+
+Thành tích trong game (Quick Quiz, Word Definition, etc.)
+
+**Example:**
+
+-   Title: "🎯 Perfect Score!"
+-   Content: "Amazing! You answered all questions correctly..."
+
+### 7. streak_milestone
+
+Cột mốc streak (3, 7, 30 ngày)
+
+**Example:**
+
+-   Title: "🔥 7-Day Streak Milestone!"
+-   Content: "Congratulations! You've maintained a 7-day learning streak..."
+
+### 8. streak_reminder
+
+Nhắc nhở duy trì streak
+
+**Example:**
+
+-   Title: "🔥 Don't lose your streak!"
+-   Content: "You haven't studied today. Complete a lesson to keep your streak alive!"
+
+### 9. streak_break
+
+Cảnh báo chuỗi học bị gián đoạn
+
+**Example:**
+
+-   Title: "💔 Streak Broken"
+-   Content: "You missed yesterday. Start a new streak today!"
+
 ## User APIs
 
 ### 1. Lấy danh sách thông báo

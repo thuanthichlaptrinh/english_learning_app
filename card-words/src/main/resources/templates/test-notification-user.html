@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Test User Notifications - WebSocket</title>
+        <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7/bundles/stomp.umd.min.js"></script>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                padding: 20px;
+            }
+
+            .container {
+                max-width: 800px;
+                margin: 0 auto;
+                background: white;
+                border-radius: 20px;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                overflow: hidden;
+            }
+
+            .header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 30px;
+                text-align: center;
+            }
+
+            .header h1 {
+                font-size: 28px;
+                margin-bottom: 10px;
+            }
+
+            .status {
+                padding: 20px 30px;
+                background: #f8f9fa;
+                border-bottom: 1px solid #e9ecef;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .status-indicator {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .status-dot {
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                background: #dc3545;
+                animation: pulse 2s infinite;
+            }
+
+            .status-dot.connected {
+                background: #28a745;
+            }
+
+            @keyframes pulse {
+                0%,
+                100% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0.5;
+                }
+            }
+
+            .badge {
+                background: #dc3545;
+                color: white;
+                padding: 4px 12px;
+                border-radius: 20px;
+                font-size: 14px;
+                font-weight: bold;
+            }
+
+            .login-section {
+                padding: 30px;
+            }
+
+            .form-group {
+                margin-bottom: 20px;
+            }
+
+            label {
+                display: block;
+                margin-bottom: 8px;
+                font-weight: 600;
+                color: #495057;
+            }
+
+            textarea,
+            input {
+                width: 100%;
+                padding: 12px;
+                border: 2px solid #e9ecef;
+                border-radius: 8px;
+                font-size: 14px;
+                font-family: monospace;
+                transition: border-color 0.3s;
+            }
+
+            textarea:focus,
+            input:focus {
+                outline: none;
+                border-color: #667eea;
+            }
+
+            textarea {
+                min-height: 120px;
+                resize: vertical;
+            }
+
+            .btn {
+                width: 100%;
+                padding: 14px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                border: none;
+                border-radius: 8px;
+                font-size: 16px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: transform 0.2s;
+            }
+
+            .btn:hover {
+                transform: translateY(-2px);
+            }
+
+            .btn:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+            }
+
+            .notifications {
+                padding: 20px 30px;
+                max-height: 600px;
+                overflow-y: auto;
+            }
+
+            .notification-item {
+                background: white;
+                border: 2px solid #e9ecef;
+                border-radius: 12px;
+                padding: 20px;
+                margin-bottom: 15px;
+                transition: all 0.3s;
+                animation: slideIn 0.3s ease-out;
+            }
+
+            .notification-item.unread {
+                background: #f0f4ff;
+                border-color: #667eea;
+            }
+
+            @keyframes slideIn {
+                from {
+                    opacity: 0;
+                    transform: translateX(-20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+
+            .notification-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: start;
+                margin-bottom: 10px;
+            }
+
+            .notification-title {
+                font-size: 18px;
+                font-weight: 600;
+                color: #212529;
+            }
+
+            .notification-type {
+                padding: 4px 10px;
+                background: #667eea;
+                color: white;
+                border-radius: 20px;
+                font-size: 12px;
+                white-space: nowrap;
+            }
+
+            .notification-content {
+                color: #6c757d;
+                margin-bottom: 10px;
+                line-height: 1.6;
+            }
+
+            .notification-footer {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-size: 12px;
+                color: #adb5bd;
+            }
+
+            .empty-state {
+                text-align: center;
+                padding: 60px 20px;
+                color: #adb5bd;
+            }
+
+            .empty-state-icon {
+                font-size: 64px;
+                margin-bottom: 20px;
+            }
+
+            .instructions {
+                background: #fff3cd;
+                border: 2px solid #ffc107;
+                border-radius: 12px;
+                padding: 20px;
+                margin: 20px 30px;
+            }
+
+            .instructions h3 {
+                color: #856404;
+                margin-bottom: 15px;
+            }
+
+            .instructions ol {
+                margin-left: 20px;
+                color: #856404;
+            }
+
+            .instructions li {
+                margin-bottom: 8px;
+            }
+
+            .instructions code {
+                background: #fff;
+                padding: 2px 6px;
+                border-radius: 4px;
+                font-size: 13px;
+            }
+
+            .test-section {
+                padding: 20px 30px;
+                background: #f8f9fa;
+                border-top: 1px solid #e9ecef;
+            }
+
+            .test-section h3 {
+                margin-bottom: 15px;
+                color: #495057;
+            }
+
+            .btn-test {
+                background: #28a745;
+                margin-bottom: 10px;
+            }
+
+            .btn-test:hover {
+                background: #218838;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>🔔 Test User Notifications</h1>
+                <p>WebSocket Real-time Testing Tool</p>
+            </div>
+
+            <div class="status">
+                <div class="status-indicator">
+                    <div class="status-dot" id="statusDot"></div>
+                    <span id="statusText">Disconnected</span>
+                </div>
+                <div>
+                    <span class="badge" id="unreadBadge">0 unread</span>
+                </div>
+            </div>
+
+            <div class="login-section" id="loginSection">
+                <div class="form-group">
+                    <label for="jwtToken">📝 Paste JWT Token (từ API login):</label>
+                    <textarea id="jwtToken" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."></textarea>
+                </div>
+
+                <button class="btn" onclick="connectWebSocket()">🚀 Connect to WebSocket</button>
+            </div>
+
+            <div class="instructions">
+                <h3>📋 Hướng dẫn test:</h3>
+                <ol>
+                    <li>Lấy JWT token từ API login: <code>POST /api/v1/auth/signin</code></li>
+                    <li>Paste token vào ô bên trên và click "Connect"</li>
+                    <li>Tạo notification bằng một trong các cách sau:</li>
+                </ol>
+                <br />
+                <strong>Cách 1: Admin API</strong><br />
+                <code>POST /api/v1/admin/notifications</code><br />
+                <code>{"title": "Test", "content": "Hello", "type": "system", "userId": "YOUR_USER_ID"}</code>
+                <br /><br />
+                <strong>Cách 2: Trigger tự động (submit review, complete game, etc.)</strong>
+            </div>
+
+            <div class="test-section" id="testSection" style="display: none">
+                <h3>🧪 Quick Test Actions</h3>
+                <p style="color: #6c757d; margin-bottom: 15px">Dùng Postman để gọi các API sau:</p>
+
+                <button class="btn btn-test" onclick="copyToClipboard('submit-review')">
+                    📝 Copy API: Submit Review (trigger streak notification)
+                </button>
+
+                <button class="btn btn-test" onclick="copyToClipboard('complete-game')">
+                    🎮 Copy API: Complete Game (trigger game result)
+                </button>
+
+                <button class="btn btn-test" onclick="copyToClipboard('admin-notif')">
+                    👑 Copy API: Admin Create Notification
+                </button>
+
+                <div id="clipboardMessage" style="color: #28a745; margin-top: 10px; display: none">
+                    ✅ Đã copy! Paste vào Postman
+                </div>
+            </div>
+
+            <div class="notifications" id="notificationsList">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📭</div>
+                    <h3>Chưa có notifications</h3>
+                    <p>Connect WebSocket và tạo notification để test</p>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            let stompClient = null;
+            let notifications = [];
+            let unreadCount = 0;
+            let currentUserId = null;
+
+            function connectWebSocket() {
+                const token = document.getElementById('jwtToken').value.trim();
+
+                if (!token) {
+                    alert('Vui lòng nhập JWT token!');
+                    return;
+                }
+
+                // Parse JWT to get user ID
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    currentUserId = payload.sub;
+                    console.log('User ID:', currentUserId);
+                } catch (e) {
+                    console.error('Invalid JWT:', e);
+                }
+
+                const socket = new SockJS('http://localhost:8080/ws');
+                stompClient = new StompClient.Client({
+                    webSocketFactory: () => socket,
+
+                    connectHeaders: {
+                        Authorization: `Bearer ${token}`,
+                    },
+
+                    debug: (str) => {
+                        console.log('STOMP:', str);
+                    },
+
+                    reconnectDelay: 5000,
+                    heartbeatIncoming: 4000,
+                    heartbeatOutgoing: 4000,
+
+                    onConnect: (frame) => {
+                        console.log('✅ Connected:', frame);
+                        updateStatus(true);
+
+                        // Subscribe to notifications
+                        stompClient.subscribe('/user/queue/notifications', (message) => {
+                            const notification = JSON.parse(message.body);
+                            handleNewNotification(notification);
+                        });
+
+                        // Subscribe to read events
+                        stompClient.subscribe('/user/queue/notifications/read', (message) => {
+                            const data = JSON.parse(message.body);
+                            markAsRead(data.id);
+                        });
+
+                        // Subscribe to read-all events
+                        stompClient.subscribe('/user/queue/notifications/read-all', () => {
+                            markAllAsRead();
+                        });
+
+                        // Subscribe to delete events
+                        stompClient.subscribe('/user/queue/notifications/deleted', (message) => {
+                            const data = JSON.parse(message.body);
+                            removeNotification(data.id);
+                        });
+
+                        console.log('📡 Subscribed to all channels');
+                        document.getElementById('testSection').style.display = 'block';
+                    },
+
+                    onStompError: (frame) => {
+                        console.error('❌ STOMP error:', frame);
+                        alert('Connection error: ' + (frame.headers.message || 'Unknown error'));
+                    },
+
+                    onWebSocketClose: () => {
+                        console.warn('⚠️ WebSocket closed');
+                        updateStatus(false);
+                    },
+                });
+
+                stompClient.activate();
+                document.getElementById('loginSection').style.display = 'none';
+            }
+
+            function updateStatus(connected) {
+                const dot = document.getElementById('statusDot');
+                const text = document.getElementById('statusText');
+
+                if (connected) {
+                    dot.classList.add('connected');
+                    text.textContent = 'Connected';
+                    text.style.color = '#28a745';
+                } else {
+                    dot.classList.remove('connected');
+                    text.textContent = 'Disconnected';
+                    text.style.color = '#dc3545';
+                }
+            }
+
+            function handleNewNotification(notification) {
+                console.log('📬 New notification:', notification);
+
+                notifications.unshift(notification);
+                if (!notification.isRead) {
+                    unreadCount++;
+                }
+
+                updateUI();
+                playSound();
+                showToast(notification);
+            }
+
+            function markAsRead(id) {
+                const index = notifications.findIndex((n) => n.id === id);
+                if (index !== -1 && !notifications[index].isRead) {
+                    notifications[index].isRead = true;
+                    unreadCount--;
+                    updateUI();
+                }
+            }
+
+            function markAllAsRead() {
+                notifications.forEach((n) => (n.isRead = true));
+                unreadCount = 0;
+                updateUI();
+            }
+
+            function removeNotification(id) {
+                const index = notifications.findIndex((n) => n.id === id);
+                if (index !== -1) {
+                    if (!notifications[index].isRead) {
+                        unreadCount--;
+                    }
+                    notifications.splice(index, 1);
+                    updateUI();
+                }
+            }
+
+            function updateUI() {
+                // Update badge
+                document.getElementById('unreadBadge').textContent = `${unreadCount} unread`;
+
+                // Update list
+                const list = document.getElementById('notificationsList');
+
+                if (notifications.length === 0) {
+                    list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <h3>Chưa có notifications</h3>
+                        <p>Tạo notification để test real-time sync</p>
+                    </div>
+                `;
+                    return;
+                }
+
+                list.innerHTML = notifications
+                    .map(
+                        (n) => `
+                <div class="notification-item ${n.isRead ? '' : 'unread'}">
+                    <div class="notification-header">
+                        <div class="notification-title">${n.title}</div>
+                        <div class="notification-type">${n.type}</div>
+                    </div>
+                    <div class="notification-content">${n.content}</div>
+                    <div class="notification-footer">
+                        <span>${formatTime(n.createdAt)}</span>
+                        <span>${n.isRead ? '✓ Đã đọc' : '● Chưa đọc'}</span>
+                    </div>
+                </div>
+            `,
+                    )
+                    .join('');
+            }
+
+            function formatTime(timestamp) {
+                const date = new Date(timestamp);
+                const now = new Date();
+                const diff = Math.floor((now - date) / 1000);
+
+                if (diff < 60) return 'Vừa xong';
+                if (diff < 3600) return `${Math.floor(diff / 60)} phút trước`;
+                if (diff < 86400) return `${Math.floor(diff / 3600)} giờ trước`;
+                return `${Math.floor(diff / 86400)} ngày trước`;
+            }
+
+            function playSound() {
+                const audio = new Audio(
+                    'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSd+zPDTgjMGHm7A7+OZUA0PVKno7adbGAg+luPxwG8gBSh7yPDajDAFIXbH8NuQQAoUXrTp66hVFApGn+DyvmwhBSd+zPDTgjMGHm7A7+OZUA0PVKno7adbGAg+luPxwG8gBSh7yPDajDAFI3bH8NuQQAoUXrTp66hVFApGn+DyvmwhBSd+zPDTgjMGHm7A7+OZUA0PVKno7adbGAg+luPxwG8gBSh7yPDajDAFI3bH8NuQQAoUXrTp66hVFApGn+DyvmwhBSd+zPDTgjMGHm7A7+OZUA0PVKno7adbGAg+luPxwG8gBSh7yPDajDAFI3bH8NuQQAoUXrTp66hVFApGn+DyvmwhBSd+zPDTgjMGHm7A7+OZUA0PVKno7adbGAg+luPxwG8gBSh7yPDajDAFI3bH8NuQQAoUXrTp66hVFApGn+DyvmwhBSd+zPDTgjMGHm7A7+OZUA0PVKno7adbGAg+luPxwG8gBSh7yPDajDAFI3bH8NuQQAoUXrTp66hVFApGn+DyvmwhBSd+zPDTgjMGHm7A7+OZUA0PVKno7adbGAg+luPxwG8gBSh7yPDajDAFI3bH8NuQQAoUXrTp66hVFApGn+DyvmwhBSd+zPDTgjMGHm7A7+OZUA0PVKno7adbGAg+luPxwG8gBSh7yPDajDAFI3bH8NuQQAoUXrTp66hVFApGn+DyvmwhBSd+zPDTgjMGHm7A7+OZUA0PVKno7adbGAg+luPxwG8gBSh7yPDajDAFI3bH8NuQQAoUXrTp66hVFApGn+DyvmwhBSd+zPDTgjMGHm7A7+OZUA0PVKno7adbGAg+luPxwG8gBSh7yPDajDAFI3bH8NuQQAoUXrTp66hVFApGn+DyvmwhBSd+zPDTgjMGHm7A7+OZUA0PVKno7Q==',
+                );
+                audio.volume = 0.3;
+                audio.play().catch(() => {});
+            }
+
+            function showToast(notification) {
+                // Simple console toast
+                console.log(
+                    `%c📬 ${notification.title}`,
+                    'background: #667eea; color: white; padding: 8px; border-radius: 4px; font-weight: bold;',
+                );
+                console.log(notification.content);
+            }
+
+            function copyToClipboard(type) {
+                let text = '';
+
+                if (type === 'submit-review') {
+                    text = `POST http://localhost:8080/api/v1/learn-vocab/submit-review
+Authorization: Bearer YOUR_JWT_TOKEN
+Content-Type: application/json
+
+{
+  "vocabId": "YOUR_VOCAB_ID",
+  "quality": 4,
+  "userId": "${currentUserId || 'YOUR_USER_ID'}"
+}`;
+                } else if (type === 'complete-game') {
+                    text = `POST http://localhost:8080/api/v1/games/complete
+Authorization: Bearer YOUR_JWT_TOKEN
+Content-Type: application/json
+
+{
+  "gameType": "QUICK_QUIZ",
+  "score": 850,
+  "correctAnswers": 8,
+  "totalQuestions": 10
+}`;
+                } else if (type === 'admin-notif') {
+                    text = `POST http://localhost:8080/api/v1/admin/notifications
+Authorization: Bearer YOUR_ADMIN_JWT_TOKEN
+Content-Type: application/json
+
+{
+  "title": "🎉 Test Notification",
+  "content": "This is a test notification from admin",
+  "type": "system",
+  "userId": "${currentUserId || 'YOUR_USER_ID'}"
+}`;
+                }
+
+                navigator.clipboard.writeText(text).then(() => {
+                    const msg = document.getElementById('clipboardMessage');
+                    msg.style.display = 'block';
+                    setTimeout(() => {
+                        msg.style.display = 'none';
+                    }, 3000);
+                });
+            }
+        </script>
+    </body>
+</html>

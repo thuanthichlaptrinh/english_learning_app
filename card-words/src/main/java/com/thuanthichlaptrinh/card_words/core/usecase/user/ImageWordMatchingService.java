@@ -40,13 +40,12 @@ public class ImageWordMatchingService {
         private final GameSessionDetailRepository gameSessionDetailRepository;
         private final VocabRepository vocabRepository;
         private final UserRepository userRepository;
-        private final UserVocabProgressRepository userVocabProgressRepository;
-        private final StreakService streakService;
+    private final UserVocabProgressRepository userVocabProgressRepository;
+    private final StreakService streakService;
+    private final NotificationService notificationService;
 
-        // Redis cache service for distributed caching
-        private final GameSessionCacheService gameSessionCacheService;
-
-        private static final String GAME_NAME = "Image-Word Matching";
+    // Redis cache service for distributed caching
+    private final GameSessionCacheService gameSessionCacheService;        private static final String GAME_NAME = "Image-Word Matching";
         private static final int DEFAULT_PAIRS = 5;
 
         @Transactional
@@ -208,6 +207,9 @@ public class ImageWordMatchingService {
 
                 // Record streak activity AFTER transaction completes
                 recordStreakActivitySafely(session.getUser());
+
+                // Send game completion notification
+                sendGameCompletionNotification(session, accuracy, totalScore);
 
                 log.info("Image-Word Matching completed: sessionId={}, cefrScore={}, timeBonus={}, wrongPenalty={}, totalScore={}, accuracy={}%",
                                 session.getId(), cefrScore, timeBonus, wrongPenalty, totalScore,
@@ -593,6 +595,51 @@ public class ImageWordMatchingService {
                         log.info("Streak activity recorded for user: {}", user.getId());
                 } catch (Exception e) {
                         log.error("Failed to record streak activity: {}", e.getMessage(), e);
+                }
+        }
+
+        /**
+         * Send notification for game completion achievements
+         */
+        private void sendGameCompletionNotification(GameSession session, double accuracy, int totalScore) {
+                try {
+                        User user = session.getUser();
+                        
+                        // Perfect score (100% accuracy)
+                        if (accuracy >= 100.0) {
+                                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = 
+                                        com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest.builder()
+                                                .userId(user.getId())
+                                                .title("🎯 Hoàn Hảo!")
+                                                .content(String.format("Bạn đã đạt 100%% độ chính xác trong game Image Word Matching! Điểm: %d", totalScore))
+                                                .type("game_result")
+                                                .build();
+                                notificationService.createNotification(request);
+                        }
+                        // High score (>= 50 points)
+                        else if (totalScore >= 50) {
+                                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = 
+                                        com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest.builder()
+                                                .userId(user.getId())
+                                                .title("🏆 Điểm Cao!")
+                                                .content(String.format("Tuyệt vời! Bạn đạt %d điểm với %.1f%% độ chính xác!", totalScore, accuracy))
+                                                .type("achievement")
+                                                .build();
+                                notificationService.createNotification(request);
+                        }
+                        // Good performance (>= 80% accuracy)
+                        else if (accuracy >= 80.0) {
+                                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = 
+                                        com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest.builder()
+                                                .userId(user.getId())
+                                                .title("👍 Làm Tốt!")
+                                                .content(String.format("Bạn đã hoàn thành game với %.1f%% độ chính xác. Điểm: %d", accuracy, totalScore))
+                                                .type("game_result")
+                                                .build();
+                                notificationService.createNotification(request);
+                        }
+                } catch (Exception e) {
+                        log.error("❌ Failed to send game completion notification: {}", e.getMessage(), e);
                 }
         }
 }

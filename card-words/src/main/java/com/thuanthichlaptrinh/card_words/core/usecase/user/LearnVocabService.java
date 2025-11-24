@@ -34,6 +34,7 @@ public class LearnVocabService {
 
     private final UserVocabProgressRepository userVocabProgressRepository;
     private final VocabRepository vocabRepository;
+    private final NotificationService notificationService;
 
     /**
      * Lấy danh sách từ vựng cần ôn tập với phân trang
@@ -251,6 +252,9 @@ public class LearnVocabService {
 
         // Save
         progress = userVocabProgressRepository.save(progress);
+
+        // Send notification for milestones
+        sendReviewMilestoneNotification(user, progress);
 
         String message = generateMessage(request.getIsCorrect(), progress.getStatus());
 
@@ -818,5 +822,86 @@ public class LearnVocabService {
                 .learningVocabs((int) (newVocabs + unknownVocabs))
                 .masteredVocabs((int) masteredVocabs)
                 .build();
+    }
+
+    /**
+     * Send notification for review milestones
+     */
+    private void sendReviewMilestoneNotification(User user, UserVocabProgress progress) {
+        try {
+            int totalReviewed = progress.getTimesCorrect() + progress.getTimesWrong();
+            
+            // Milestone: 10 reviews
+            if (totalReviewed == 10) {
+                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = 
+                    com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest.builder()
+                        .userId(user.getId())
+                        .title("📚 10 Lần Ôn Tập!")
+                        .content(String.format("Bạn đã ôn tập từ '%s' được 10 lần. Tiếp tục phấn đấu nhé!", progress.getVocab().getWord()))
+                        .type("learning_milestone")
+                        .build();
+                notificationService.createNotification(request);
+            }
+            
+            // Milestone: Mastered status
+            if (progress.getStatus() == VocabStatus.MASTERED && progress.getTimesCorrect() >= 5) {
+                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = 
+                    com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest.builder()
+                        .userId(user.getId())
+                        .title("🏆 Thành Thạo!")
+                        .content(String.format("Chúc mừng! Bạn đã thành thạo từ '%s' với %d lần trả lời đúng!", 
+                            progress.getVocab().getWord(), progress.getTimesCorrect()))
+                        .type("achievement")
+                        .build();
+                notificationService.createNotification(request);
+            }
+
+            // Daily goal milestone: Check how many words reviewed today
+            checkDailyGoalMilestone(user);
+        } catch (Exception e) {
+            log.error("❌ Failed to send review milestone notification: {}", e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Check and notify if user achieved daily review goal
+     */
+    private void checkDailyGoalMilestone(User user) {
+        try {
+            LocalDate today = LocalDate.now();
+            long reviewedToday = userVocabProgressRepository.countByUserIdAndLastReviewed(user.getId(), today);
+            
+            // Milestone notifications for daily goals
+            if (reviewedToday == 10) {
+                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = 
+                    com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest.builder()
+                        .userId(user.getId())
+                        .title("🎯 Hoàn Thành 10 Từ!")
+                        .content("Tuyệt vời! Bạn đã ôn tập được 10 từ hôm nay! Tiếp tục duy trì nhé!")
+                        .type("study_progress")
+                        .build();
+                notificationService.createNotification(request);
+            } else if (reviewedToday == 20) {
+                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = 
+                    com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest.builder()
+                        .userId(user.getId())
+                        .title("🌟 Ôn 20 Từ Trong Ngày!")
+                        .content("Xuất sắc! Bạn đã ôn tập 20 từ hôm nay. Bạn đang học rất chăm chỉ!")
+                        .type("study_progress")
+                        .build();
+                notificationService.createNotification(request);
+            } else if (reviewedToday == 50) {
+                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = 
+                    com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest.builder()
+                        .userId(user.getId())
+                        .title("🔥 50 Từ Trong Một Ngày!")
+                        .content("Không thể tin được! Bạn đã ôn tập 50 từ hôm nay! Bạn là siêu sao học tập! ⭐")
+                        .type("achievement")
+                        .build();
+                notificationService.createNotification(request);
+            }
+        } catch (Exception e) {
+            log.error("❌ Failed to check daily goal milestone: {}", e.getMessage(), e);
+        }
     }
 }

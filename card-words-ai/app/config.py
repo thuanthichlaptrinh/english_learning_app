@@ -28,10 +28,18 @@ class Settings(BaseSettings):
     JWT_SECRET: str = "your-secret-key"
     JWT_ALGORITHM: str = "HS256"
     
-    # Model
+    # Model - XGBoost
     MODEL_PATH: str = "/app/models/xgboost_model_v1.pkl"
     SCALER_PATH: str = "/app/models/scaler_v1.pkl"
     MODEL_VERSION: str = "v1.0.0"
+    
+    # Model - Random Forest
+    RF_MODEL_PATH: str = "/app/models/random_forest_model_v1.pkl"
+    RF_SCALER_PATH: str = "/app/models/rf_scaler_v1.pkl"
+    RF_MODEL_VERSION: str = "v1.0.0"
+    
+    # Active model type: "xgboost" or "random_forest"
+    ACTIVE_MODEL_TYPE: str = "xgboost"
     
     # API
     API_HOST: str = "0.0.0.0"

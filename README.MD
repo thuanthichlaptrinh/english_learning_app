@@ -1,6 +1,6 @@
-# 🎴 Card Words Platform
+# 🎴 Nền Tảng Card Words
 
-> Enterprise-grade vocabulary learning platform with AI-powered spaced repetition, real-time notifications, and gamification features.
+> Nền tảng học từ vựng cấp doanh nghiệp với công nghệ lặp lại ngắt quãng (Spaced Repetition) hỗ trợ bởi AI, thông báo thời gian thực và các tính năng gamification.
 
 [![Java](https://img.shields.io/badge/Java-17-orange)](https://www.oracle.com/java/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.5-brightgreen)](https://spring.io/projects/spring-boot)
@@ -9,60 +9,62 @@
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED)](https://www.docker.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/Redis-7-DC382D)](https://redis.io/)
+[![Firebase](https://img.shields.io/badge/Firebase-Storage-FFCA28)](https://firebase.google.com/)
 
 ---
 
-## 📖 Table of Contents
+## 📖 Mục Lục
 
--   [Overview](#-overview)
--   [Architecture](#-architecture)
--   [Quick Start](#-quick-start)
--   [Services](#-services)
--   [Key Features](#-key-features)
--   [Configuration](#️-configuration)
--   [Development](#-development)
--   [Database](#️-database)
--   [API Documentation](#-api-documentation)
--   [Troubleshooting](#️-troubleshooting)
--   [Contributing](#-contributing)
-
----
-
-## 🌟 Overview
-
-**Card Words Platform** is a comprehensive vocabulary learning system that combines:
-
--   **Spring Boot Backend**: RESTful API with real-time WebSocket notifications
--   **AI Service**: LightGBM-powered smart review predictions
--   **PostgreSQL**: Robust relational database with Flyway migrations
--   **Redis**: High-performance caching and session management
--   **Docker**: Containerized deployment for all services
-
-### Core Capabilities
-
-✅ **Authentication & Authorization** - JWT + OAuth2 (Google)  
-✅ **Vocabulary Management** - CRUD operations with rich metadata  
-✅ **Spaced Repetition** - SM-2 algorithm for optimal learning  
-✅ **Real-time Notifications** - WebSocket + STOMP protocol  
-✅ **Gamification** - Multiple game modes with leaderboards  
-✅ **AI-Powered Reviews** - Machine learning predictions  
-✅ **Automated Reminders** - Daily streak emails via scheduler  
-✅ **Admin Dashboard** - User monitoring and analytics  
-✅ **Offline Sync** - Mobile-friendly data synchronization
+-   [Tổng Quan](#-tổng-quan)
+-   [Kiến Trúc](#-kiến-trúc)
+-   [Bắt Đầu Nhanh](#-bắt-đầu-nhanh)
+-   [Dịch Vụ](#-dịch-vụ)
+-   [Tính Năng Chính](#-tính-năng-chính)
+-   [Cấu Hình](#️-cấu-hình)
+-   [Phát Triển](#-phát-triển)
+-   [Cơ Sở Dữ Liệu](#️-cơ-sở-dữ-liệu)
+-   [Tài Liệu API](#-tài-liệu-api)
+-   [Khắc Phục Sự Cố](#️-khắc-phục-sự-cố)
+-   [Đóng Góp](#-đóng-góp)
 
 ---
 
-## 🏗 Architecture
+## 🌟 Tổng Quan
 
-### Project Structure
+**Card Words Platform** là một hệ thống học từ vựng toàn diện kết hợp:
+
+-   **Spring Boot Backend**: RESTful API với thông báo thời gian thực qua WebSocket.
+-   **AI Service**: Dự đoán ôn tập thông minh sử dụng LightGBM.
+-   **PostgreSQL**: Cơ sở dữ liệu quan hệ mạnh mẽ với Flyway migrations.
+-   **Redis**: Caching hiệu năng cao và quản lý session.
+-   **Firebase Storage**: Lưu trữ hình ảnh từ vựng và avatar người dùng.
+-   **Docker**: Triển khai container hóa cho tất cả các dịch vụ.
+
+### Khả Năng Cốt Lõi
+
+✅ **Xác thực & Phân quyền** - JWT + OAuth2 (Google)  
+✅ **Quản lý Từ vựng** - CRUD với metadata phong phú và hình ảnh (Firebase)  
+✅ **Lặp lại Ngắt quãng** - Thuật toán SM-2 tối ưu hóa việc học  
+✅ **Thông báo Thời gian thực** - Giao thức WebSocket + STOMP  
+✅ **Gamification** - Nhiều chế độ chơi với bảng xếp hạng  
+✅ **Ôn tập Hỗ trợ bởi AI** - Dự đoán Machine Learning  
+✅ **Nhắc nhở Tự động** - Email chuỗi hàng ngày qua scheduler  
+✅ **Admin Dashboard** - Giám sát người dùng và phân tích  
+✅ **Đồng bộ Offline** - Đồng bộ dữ liệu thân thiện với thiết bị di động
+
+---
+
+## 🏗 Kiến Trúc
+
+### Cấu Trúc Dự Án
 
 ```
 card-words-platform/
 ├── 📁 card-words/              # Spring Boot Backend API
 │   ├── src/
 │   │   ├── main/
-│   │   │   ├── java/            # Application code
-│   │   │   └── resources/       # Configurations & migrations
+│   │   │   ├── java/            # Mã nguồn ứng dụng
+│   │   │   └── resources/       # Cấu hình & migrations
 │   │   └── test/                # Unit & integration tests
 │   ├── pom.xml                  # Maven dependencies
 │   ├── Dockerfile               # Multi-stage build
@@ -72,60 +74,61 @@ card-words-platform/
 │   ├── app/
 │   │   ├── api/                 # FastAPI endpoints
 │   │   ├── core/                # Business logic
-│   │   ├── db/                  # Database connections
+│   │   ├── db/                  # Kết nối Database
 │   │   └── middleware/          # Authentication & logging
 │   ├── models/                  # LightGBM trained models
 │   ├── pyproject.toml           # Poetry dependencies
 │   └── Dockerfile               # Python container build
 │
-├── 📁 docs/                    # Comprehensive documentation
-│   ├── admin/                   # Admin features
-│   ├── AI/                      # ML model documentation
-│   ├── auth/                    # Authentication guides
-│   ├── docker/                  # Deployment guides
-│   └── ...                      # Feature-specific docs
+├── 📁 docs/                    # Tài liệu chi tiết
+│   ├── admin/                   # Tính năng Admin
+│   ├── AI/                      # Tài liệu mô hình ML
+│   ├── auth/                    # Hướng dẫn xác thực
+│   ├── docker/                  # Hướng dẫn triển khai
+│   └── ...                      # Tài liệu tính năng cụ thể
 │
-├── docker-compose.yml           # 🔥 Root orchestration (all services)
-├── .env                         # 🔐 Environment variables (gitignored)
+├── docker-compose.yml           # 🔥 Root orchestration (tất cả services)
+├── .env                         # 🔐 Biến môi trường (gitignored)
 ├── .gitignore                   # Git exclusions
-└── README.MD                    # This file
+└── README.MD                    # File này
 ```
 
 ### Technology Stack
 
-| Component         | Technology   | Version | Purpose                        |
-| ----------------- | ------------ | ------- | ------------------------------ |
-| **Backend API**   | Spring Boot  | 3.2.5   | RESTful API & WebSocket server |
-| **Language**      | Java         | 17      | Primary programming language   |
-| **AI Service**    | FastAPI      | Latest  | ML prediction endpoints        |
-| **ML Engine**     | LightGBM     | Latest  | Smart review predictions       |
-| **Database**      | PostgreSQL   | 16      | Primary data store             |
-| **Cache**         | Redis        | 7       | Session & performance caching  |
-| **Message Queue** | STOMP        | -       | WebSocket messaging            |
-| **Build Tool**    | Maven        | 3.9+    | Java dependency management     |
-| **Migration**     | Flyway       | -       | Database schema versioning     |
-| **Container**     | Docker       | Latest  | Service orchestration          |
-| **Auth**          | JWT + OAuth2 | -       | Authentication & authorization |
+| Thành phần        | Công nghệ    | Phiên bản | Mục đích                       |
+| ----------------- | ------------ | --------- | ------------------------------ |
+| **Backend API**   | Spring Boot  | 3.2.5     | RESTful API & WebSocket server |
+| **Ngôn ngữ**      | Java         | 17        | Ngôn ngữ lập trình chính       |
+| **AI Service**    | FastAPI      | Mới nhất  | ML prediction endpoints        |
+| **ML Engine**     | LightGBM     | Mới nhất  | Dự đoán ôn tập thông minh      |
+| **Database**      | PostgreSQL   | 16        | Lưu trữ dữ liệu chính          |
+| **Cache**         | Redis        | 7         | Session & performance caching  |
+| **Storage**       | Firebase     | -         | Lưu trữ hình ảnh (Cloud)       |
+| **Message Queue** | STOMP        | -         | Nhắn tin WebSocket             |
+| **Build Tool**    | Maven        | 3.9+      | Quản lý phụ thuộc Java         |
+| **Migration**     | Flyway       | -         | Quản lý phiên bản Schema DB    |
+| **Container**     | Docker       | Mới nhất  | Điều phối dịch vụ              |
+| **Auth**          | JWT + OAuth2 | -         | Xác thực & phân quyền          |
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Bắt Đầu Nhanh
 
-### Prerequisites
+### Yêu Cầu Tiên Quyết
 
-Ensure you have the following installed:
+Đảm bảo bạn đã cài đặt:
 
--   **Docker Desktop** 20.10+ (or Docker Engine + Docker Compose)
--   **Git** for version control
+-   **Docker Desktop** 20.10+ (hoặc Docker Engine + Docker Compose)
+-   **Git** để quản lý mã nguồn
 
-**Optional (for local development):**
+**Tùy chọn (cho phát triển local):**
 
--   Java 17+ (Eclipse Temurin recommended)
+-   Java 17+ (Khuyên dùng Eclipse Temurin)
 -   Maven 3.9+
--   Python 3.11+ with Poetry
--   Node.js 18+ (for frontend integration)
+-   Python 3.11+ với Poetry
+-   Node.js 18+ (để tích hợp frontend)
 
-### Installation
+### Cài Đặt
 
 #### 1. Clone Repository
 
@@ -134,31 +137,31 @@ git clone https://github.com/yourusername/card-words-platform.git
 cd card-words-platform
 ```
 
-#### 2. Configure Environment
+#### 2. Cấu Hình Môi Trường
 
 ```bash
 # Copy template
 cp .env.example .env
 
-# Edit with your credentials
-# Required: Database password, JWT secret, email credentials
-nano .env  # or use your preferred editor
+# Chỉnh sửa với thông tin của bạn
+# Bắt buộc: Database password, JWT secret, email credentials, Firebase config
+nano .env  # hoặc dùng editor ưa thích
 ```
 
-#### 3. Start All Services
+#### 3. Khởi Chạy Tất Cả Dịch Vụ
 
 ```bash
-# Build and start all containers
+# Build và start tất cả containers
 docker-compose up -d --build
 
-# View logs
+# Xem logs
 docker-compose logs -f
 
-# Check service health
+# Kiểm tra sức khỏe dịch vụ
 docker-compose ps
 ```
 
-#### 4. Verify Deployment
+#### 4. Kiểm Tra Triển Khai
 
 ```bash
 # Backend API health
@@ -171,35 +174,35 @@ curl http://localhost:8001/health
 docker-compose exec postgres pg_isready -U postgres
 ```
 
-### Access Services
+### Truy Cập Dịch Vụ
 
-| Service             | URL                                   | Credentials                 |
+| Dịch vụ             | URL                                   | Thông tin đăng nhập         |
 | ------------------- | ------------------------------------- | --------------------------- |
-| **Spring Boot API** | http://localhost:8080                 | JWT token required          |
+| **Spring Boot API** | http://localhost:8080                 | Yêu cầu JWT token           |
 | Swagger UI          | http://localhost:8080/swagger-ui.html | -                           |
 | API Documentation   | http://localhost:8080/v3/api-docs     | -                           |
 | Actuator            | http://localhost:8080/actuator        | -                           |
-| **WebSocket**       | ws://localhost:8080/ws                | JWT in handshake            |
+| **WebSocket**       | ws://localhost:8080/ws                | JWT trong handshake         |
 | **AI Service**      | http://localhost:8001                 | Shared JWT auth             |
 | AI Documentation    | http://localhost:8001/docs            | -                           |
-| **PostgreSQL**      | localhost:5433                        | `postgres` / see `.env`     |
-| **Redis**           | localhost:6379                        | No password                 |
+| **PostgreSQL**      | localhost:5433                        | `postgres` / xem `.env`     |
+| **Redis**           | localhost:6379                        | Không mật khẩu              |
 | **PgAdmin**         | http://localhost:5050                 | admin@cardwords.com / admin |
 | **Redis Insight**   | http://localhost:5540                 | -                           |
 
-#### WebSocket URL Matrix
+#### Ma Trận URL WebSocket
 
-| Context                   | URL                           | Notes                                                                                                        |
-| ------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| Local development         | `ws://localhost:8080/ws`      | Default when running Spring Boot via Maven or Docker port mapping                                            |
-| Docker Compose networking | `ws://card-words-api:8080/ws` | Use this service name when another container (frontend, AI, etc.) needs to subscribe inside the same network |
-| Production (HTTPS)        | `wss://<your-domain>/ws`      | Replace with the public domain behind your load balancer / reverse proxy; TLS termination required           |
+| Ngữ cảnh                  | URL                           | Ghi chú                                                                                       |
+| ------------------------- | ----------------------------- | --------------------------------------------------------------------------------------------- |
+| Phát triển Local          | `ws://localhost:8080/ws`      | Mặc định khi chạy Spring Boot qua Maven hoặc Docker port mapping                              |
+| Docker Compose networking | `ws://card-words-api:8080/ws` | Sử dụng tên service này khi container khác (frontend, AI, etc.) cần subscribe trong cùng mạng |
+| Production (HTTPS)        | `wss://<your-domain>/ws`      | Thay thế bằng domain public sau load balancer / reverse proxy; yêu cầu TLS termination        |
 
-> 🔐 Always send `Authorization: Bearer <JWT>` in the STOMP CONNECT headers regardless of environment.
+> 🔐 Luôn gửi `Authorization: Bearer <JWT>` trong header STOMP CONNECT bất kể môi trường nào.
 
-### Quick API Test
+### Test API Nhanh
 
-#### 1. Register User
+#### 1. Đăng Ký User
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/auth/register \
@@ -211,7 +214,7 @@ curl -X POST http://localhost:8080/api/v1/auth/register \
   }'
 ```
 
-#### 2. Sign In
+#### 2. Đăng Nhập
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/auth/signin \
@@ -233,116 +236,116 @@ curl -X POST http://localhost:8080/api/v1/auth/signin \
 }
 ```
 
-#### 3. Test Authenticated Endpoint
+#### 3. Test Endpoint Có Xác Thực
 
 ```bash
 curl -X GET http://localhost:8080/api/v1/vocabs \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
-#### 4. Test WebSocket Connection
+#### 4. Test Kết Nối WebSocket
 
-Open `test-websocket-events.html` in your browser:
+Mở `test-websocket-events.html` trong trình duyệt:
 
-1. Paste your JWT token
-2. Click "Connect WebSocket"
-3. Subscribe to notification channels
-4. Trigger a notification (e.g., complete a game)
-5. See real-time updates! ⚡
+1. Dán JWT token của bạn
+2. Nhấn "Connect WebSocket"
+3. Subscribe các kênh thông báo
+4. Trigger một thông báo (ví dụ: hoàn thành game)
+5. Xem cập nhật thời gian thực! ⚡
 
 ---
 
-## 📦 Services
+## 📦 Dịch Vụ
 
 ### Spring Boot Backend (card-words)
 
-**Core Technologies:**
+**Công Nghệ Cốt Lõi:**
 
 -   Spring Boot 3.2.5 (Java 17)
 -   Spring Security + JWT Authentication
 -   Spring WebSocket + STOMP Messaging
 -   Spring Data JPA + Hibernate
--   Spring Scheduler (Automated tasks)
--   PostgreSQL 16 (Primary database)
--   Redis 7 (Caching layer)
+-   Spring Scheduler (Tác vụ tự động)
+-   PostgreSQL 16 (Database chính)
+-   Redis 7 (Lớp Caching)
 -   Flyway (Database migrations)
--   Firebase Storage (Image uploads)
--   Google OAuth2 (Social login)
--   JavaMailSender (Email service)
+-   **Firebase Storage** (Lưu trữ hình ảnh)
+-   Google OAuth2 (Đăng nhập xã hội)
+-   JavaMailSender (Dịch vụ Email)
 
-**Key Features:**
+**Tính Năng Chính:**
 
-🔐 **Authentication & Authorization**
+🔐 **Xác thực & Phân quyền**
 
--   JWT-based authentication with refresh tokens
--   Google OAuth2 integration
--   Role-based access control (ADMIN, USER)
--   Secure password hashing with BCrypt
+-   Xác thực dựa trên JWT với refresh tokens
+-   Tích hợp Google OAuth2
+-   Kiểm soát truy cập dựa trên vai trò (ADMIN, USER)
+-   Mã hóa mật khẩu an toàn với BCrypt
 
-📚 **Vocabulary Management**
+📚 **Quản lý Từ vựng**
 
--   CRUD operations for words and topics
--   Rich metadata (definitions, examples, images)
--   Advanced search and filtering
--   Multi-language support
+-   CRUD cho từ vựng và chủ đề
+-   Metadata phong phú (định nghĩa, ví dụ, hình ảnh từ Firebase)
+-   Tìm kiếm và lọc nâng cao
+-   Hỗ trợ đa ngôn ngữ
 
-🎮 **Interactive Games**
+🎮 **Trò chơi Tương tác**
 
--   Quick Quiz (True/False with streak bonuses)
--   Image-Word Matching (Memory game)
+-   Quick Quiz (Đúng/Sai với bonus chuỗi)
+-   Image-Word Matching (Game lật thẻ nhớ)
 -   Word Definition Matching
--   Real-time leaderboards
--   Score calculation with time bonuses
+-   Bảng xếp hạng thời gian thực
+-   Tính điểm với bonus thời gian
 
-📊 **Learning Progress**
+📊 **Tiến Trình Học Tập**
 
--   SM-2 spaced repetition algorithm
--   Vocabulary mastery tracking
--   Progress analytics and statistics
--   Personalized review scheduling
+-   Thuật toán lặp lại ngắt quãng SM-2
+-   Theo dõi mức độ thành thạo từ vựng
+-   Phân tích và thống kê tiến độ
+-   Lên lịch ôn tập cá nhân hóa
 
-🔥 **Streak System**
+🔥 **Hệ Thống Streak**
 
--   Daily learning consistency tracking
--   Automatic streak updates
--   Milestone achievements (7, 30, 100 days)
--   Visual activity calendar
--   Personal best records
+-   Theo dõi tính kiên trì học tập hàng ngày
+-   Cập nhật streak tự động
+-   Thành tựu cột mốc (7, 30, 100 ngày)
+-   Lịch hoạt động trực quan
+-   Kỷ lục cá nhân tốt nhất
 
-🔔 **Real-time Notifications**
+🔔 **Thông Báo Thời Gian Thực (WebSocket)**
 
--   WebSocket + STOMP protocol
--   5 dedicated notification channels
--   Instant multi-device synchronization
--   Auto-triggered achievements
--   Admin broadcast capabilities
+-   Giao thức WebSocket + STOMP
+-   5 kênh thông báo chuyên dụng
+-   Đồng bộ tức thì trên nhiều thiết bị
+-   Thành tựu tự động kích hoạt
+-   Khả năng broadcast của Admin
 
-📧 **Email Automation**
+📧 **Tự Động Hóa Email**
 
--   Welcome emails for new users
--   Account activation links
--   Password reset with secure tokens
--   Daily streak reminders (9:00 AM)
--   Beautiful HTML templates
+-   Email chào mừng cho người dùng mới
+-   Liên kết kích hoạt tài khoản
+-   Đặt lại mật khẩu với token an toàn
+-   Nhắc nhở streak hàng ngày (9:00 AM)
+-   Template HTML đẹp mắt
 
 📝 **Admin Dashboard**
 
--   User activity monitoring
--   Action logs with detailed tracking
--   System statistics and analytics
--   Notification management
--   User management tools
+-   Giám sát hoạt động người dùng
+-   Nhật ký hành động (Action logs) chi tiết
+-   Thống kê và phân tích hệ thống
+-   Quản lý thông báo
+-   Công cụ quản lý người dùng
 
-💾 **Offline Sync Support**
+💾 **Hỗ Trợ Đồng Bộ Offline**
 
--   Batch data download endpoints
--   Conflict resolution strategies
--   Delta synchronization
--   Mobile-optimized responses
+-   Endpoint tải xuống dữ liệu hàng loạt
+-   Chiến lược giải quyết xung đột
+-   Đồng bộ Delta (chỉ thay đổi)
+-   Phản hồi tối ưu cho mobile
 
 **API Endpoints:** `http://localhost:8080/api/v1/`
 
-**Documentation:**
+**Tài liệu:**
 
 -   Swagger UI: `/swagger-ui.html`
 -   OpenAPI Spec: `/v3/api-docs`
@@ -354,195 +357,202 @@ Open `test-websocket-events.html` in your browser:
 
 ### AI Service (card-words-ai)
 
-**Core Technologies:**
+**Công Nghệ Cốt Lõi:**
 
 -   Python 3.11
--   FastAPI (High-performance API framework)
--   LightGBM (Gradient boosting ML library)
--   PostgreSQL (Read-only database access)
--   Redis (Prediction caching)
+-   FastAPI (Framework API hiệu năng cao)
+-   LightGBM (Thư viện ML Gradient boosting)
+-   PostgreSQL (Truy cập database chỉ đọc)
+-   Redis (Caching dự đoán)
 -   SQLAlchemy (Database ORM)
 -   Pydantic (Data validation)
--   Poetry (Dependency management)
+-   Poetry (Quản lý phụ thuộc)
 
-**Key Features:**
+**Tính Năng Chính:**
 
-🤖 **Smart Review Predictions**
+🤖 **Dự Đoán Ôn Tập Thông Minh**
 
--   LightGBM machine learning model
--   Predicts optimal review timing
--   Considers user performance patterns
--   Adapts to individual learning curves
+-   Mô hình máy học LightGBM
+-   Dự đoán thời điểm ôn tập tối ưu
+-   Xem xét các mẫu hiệu suất của người dùng
+-   Thích ứng với đường cong học tập cá nhân
 
-⚡ **Performance Optimization**
+⚡ **Tối Ưu Hóa Hiệu Năng**
 
--   Redis caching for predictions
--   Asynchronous database queries
+-   Redis caching cho các dự đoán
+-   Truy vấn database bất đồng bộ
 -   Connection pooling
--   Response time < 100ms
+-   Thời gian phản hồi < 100ms
 
-🔐 **Security**
+🔐 **Bảo Mật**
 
--   JWT authentication (shared with Spring Boot)
--   Read-only database access
--   Request rate limiting
--   Input validation with Pydantic
+-   Xác thực JWT (chia sẻ với Spring Boot)
+-   Truy cập database chỉ đọc
+-   Giới hạn tốc độ request (Rate limiting)
+-   Validate đầu vào với Pydantic
 
-📊 **Model Features**
+📊 **Đặc Trưng Mô Hình (Features)**
 
--   User correctness history
--   Time since last review
--   Vocabulary difficulty
--   User performance metrics
--   Streak consistency
+-   Lịch sử độ chính xác của người dùng
+-   Thời gian kể từ lần ôn tập cuối
+-   Độ khó của từ vựng
+-   Chỉ số hiệu suất người dùng
+-   Tính nhất quán của Streak
 
 **API Endpoints:** `http://localhost:8001/api/`
 
-**Documentation:**
+**Tài liệu:**
 
 -   Interactive Docs: `/docs`
 -   ReDoc: `/redoc`
--   Model Details: `docs/AI/`
+-   Chi tiết mô hình: `docs/AI/`
 
 ---
 
-## 🎯 Key Features
+## 🎯 Tính Năng Chính
 
-### 1. Real-time Notifications with WebSocket
+### 1. Thông Báo Thời Gian Thực với WebSocket
 
-**Complete push notification system with zero polling overhead.**
+**Hệ thống push notification hoàn chỉnh không có độ trễ polling.**
 
-#### Architecture
+#### Kiến Trúc
 
--   **Protocol**: STOMP over WebSocket with SockJS fallback
--   **Authentication**: JWT token in handshake header
--   **Latency**: < 100ms end-to-end
--   **Scalability**: Supports thousands of concurrent connections
+-   **Giao thức**: STOMP over WebSocket với SockJS fallback
+-   **Xác thực**: JWT token trong handshake header
+-   **Độ trễ**: < 100ms end-to-end
+-   **Khả năng mở rộng**: Hỗ trợ hàng ngàn kết nối đồng thời
 
-#### Notification Channels
+#### Các Kênh Thông Báo
 
-| Channel                                   | Purpose           | Trigger                              |
-| ----------------------------------------- | ----------------- | ------------------------------------ |
-| `/user/queue/notifications`               | New notifications | Achievement, reminder, admin message |
-| `/user/queue/notifications/read`          | Mark as read      | User marks single notification read  |
-| `/user/queue/notifications/read-all`      | Mark all read     | User marks all notifications read    |
-| `/user/queue/notifications/deleted`       | Single delete     | User deletes notification            |
-| `/user/queue/notifications/batch-deleted` | Batch delete      | User deletes multiple notifications  |
-| `/topic/admin/user-registrations`         | Admin broadcast   | Any successful user registration     |
+| Kênh                                      | Mục đích        | Trigger                             |
+| ----------------------------------------- | --------------- | ----------------------------------- |
+| `/user/queue/notifications`               | Thông báo mới   | Thành tựu, nhắc nhở, tin nhắn admin |
+| `/user/queue/notifications/read`          | Đánh dấu đã đọc | User đánh dấu 1 thông báo đã đọc    |
+| `/user/queue/notifications/read-all`      | Đánh dấu tất cả | User đánh dấu tất cả thông báo      |
+| `/user/queue/notifications/deleted`       | Xóa đơn lẻ      | User xóa thông báo                  |
+| `/user/queue/notifications/batch-deleted` | Xóa hàng loạt   | User xóa nhiều thông báo            |
+| `/topic/admin/user-registrations`         | Admin broadcast | Bất kỳ đăng ký user thành công nào  |
 
-#### Auto-triggered Notifications
+#### Thông Báo Tự Động Kích Hoạt
 
-✨ **Game Achievements** (Instant delivery)
+✨ **Thành Tựu Game** (Gửi tức thì)
 
--   Perfect accuracy (100%)
--   High score milestones
--   Speed completion bonuses
+-   **Quick Quiz**: Điểm cao, Độ chính xác tuyệt đối, Hiệu suất xuất sắc
+-   **Word Definition**: Điểm cao, Độ chính xác tuyệt đối, Hiệu suất xuất sắc
+-   Thưởng hoàn thành tốc độ
 
-🔥 **Streak Milestones** (Real-time updates)
+🔥 **Cột Mốc Streak** (Cập nhật thời gian thực)
 
--   7-day consistency
--   30-day dedication
--   100-day mastery
+-   Kiên trì 7 ngày
+-   Cống hiến 30 ngày
+-   Thành thạo 100 ngày
+-   Kỷ lục cá nhân mới
 
-📧 **Daily Reminders** (Dual delivery)
+🏆 **Bảng Xếp Hạng & Mục Tiêu**
 
--   Scheduled 2 lần/ngày: 07:00 & 19:00 (kèm cảnh báo gãy chuỗi lúc 07:00)
+-   **Thăng Hạng**: Top 1, Top 3, Top 10 bảng xếp hạng
+-   **Mục Tiêu Ngày**: Ôn tập 10, 20, 50 từ mỗi ngày
+-   **Chào Mừng**: Lời chào ngay khi đăng ký
+
+📧 **Nhắc Nhở Hàng Ngày** (Gửi kép)
+
+-   Lên lịch 2 lần/ngày: 07:00 & 19:00 (kèm cảnh báo gãy chuỗi lúc 07:00)
 -   Email + WebSocket notification
--   Smart targeting (users với streak hiện tại ≥ 3 ngày)
+-   Nhắm mục tiêu thông minh (users với streak hiện tại ≥ 3 ngày)
 
-📢 **Admin Broadcasts** (Push to all users)
+📢 **Admin Broadcasts** (Push tới tất cả users)
 
--   System announcements
--   Platform updates
--   Maintenance notices
--   Realtime signup feed qua `/topic/admin/user-registrations` giúp dashboard cập nhật tổng user
+-   Thông báo hệ thống
+-   Cập nhật nền tảng
+-   Thông báo bảo trì
+-   Feed đăng ký realtime qua `/topic/admin/user-registrations` giúp dashboard cập nhật tổng user
 
-#### Performance Benefits
+#### Lợi Ích Hiệu Năng
 
-| Metric            | Polling  | WebSocket | Improvement         |
-| ----------------- | -------- | --------- | ------------------- |
-| Latency           | 10-30s   | < 100ms   | **99.7% faster**    |
-| Server Requests   | 360/hour | 1/session | **99.9% reduction** |
-| Battery Impact    | High     | Minimal   | **~90% savings**    |
-| Multi-device Sync | Delayed  | Instant   | **Real-time**       |
+| Chỉ số              | Polling | WebSocket | Cải thiện           |
+| ------------------- | ------- | --------- | ------------------- |
+| Độ trễ              | 10-30s  | < 100ms   | **Nhanh hơn 99.7%** |
+| Server Requests     | 360/giờ | 1/session | **Giảm 99.9%**      |
+| Tác động Pin        | Cao     | Tối thiểu | **Tiết kiệm ~90%**  |
+| Đồng bộ Đa thiết bị | Trễ     | Tức thì   | **Thời gian thực**  |
 
-**Testing Tools:**
+**Công Cụ Test:**
 
--   Interactive test: `test-websocket-events.html`
--   Client examples: React, Flutter, JavaScript
--   See: `docs/WEBSOCKET_EVENTS.md`
+-   Test tương tác: `test-websocket-events.html`
+-   Ví dụ Client: React, Flutter, JavaScript
+-   Xem: `docs/WEBSOCKET_EVENTS.md`
 
 ---
 
-### 2. Automated Email System
+### 2. Hệ Thống Email Tự Động
 
-**Fully automated email delivery with beautiful HTML templates.**
+**Gửi email hoàn toàn tự động với template HTML đẹp mắt.**
 
-#### Email Types
+#### Các Loại Email
 
-📧 **Welcome Email**
+📧 **Email Chào Mừng**
 
--   Sent on user registration
--   Includes temporary password
--   Platform introduction
+-   Gửi khi đăng ký người dùng
+-   Bao gồm mật khẩu tạm thời
+-   Giới thiệu nền tảng
 
-🔑 **Account Activation**
+🔑 **Kích Hoạt Tài Khoản**
 
--   Secure activation link
--   24-hour expiration
--   Email verification
+-   Liên kết kích hoạt an toàn
+-   Hết hạn sau 24 giờ
+-   Xác minh email
 
-🔒 **Password Reset**
+🔒 **Đặt Lại Mật Khẩu**
 
--   Secure reset token
--   One-time use link
--   1-hour expiration
+-   Token đặt lại an toàn
+-   Liên kết sử dụng một lần
+-   Hết hạn sau 1 giờ
 
-⏰ **Daily Streak Reminders**
+⏰ **Nhắc Nhở Streak Hàng Ngày**
 
--   Automated schedule: 9:00 AM daily
--   Smart targeting criteria:
-    -   ✅ Studied yesterday
-    -   ❌ Haven't studied today
-    -   🔥 Streak ≥ 3 days (worth protecting)
--   Dual delivery: Email + WebSocket
--   Beautiful HTML template
--   Zero manual intervention
+-   Lịch tự động: 9:00 AM hàng ngày
+-   Tiêu chí nhắm mục tiêu thông minh:
+    -   ✅ Đã học hôm qua
+    -   ❌ Chưa học hôm nay
+    -   🔥 Streak ≥ 3 ngày (đáng để bảo vệ)
+-   Gửi kép: Email + WebSocket
+-   Template HTML đẹp mắt
+-   Không cần can thiệp thủ công
 
-#### Configuration
+#### Cấu Hình
 
 ```properties
-# Gmail SMTP (recommended)
+# Gmail SMTP (khuyên dùng)
 spring.mail.host=smtp.gmail.com
 spring.mail.port=587
 spring.mail.username=your-email@gmail.com
-spring.mail.password=your-app-password  # Use App Password, not account password
+spring.mail.password=your-app-password  # Dùng App Password, không phải mật khẩu tài khoản
 ```
 
-**Setup Guide:** Generate Gmail App Password at https://myaccount.google.com/apppasswords
+**Hướng dẫn cài đặt:** Tạo Gmail App Password tại https://myaccount.google.com/apppasswords
 
 ---
 
-### 3. AI-Powered Spaced Repetition
+### 3. Lặp Lại Ngắt Quãng Hỗ Trợ Bởi AI
 
-**LightGBM machine learning model for personalized review scheduling.**
+**Mô hình máy học LightGBM để lên lịch ôn tập cá nhân hóa.**
 
-#### Algorithm: SM-2 Enhanced with ML
+#### Thuật Toán: SM-2 Nâng Cấp với ML
 
-**Traditional SM-2 Parameters:**
+**Tham Số SM-2 Truyền Thống:**
 
 -   `EF` (Easiness Factor): 1.3 - 2.5
--   `Interval`: Days until next review
--   `Repetition`: Number of successful reviews
+-   `Interval`: Số ngày cho đến lần ôn tiếp theo
+-   `Repetition`: Số lần ôn tập thành công
 
-**ML Enhancements:**
+**Cải Tiến ML:**
 
--   User performance patterns
--   Time-of-day effectiveness
--   Vocabulary difficulty
--   Historical accuracy trends
+-   Mẫu hiệu suất người dùng
+-   Hiệu quả theo thời gian trong ngày
+-   Độ khó của từ vựng
+-   Xu hướng độ chính xác lịch sử
 
-#### Prediction Process
+#### Quy Trình Dự Đoán
 
 ```
 User Request → Model Features → LightGBM Prediction → Redis Cache → Response
@@ -550,108 +560,108 @@ User Request → Model Features → LightGBM Prediction → Redis Cache → Resp
         [correctness_rate, time_since_last, vocab_difficulty, user_streak]
 ```
 
-#### Performance
+#### Hiệu Năng
 
--   **Prediction Time**: < 50ms (cached: < 5ms)
--   **Model Accuracy**: ~85% (F1 score)
--   **Cache Hit Rate**: > 90%
--   **Features**: 15 engineered features
+-   **Thời gian dự đoán**: < 50ms (cached: < 5ms)
+-   **Độ chính xác mô hình**: ~85% (F1 score)
+-   **Tỷ lệ Cache Hit**: > 90%
+-   **Features**: 15 đặc trưng được kỹ thuật hóa
 
-**Model Training:** `card-words-ai/train-model.sh`
+**Huấn luyện mô hình:** `card-words-ai/train-model.sh`
 
 ---
 
 ### 4. Admin Dashboard
 
-**Comprehensive monitoring and management tools.**
+**Công cụ giám sát và quản lý toàn diện.**
 
-#### Features
+#### Tính Năng
 
-📊 **Analytics**
+📊 **Phân Tích (Analytics)**
 
--   Total users and growth
--   Active sessions
--   Game completion rates
--   Learning progress metrics
+-   Tổng người dùng và tăng trưởng
+-   Phiên hoạt động (Active sessions)
+-   Tỷ lệ hoàn thành game
+-   Chỉ số tiến trình học tập
 
-📝 **Action Logs**
+📝 **Nhật Ký Hành Động (Action Logs)**
 
--   User activity tracking
--   Login/logout events
--   Game completions
--   Vocabulary interactions
--   Advanced filtering by date, user, action type
+-   Theo dõi hoạt động người dùng
+-   Sự kiện đăng nhập/đăng xuất
+-   Hoàn thành game
+-   Tương tác từ vựng
+-   Lọc nâng cao theo ngày, user, loại hành động
 
-🔔 **Notification Management**
+🔔 **Quản Lý Thông Báo**
 
--   Create system notifications
--   Broadcast to all users
--   Targeted user notifications
--   View notification history
+-   Tạo thông báo hệ thống
+-   Broadcast tới tất cả users
+-   Thông báo nhắm mục tiêu user cụ thể
+-   Xem lịch sử thông báo
 
-👥 **User Management**
+👥 **Quản Lý Người Dùng**
 
--   View user profiles
--   Activity monitoring
--   Role assignment
--   Account status management
+-   Xem hồ sơ người dùng
+-   Giám sát hoạt động
+-   Gán vai trò (Role assignment)
+-   Quản lý trạng thái tài khoản
 
-**Documentation:** `docs/admin/ADMIN_DASHBOARD_API.md`
+**Tài liệu:** `docs/admin/ADMIN_DASHBOARD_API.md`
 
 ---
 
-### 5. Gamification System
+### 5. Hệ Thống Gamification
 
-**Multiple game modes with intelligent scoring and leaderboards.**
+**Nhiều chế độ chơi với tính điểm thông minh và bảng xếp hạng.**
 
-#### Game Modes
+#### Chế Độ Chơi
 
 🎯 **Quick Quiz**
 
--   True/False format
--   10 questions per session
--   Time bonus: +10 points if < 5 seconds
--   Streak bonus: +5 points per consecutive correct answer
--   Perfect score achievement: 100% accuracy
+-   Định dạng Đúng/Sai
+-   10 câu hỏi mỗi phiên
+-   Bonus thời gian: +10 điểm nếu < 5 giây
+-   Bonus streak: +5 điểm mỗi câu trả lời đúng liên tiếp
+-   Thành tựu điểm tuyệt đối: 100% độ chính xác
 
 🖼️ **Image-Word Matching**
 
--   Memory-style card game
--   Match words to images
--   Time-based scoring
--   Difficulty levels
+-   Game lật thẻ nhớ (Memory-style)
+-   Ghép từ với hình ảnh
+-   Tính điểm dựa trên thời gian
+-   Các cấp độ khó
 
 📖 **Word Definition Matching**
 
--   Match words to definitions
--   Multiple choice format
--   Adaptive difficulty
+-   Ghép từ với định nghĩa
+-   Định dạng trắc nghiệm
+-   Độ khó thích ứng
 
-#### Scoring Algorithm
+#### Thuật Toán Tính Điểm
 
 ```
-Base Score = Correct Answers × 100
-Time Bonus = Fast Answers × 10
-Streak Bonus = Consecutive Correct × 5
-Final Score = Base + Time Bonus + Streak Bonus
+Điểm Cơ Bản = Câu Trả Lời Đúng × 100
+Bonus Thời Gian = Trả Lời Nhanh × 10
+Bonus Streak = Đúng Liên Tiếp × 5
+Tổng Điểm = Cơ Bản + Bonus Thời Gian + Bonus Streak
 ```
 
-#### Leaderboards
+#### Bảng Xếp Hạng (Leaderboards)
 
--   **Global**: All-time top scores
--   **Game-specific**: Per-game rankings
--   **Time-based**: Daily, weekly, monthly
--   **Personal**: Individual progress tracking
+-   **Toàn Cầu**: Top điểm mọi thời đại
+-   **Theo Game**: Xếp hạng từng game cụ thể
+-   **Theo Thời Gian**: Ngày, tuần, tháng
+-   **Cá Nhân**: Theo dõi tiến bộ cá nhân
 
-**Documentation:** `docs/game/GAME_ALGORITHMS_DESIGN.md`
+**Tài liệu:** `docs/game/GAME_ALGORITHMS_DESIGN.md`
 
 ---
 
-## ⚙️ Configuration
+## ⚙️ Cấu Hình
 
-### Environment Variables
+### Biến Môi Trường
 
-Create `.env` file in project root:
+Tạo file `.env` trong thư mục gốc dự án:
 
 ```env
 #─────────────────────────────────────
@@ -684,7 +694,7 @@ JWT_EXPIRATION=86400000  # 24 hours in milliseconds
 # Email Configuration (Gmail)
 #─────────────────────────────────────
 MAIL_USERNAME=your_email@gmail.com
-MAIL_PASSWORD=your_gmail_app_password  # NOT your Gmail password!
+MAIL_PASSWORD=your_gmail_app_password  # KHÔNG PHẢI mật khẩu Gmail của bạn!
 
 #─────────────────────────────────────
 # Google OAuth2
@@ -706,107 +716,107 @@ PGADMIN_DEFAULT_EMAIL=admin@cardwords.com
 PGADMIN_DEFAULT_PASSWORD=admin
 ```
 
-**⚠️ Security Notice:** Never commit `.env` to version control. Use `.env.example` as template.
+**⚠️ Lưu ý Bảo Mật:** Không bao giờ commit `.env` lên version control. Sử dụng `.env.example` làm mẫu.
 
 ---
 
-## 🔧 Development
+## 🔧 Phát Triển
 
-### Local Development (Without Docker)
+### Phát Triển Local (Không dùng Docker)
 
 #### 1. Spring Boot Backend
 
 ```bash
 cd card-words
 
-# Install dependencies
+# Cài đặt dependencies
 mvn clean install
 
-# Run with hot reload
+# Chạy với hot reload
 mvn spring-boot:run
 
-# Or run JAR
+# Hoặc chạy JAR
 mvn clean package -DskipTests
 java -jar target/card-words-0.0.1-SNAPSHOT.jar
 ```
 
-**Access:** http://localhost:8080
+**Truy cập:** http://localhost:8080
 
 #### 2. AI Service
 
 ```bash
 cd card-words-ai
 
-# Install Poetry (if not installed)
+# Cài đặt Poetry (nếu chưa có)
 curl -sSL https://install.python-poetry.org | python3 -
 
-# Install dependencies
+# Cài đặt dependencies
 poetry install
 
-# Activate virtual environment
+# Kích hoạt môi trường ảo
 poetry shell
 
-# Run with hot reload
+# Chạy với hot reload
 poetry run uvicorn app.main:app --reload --port 8001
 ```
 
-**Access:** http://localhost:8001
+**Truy cập:** http://localhost:8001
 
-#### 3. Database Setup
+#### 3. Thiết Lập Database
 
 ```bash
-# Start only PostgreSQL and Redis
+# Chỉ khởi chạy PostgreSQL và Redis
 docker-compose up -d postgres redis
 
-# Verify connection
+# Kiểm tra kết nối
 psql -h localhost -p 5433 -U postgres -d card_words
 ```
 
-### Docker Development
+### Phát Triển Docker
 
 #### Build Services
 
 ```bash
-# Build all services
+# Build tất cả services
 docker-compose build
 
-# Build specific service
+# Build service cụ thể
 docker-compose build card-words-api
 docker-compose build card-words-ai
 
-# Build with no cache (clean build)
+# Build không cache (clean build)
 docker-compose build --no-cache card-words-api
 ```
 
 #### Run Services
 
 ```bash
-# Start all services
+# Start tất cả services
 docker-compose up -d
 
-# Start specific services
+# Start service cụ thể
 docker-compose up -d postgres redis card-words-api
 
-# View logs
+# Xem logs
 docker-compose logs -f card-words-api
 
-# Follow logs from all services
+# Theo dõi logs từ tất cả services
 docker-compose logs -f
 ```
 
 #### Stop Services
 
 ```bash
-# Stop all services
+# Stop tất cả services
 docker-compose stop
 
-# Stop specific service
+# Stop service cụ thể
 docker-compose stop card-words-api
 
-# Stop and remove containers
+# Stop và remove containers
 docker-compose down
 
-# Remove containers and volumes (⚠️ DELETES DATA)
+# Remove containers và volumes (⚠️ XÓA DỮ LIỆU)
 docker-compose down -v
 ```
 
@@ -817,13 +827,13 @@ docker-compose down -v
 ```bash
 cd card-words
 
-# Run all tests
+# Chạy tất cả tests
 mvn test
 
-# Run specific test class
+# Chạy test class cụ thể
 mvn test -Dtest=VocabServiceTest
 
-# Run with coverage
+# Chạy với coverage report
 mvn clean test jacoco:report
 ```
 
@@ -832,47 +842,47 @@ mvn clean test jacoco:report
 ```bash
 cd card-words-ai
 
-# Run all tests
+# Chạy tất cả tests
 poetry run pytest
 
-# Run with coverage
+# Chạy với coverage
 poetry run pytest --cov=app
 
-# Run specific test
+# Chạy test cụ thể
 poetry run pytest tests/test_predictions.py
 ```
 
 ---
 
-## 🗄️ Database
+## 🗄️ Cơ Sở Dữ Liệu
 
-### Schema Management
+### Quản Lý Schema
 
-**Flyway migrations** manage all schema changes:
+**Flyway migrations** quản lý tất cả thay đổi schema:
 
--   **Location:** `card-words/src/main/resources/db/migration/`
--   **Auto-run:** On application startup
--   **Naming:** `V{version}__{description}.sql`
--   **Versioning:** Sequential (V1, V2, V3, ...)
+-   **Vị trí:** `card-words/src/main/resources/db/migration/`
+-   **Tự động chạy:** Khi khởi động ứng dụng
+-   **Đặt tên:** `V{version}__{description}.sql`
+-   **Phiên bản:** Tuần tự (V1, V2, V3, ...)
 
-#### Migration History
+#### Lịch Sử Migration
 
-| Version | Description       | Tables Added                                     |
-| ------- | ----------------- | ------------------------------------------------ |
-| V1      | Initial schema    | `users`, `roles`, `topics`, `vocabs`             |
-| V2      | Games system      | `games`, `game_sessions`, `game_session_details` |
-| V3      | Learning progress | `user_vocab_progress` (SM-2 algorithm)           |
-| V4      | Streak tracking   | `streak_records`                                 |
-| V5      | Leaderboards      | `leaderboards`, `game_leaderboards`              |
-| V6      | Notifications     | `notifications`                                  |
-| V7      | Admin tools       | `action_logs` + missing columns                  |
+| Phiên bản | Mô tả             | Bảng được thêm                                   |
+| --------- | ----------------- | ------------------------------------------------ |
+| V1        | Initial schema    | `users`, `roles`, `topics`, `vocabs`             |
+| V2        | Games system      | `games`, `game_sessions`, `game_session_details` |
+| V3        | Learning progress | `user_vocab_progress` (SM-2 algorithm)           |
+| V4        | Streak tracking   | `streak_records`                                 |
+| V5        | Leaderboards      | `leaderboards`, `game_leaderboards`              |
+| V6        | Notifications     | `notifications`                                  |
+| V7        | Admin tools       | `action_logs` + missing columns                  |
 
-#### Create New Migration
+#### Tạo Migration Mới
 
 ```bash
 cd card-words/src/main/resources/db/migration
 
-# Create new file
+# Tạo file mới
 touch V8__add_user_preferences.sql
 ```
 
@@ -890,9 +900,9 @@ CREATE TABLE user_preferences (
 CREATE INDEX idx_user_preferences_user_id ON user_preferences(user_id);
 ```
 
-### Backup & Restore
+### Sao Lưu & Khôi Phục
 
-#### Automated Backups
+#### Sao Lưu Tự Động
 
 ```bash
 cd card-words
@@ -905,9 +915,9 @@ chmod +x backup-database.sh
 ./backup-database.sh
 ```
 
-**Backup location:** `card-words/database-backups/card_words_YYYYMMDD_HHMMSS.sql`
+**Vị trí backup:** `card-words/database-backups/card_words_YYYYMMDD_HHMMSS.sql`
 
-#### Automated Daily Backups
+#### Sao Lưu Hàng Ngày Tự Động
 
 ```bash
 # Windows Task Scheduler
@@ -916,10 +926,10 @@ chmod +x backup-database.sh
 # Linux Cron
 chmod +x auto-backup.sh
 crontab -e
-# Add: 0 2 * * * /path/to/auto-backup.sh  # Daily at 2 AM
+# Thêm: 0 2 * * * /path/to/auto-backup.sh  # Hàng ngày lúc 2 AM
 ```
 
-#### Restore from Backup
+#### Khôi Phục từ Backup
 
 ```bash
 cd card-words
@@ -933,9 +943,9 @@ cd card-words
 
 ### Database Schema
 
-#### Core Tables
+#### Các Bảng Cốt Lõi
 
-**users** - User accounts
+**users** - Tài khoản người dùng
 
 ```sql
 - id (UUID, PK)
@@ -947,7 +957,7 @@ cd card-words
 - updated_at (TIMESTAMP)
 ```
 
-**vocabs** - Vocabulary words
+**vocabs** - Từ vựng
 
 ```sql
 - id (UUID, PK)
@@ -960,7 +970,7 @@ cd card-words
 - created_at (TIMESTAMP)
 ```
 
-**user_vocab_progress** - SM-2 spaced repetition
+**user_vocab_progress** - Lặp lại ngắt quãng SM-2
 
 ```sql
 - id (UUID, PK)
@@ -978,7 +988,7 @@ cd card-words
 - updated_at (TIMESTAMP)
 ```
 
-**notifications** - User notifications
+**notifications** - Thông báo người dùng
 
 ```sql
 - id (UUID, PK)
@@ -990,228 +1000,228 @@ cd card-words
 - created_at (TIMESTAMP)
 ```
 
-**Full schema:** See migrations in `card-words/src/main/resources/db/migration/`
+**Full schema:** Xem migrations trong `card-words/src/main/resources/db/migration/`
 
 ---
 
-## 📚 API Documentation
+## 📚 Tài Liệu API
 
 ### Swagger UI
 
-Interactive API documentation with try-it-out functionality:
+Tài liệu API tương tác với chức năng try-it-out:
 
 **URL:** http://localhost:8080/swagger-ui.html
 
-**Features:**
+**Tính năng:**
 
--   Complete endpoint listing
--   Request/response schemas
--   Authentication testing
--   Live API calls
+-   Danh sách endpoint đầy đủ
+-   Schemas request/response
+-   Test xác thực
+-   Gọi API trực tiếp
 
 ### OpenAPI Specification
 
 **URL:** http://localhost:8080/v3/api-docs
 
-**Format:** JSON (OpenAPI 3.0)
+**Định dạng:** JSON (OpenAPI 3.0)
 
 ### Postman Collection
 
-Import collection from: `docs/postman/Card-Words-API.postman_collection.json`
+Import collection từ: `docs/postman/Card-Words-API.postman_collection.json`
 
-### API Endpoint Categories
+### Danh Mục API Endpoint
 
 #### Authentication (`/api/v1/auth`)
 
--   `POST /register` - User registration
--   `POST /signin` - JWT authentication
--   `POST /google` - OAuth2 login
+-   `POST /register` - Đăng ký người dùng
+-   `POST /signin` - Xác thực JWT
+-   `POST /google` - Đăng nhập OAuth2
 -   `POST /refresh` - Refresh token
--   `POST /forgot-password` - Request password reset
--   `POST /reset-password` - Reset password with token
+-   `POST /forgot-password` - Yêu cầu đặt lại mật khẩu
+-   `POST /reset-password` - Đặt lại mật khẩu với token
 
 #### Vocabularies (`/api/v1/vocabs`)
 
--   `GET /` - List vocabularies (paginated, filterable)
--   `GET /{id}` - Get vocabulary details
--   `POST /` - Create vocabulary (ADMIN)
--   `PUT /{id}` - Update vocabulary (ADMIN)
--   `DELETE /{id}` - Delete vocabulary (ADMIN)
--   `GET /search` - Search vocabularies
+-   `GET /` - Danh sách từ vựng (phân trang, lọc)
+-   `GET /{id}` - Lấy chi tiết từ vựng
+-   `POST /` - Tạo từ vựng (ADMIN)
+-   `PUT /{id}` - Cập nhật từ vựng (ADMIN)
+-   `DELETE /{id}` - Xóa từ vựng (ADMIN)
+-   `GET /search` - Tìm kiếm từ vựng
 
 #### Games (`/api/v1/games`)
 
--   `GET /` - List available games
--   `POST /sessions` - Start game session
--   `POST /sessions/{id}/answers` - Submit answer
--   `POST /sessions/{id}/complete` - Complete session
--   `GET /sessions/{id}` - Get session results
--   `GET /leaderboard` - Global leaderboard
--   `GET /{gameId}/leaderboard` - Game-specific leaderboard
+-   `GET /` - Danh sách game khả dụng
+-   `POST /sessions` - Bắt đầu phiên game
+-   `POST /sessions/{id}/answers` - Gửi câu trả lời
+-   `POST /sessions/{id}/complete` - Hoàn thành phiên
+-   `GET /sessions/{id}` - Lấy kết quả phiên
+-   `GET /leaderboard` - Bảng xếp hạng toàn cầu
+-   `GET /{gameId}/leaderboard` - Bảng xếp hạng theo game
 
 #### Notifications (`/api/v1/notifications`)
 
--   `GET /` - List user notifications
--   `GET /unread-count` - Get unread count
--   `PATCH /{id}/read` - Mark as read
--   `PATCH /read-all` - Mark all as read
--   `DELETE /{id}` - Delete notification
--   `DELETE /batch` - Batch delete
+-   `GET /` - Danh sách thông báo người dùng
+-   `GET /unread-count` - Lấy số lượng chưa đọc
+-   `PATCH /{id}/read` - Đánh dấu đã đọc
+-   `PATCH /read-all` - Đánh dấu tất cả đã đọc
+-   `DELETE /{id}` - Xóa thông báo
+-   `DELETE /batch` - Xóa hàng loạt
 
 #### Admin (`/api/v1/admin`)
 
--   `GET /users` - List all users
--   `GET /dashboard/stats` - Dashboard statistics
--   `GET /action-logs` - User activity logs
--   `POST /notifications` - Create notification
--   `POST /notifications/broadcast` - Broadcast to all users
+-   `GET /users` - Danh sách tất cả người dùng
+-   `GET /dashboard/stats` - Thống kê Dashboard
+-   `GET /action-logs` - Nhật ký hoạt động người dùng
+-   `POST /notifications` - Tạo thông báo
+-   `POST /notifications/broadcast` - Broadcast tới tất cả users
 
 #### Offline Sync (`/api/v1/offline`)
 
--   `GET /user-vocab-progress` - Download all progress
--   `GET /user-vocab-progress/topic/{id}` - Download by topic
--   `GET /user-vocab-progress/due-review` - Download due reviews
+-   `GET /user-vocab-progress` - Tải xuống tất cả tiến trình
+-   `GET /user-vocab-progress/topic/{id}` - Tải xuống theo chủ đề
+-   `GET /user-vocab-progress/due-review` - Tải xuống các từ cần ôn tập
 
 ### WebSocket Endpoints
 
-**Connection:** `ws://localhost:8080/ws`
+**Kết nối:** `ws://localhost:8080/ws`
 
 **Subscriptions:**
 
 ```javascript
-// New notifications
+// Thông báo mới
 stompClient.subscribe('/user/queue/notifications', callback);
 
-// Mark as read events
+// Sự kiện đánh dấu đã đọc
 stompClient.subscribe('/user/queue/notifications/read', callback);
 
-// Mark all read events
+// Sự kiện đánh dấu tất cả đã đọc
 stompClient.subscribe('/user/queue/notifications/read-all', callback);
 
-// Delete events
+// Sự kiện xóa
 stompClient.subscribe('/user/queue/notifications/deleted', callback);
 
-// Batch delete events
+// Sự kiện xóa hàng loạt
 stompClient.subscribe('/user/queue/notifications/batch-deleted', callback);
 ```
 
-**Documentation:**
+**Tài liệu:**
 
--   Complete guide: `docs/WEBSOCKET_EVENTS.md`
--   Client examples: `docs/WEBSOCKET_CLIENT_GUIDE.md`
+-   Hướng dẫn đầy đủ: `docs/WEBSOCKET_EVENTS.md`
+-   Ví dụ Client: `docs/WEBSOCKET_CLIENT_GUIDE.md`
 -   Notification playbook: `docs/websocket/WEBSOCKET_NOTIFICATION_PLAYBOOK.md`
--   Quick test: `test-websocket-events.html`
+-   Test nhanh: `test-websocket-events.html`
 
 ---
 
-## 🛠️ Troubleshooting
+## 🛠️ Khắc Phục Sự Cố
 
-### Common Issues
+### Các Vấn Đề Thường Gặp
 
-#### 1. Containers Won't Start
+#### 1. Containers Không Khởi Động
 
 ```bash
-# Check container status
+# Kiểm tra trạng thái container
 docker-compose ps
 
-# View error logs
+# Xem logs lỗi
 docker-compose logs --tail=50
 
-# Stop all services
+# Stop tất cả services
 docker-compose down
 
-# Remove volumes (⚠️ DELETES DATA)
+# Xóa volumes (⚠️ XÓA DỮ LIỆU)
 docker-compose down -v
 
-# Rebuild and restart
+# Rebuild và restart
 docker-compose up -d --build
 ```
 
-#### 2. Port Already in Use
+#### 2. Port Đã Được Sử Dụng
 
 ```bash
-# Windows: Find process using port
+# Windows: Tìm process đang dùng port
 netstat -ano | findstr :8080
-# Kill process by PID
+# Kill process bằng PID
 taskkill /PID <process_id> /F
 
-# Linux/Mac: Find and kill process
+# Linux/Mac: Tìm và kill process
 lsof -ti:8080 | xargs kill -9
 
-# Or change port in .env
+# Hoặc đổi port trong .env
 SERVER_SPRING_PORT=8081
 ```
 
-#### 3. Database Connection Failed
+#### 3. Kết Nối Database Thất Bại
 
 ```bash
-# Check PostgreSQL logs
+# Kiểm tra logs PostgreSQL
 docker-compose logs postgres
 
-# Verify PostgreSQL is running
+# Xác minh PostgreSQL đang chạy
 docker-compose ps postgres
 
-# Test connection
+# Test kết nối
 docker-compose exec postgres psql -U postgres -d card_words -c 'SELECT 1;'
 
-# Check network
+# Kiểm tra mạng
 docker network inspect server_default
 ```
 
-#### 4. Migration Errors
+#### 4. Lỗi Migration
 
 ```bash
-# View Flyway status
+# Xem trạng thái Flyway
 docker-compose logs card-words-api | grep Flyway
 
-# Repair Flyway schema
+# Sửa chữa Flyway schema
 docker-compose exec card-words-api \
   mvn flyway:repair -Dflyway.url=jdbc:postgresql://postgres:5432/card_words
 
-# Reset database (⚠️ DELETES ALL DATA)
+# Reset database (⚠️ XÓA TẤT CẢ DỮ LIỆU)
 docker-compose down -v
 docker-compose up -d
 ```
 
-#### 5. Email Not Sending
+#### 5. Email Không Gửi Được
 
 ```bash
-# Check email configuration
+# Kiểm tra cấu hình email
 docker-compose logs card-words-api | grep "mail"
 
-# Verify Gmail App Password
-# 1. Enable 2-Step Verification on Google Account
-# 2. Generate App Password: https://myaccount.google.com/apppasswords
-# 3. Update MAIL_PASSWORD in .env
+# Xác minh Gmail App Password
+# 1. Bật Xác minh 2 bước trên Tài khoản Google
+# 2. Tạo App Password: https://myaccount.google.com/apppasswords
+# 3. Cập nhật MAIL_PASSWORD trong .env
 # 4. Restart service: docker-compose restart card-words-api
 ```
 
-#### 6. WebSocket Connection Failed
+#### 6. Kết Nối WebSocket Thất Bại
 
 ```bash
-# Check WebSocket endpoint
+# Kiểm tra WebSocket endpoint
 curl -i -N -H "Connection: Upgrade" \
   -H "Upgrade: websocket" \
   -H "Sec-WebSocket-Version: 13" \
   -H "Sec-WebSocket-Key: test" \
   http://localhost:8080/ws
 
-# Enable debug logging
-# Add to application.properties:
+# Bật debug logging
+# Thêm vào application.properties:
 logging.level.org.springframework.web.socket=DEBUG
 
-# Restart and check logs
+# Restart và kiểm tra logs
 docker-compose restart card-words-api
 docker-compose logs -f card-words-api | grep WebSocket
 ```
 
-#### 7. AI Service Predictions Failing
+#### 7. AI Service Dự Đoán Thất Bại
 
 ```bash
-# Check AI service logs
+# Kiểm tra logs AI service
 docker-compose logs card-words-ai
 
-# Verify model files exist
+# Xác minh file model tồn tại
 docker-compose exec card-words-ai ls -la /app/models/
 
 # Test prediction endpoint
@@ -1220,12 +1230,12 @@ curl http://localhost:8001/api/predict \
   -H "Content-Type: application/json" \
   -d '{"user_id": "uuid", "vocab_id": "uuid"}'
 
-# Retrain model if necessary
+# Huấn luyện lại model nếu cần
 cd card-words-ai
 ./train-model.sh
 ```
 
-### Health Checks
+### Kiểm Tra Sức Khỏe (Health Checks)
 
 ```bash
 # Spring Boot actuator
@@ -1240,17 +1250,17 @@ docker-compose exec postgres pg_isready -U postgres
 # Redis
 docker-compose exec redis redis-cli ping
 
-# All services
+# Tất cả services
 docker-compose ps
 ```
 
-### Performance Monitoring
+### Giám Sát Hiệu Năng
 
 ```bash
 # Spring Boot metrics
 curl http://localhost:8080/actuator/metrics | jq
 
-# Database performance
+# Hiệu năng Database
 docker-compose exec postgres psql -U postgres -d card_words -c '\
   SELECT pid, usename, application_name, state, query \
   FROM pg_stat_activity WHERE state = '\''active'\'';'
@@ -1258,76 +1268,76 @@ docker-compose exec postgres psql -U postgres -d card_words -c '\
 # Redis stats
 docker-compose exec redis redis-cli INFO stats
 
-# Docker resource usage
+# Sử dụng tài nguyên Docker
 docker stats
 ```
 
 ---
 
-## 🤝 Contributing
+## 🤝 Đóng Góp
 
-### Development Workflow
+### Quy Trình Phát Triển
 
-#### 1. Create Feature Branch
+#### 1. Tạo Feature Branch
 
 ```bash
-# Update main branch
+# Cập nhật nhánh main
 git checkout main
 git pull origin main
 
-# Create feature branch
-git checkout -b feature/your-feature-name
+# Tạo feature branch
+git checkout -b feature/ten-tinh-nang-cua-ban
 
-# For bug fixes
-git checkout -b fix/bug-description
+# Cho sửa lỗi
+git checkout -b fix/mo-ta-loi
 
-# For documentation
-git checkout -b docs/documentation-topic
+# Cho tài liệu
+git checkout -b docs/chu-de-tai-lieu
 ```
 
-#### 2. Make Changes
+#### 2. Thực Hiện Thay Đổi
 
 ```bash
-# Write code
-# Add tests
-# Update documentation
+# Viết code
+# Thêm tests
+# Cập nhật tài liệu
 
-# Check code style
+# Kiểm tra code style
 mvn checkstyle:check  # Java
 poetry run black app/  # Python
 poetry run flake8 app/  # Python linting
 ```
 
-#### 3. Commit Changes
+#### 3. Commit Thay Đổi
 
 ```bash
 # Stage files
 git add .
 
-# Commit with conventional message
+# Commit với conventional message
 git commit -m "feat: add smart review predictions"
 
-# Push to remote
-git push origin feature/your-feature-name
+# Push lên remote
+git push origin feature/ten-tinh-nang-cua-ban
 ```
 
-#### 4. Create Pull Request
+#### 4. Tạo Pull Request
 
-1. Go to GitHub repository
-2. Click "New Pull Request"
-3. Select your feature branch
-4. Fill in PR template:
-    - Description of changes
-    - Related issues
-    - Testing performed
-    - Screenshots (if UI changes)
-5. Request review from team members
-6. Address review comments
-7. Merge when approved
+1. Truy cập GitHub repository
+2. Nhấn "New Pull Request"
+3. Chọn feature branch của bạn
+4. Điền vào PR template:
+    - Mô tả thay đổi
+    - Các issue liên quan
+    - Testing đã thực hiện
+    - Screenshots (nếu có thay đổi UI)
+5. Yêu cầu review từ thành viên team
+6. Giải quyết các comment review
+7. Merge khi được approve
 
-### Commit Message Convention
+### Quy Ước Commit Message
 
-Follow [Conventional Commits](https://www.conventionalcommits.org/):
+Tuân theo [Conventional Commits](https://www.conventionalcommits.org/):
 
 ```
 <type>(<scope>): <subject>
@@ -1337,20 +1347,20 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 <footer>
 ```
 
-#### Types
+#### Các Loại (Types)
 
--   `feat`: New feature
--   `fix`: Bug fix
--   `docs`: Documentation changes
--   `refactor`: Code refactoring (no functional changes)
--   `test`: Adding or updating tests
--   `chore`: Maintenance tasks (dependencies, configs)
--   `perf`: Performance improvements
--   `style`: Code formatting (no logic changes)
--   `ci`: CI/CD pipeline changes
--   `build`: Build system changes
+-   `feat`: Tính năng mới
+-   `fix`: Sửa lỗi
+-   `docs`: Thay đổi tài liệu
+-   `refactor`: Tái cấu trúc code (không thay đổi chức năng)
+-   `test`: Thêm hoặc cập nhật tests
+-   `chore`: Tác vụ bảo trì (dependencies, configs)
+-   `perf`: Cải thiện hiệu năng
+-   `style`: Định dạng code (không thay đổi logic)
+-   `ci`: Thay đổi CI/CD pipeline
+-   `build`: Thay đổi hệ thống build
 
-#### Examples
+#### Ví Dụ
 
 ```bash
 # Feature
@@ -1368,7 +1378,7 @@ git commit -m "refactor(service): simplify streak calculation logic"
 # Performance
 git commit -m "perf(api): add Redis caching for vocab queries"
 
-# Multiple paragraphs
+# Nhiều đoạn văn
 git commit -m "feat(games): add new word matching game
 
 - Implement game logic with scoring
@@ -1378,15 +1388,15 @@ git commit -m "feat(games): add new word matching game
 Closes #123"
 ```
 
-### Code Style Guidelines
+### Hướng Dẫn Code Style
 
 #### Java (Spring Boot)
 
--   Follow [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html)
--   Use meaningful variable names
--   Add JavaDoc for public methods
--   Keep methods under 50 lines
--   Write unit tests (target: > 80% coverage)
+-   Tuân theo [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html)
+-   Sử dụng tên biến có ý nghĩa
+-   Thêm JavaDoc cho các public methods
+-   Giữ methods dưới 50 dòng
+-   Viết unit tests (mục tiêu: > 80% coverage)
 
 ```java
 /**
@@ -1403,11 +1413,11 @@ public UserVocabProgress calculateNextReview(UserVocabProgress progress, int qua
 
 #### Python (AI Service)
 
--   Follow [PEP 8](https://peps.python.org/pep-0008/)
--   Use type hints
--   Add docstrings for functions
--   Format with Black
--   Lint with Flake8
+-   Tuân theo [PEP 8](https://peps.python.org/pep-0008/)
+-   Sử dụng type hints
+-   Thêm docstrings cho functions
+-   Format với Black
+-   Lint với Flake8
 
 ```python
 from typing import Dict, List
@@ -1431,12 +1441,12 @@ def predict_review_success(
     # Implementation
 ```
 
-### Testing Requirements
+### Yêu Cầu Testing
 
--   All new features must include tests
--   Bug fixes must include regression tests
--   Aim for > 80% code coverage
--   Run tests before committing
+-   Tất cả tính năng mới phải bao gồm tests
+-   Sửa lỗi phải bao gồm regression tests
+-   Mục tiêu > 80% code coverage
+-   Chạy tests trước khi commit
 
 ```bash
 # Java tests
@@ -1451,44 +1461,44 @@ docker-compose -f docker-compose.test.yml up --abort-on-container-exit
 
 ---
 
-## 📄 License
+## 📄 Giấy Phép
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 👥 Team
-
-**Developer:** Ngô Minh Thuận  
-**Institution:** Đại học Kỹ thuật - Công nghệ TP.HCM (HUTECH)  
-**Project:** Khóa luận tốt nghiệp - Năm 4 HK1
+Dự án này được cấp phép theo Giấy phép MIT - xem file [LICENSE](LICENSE) để biết chi tiết.
 
 ---
 
-## 📞 Support
+## 👥 Nhóm Thực Hiện
 
-### Documentation
+**Sinh viên:** Ngô Minh Thuận  
+**Trường:** Đại học Kỹ thuật - Công nghệ TP.HCM (HUTECH)  
+**Đồ án:** Khóa luận tốt nghiệp - Năm 4 HK1
 
--   **Main Docs**: `docs/`
--   **API Reference**: http://localhost:8080/swagger-ui.html
--   **WebSocket Guide**: `docs/WEBSOCKET_EVENTS.md`
--   **Deployment**: `docs/docker/`
+---
 
-### Issue Reporting
+## 📞 Hỗ Trợ
 
-Found a bug? Please create an issue on GitHub with:
+### Tài Liệu
 
--   Description of the problem
--   Steps to reproduce
--   Expected vs actual behavior
--   Screenshots (if applicable)
--   Environment details (OS, Docker version, etc.)
+-   **Tài liệu chính**: `docs/`
+-   **Tham khảo API**: http://localhost:8080/swagger-ui.html
+-   **Hướng dẫn WebSocket**: `docs/WEBSOCKET_EVENTS.md`
+-   **Triển khai**: `docs/docker/`
 
-### Contact
+### Báo Cáo Lỗi
+
+Tìm thấy lỗi? Vui lòng tạo issue trên GitHub với:
+
+-   Mô tả vấn đề
+-   Các bước tái hiện
+-   Hành vi mong đợi vs thực tế
+-   Screenshots (nếu có)
+-   Chi tiết môi trường (OS, Docker version, etc.)
+
+### Liên Hệ
 
 -   Email: ngominhthuan@example.com
 -   GitHub: [@thuanthichlaptrinh](https://github.com/thuanthichlaptrinh)
 
 ---
 
-**Made with ❤️ by Card Words Team**
+**Được thực hiện với ❤️ bởi Card Words Team**
