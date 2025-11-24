@@ -3,6 +3,7 @@ package com.thuanthichlaptrinh.card_words.entrypoint.rest.v1.user;
 import com.thuanthichlaptrinh.card_words.core.domain.User;
 import com.thuanthichlaptrinh.card_words.core.usecase.user.FlashcardReviewService;
 import com.thuanthichlaptrinh.card_words.core.usecase.user.SimpleRecommendationService;
+import com.thuanthichlaptrinh.card_words.core.usecase.user.StreakService;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.ReviewFlashcardRequest;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.ApiResponse;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.FlashcardResponse;
@@ -16,6 +17,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -26,10 +28,12 @@ import java.util.UUID;
 @RequestMapping(path = "/api/v1/flashcard-review")
 @RequiredArgsConstructor
 @Tag(name = "Flashcard Review", description = "API ôn tập từ vựng với thuật toán Spaced Repetition (SM-2)")
+@Slf4j
 public class FlashcardReviewController {
 
         private final FlashcardReviewService flashcardReviewService;
         private final SimpleRecommendationService simpleRecommendationService;
+        private final StreakService streakService;
 
         @GetMapping("/due")
         @Operation(summary = "Lấy danh sách flashcard cần ôn tập hôm nay", description = "Lấy tất cả flashcard đến hạn ôn tập dựa trên thuật toán SM-2", security = @SecurityRequirement(name = "Bearer Authentication"))
@@ -66,6 +70,13 @@ public class FlashcardReviewController {
                         @Valid @RequestBody ReviewFlashcardRequest request) {
 
                 ReviewResultResponse response = flashcardReviewService.submitReview(user, request);
+
+                try {
+                        streakService.recordActivity(user);
+                } catch (Exception ex) {
+                        log.error("Không thể cập nhật streak sau khi submit flashcard cho user {}: {}", user.getId(), ex.getMessage(),
+                                        ex);
+                }
 
                 return ResponseEntity.ok(ApiResponse.success(
                                 "Gửi kết quả ôn tập thành công",

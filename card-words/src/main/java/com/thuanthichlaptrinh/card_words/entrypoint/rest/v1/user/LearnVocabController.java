@@ -2,6 +2,7 @@ package com.thuanthichlaptrinh.card_words.entrypoint.rest.v1.user;
 
 import com.thuanthichlaptrinh.card_words.core.domain.User;
 import com.thuanthichlaptrinh.card_words.core.usecase.user.LearnVocabService;
+import com.thuanthichlaptrinh.card_words.core.usecase.user.StreakService;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.GetReviewVocabsRequest;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.ReviewVocabRequest;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.ApiResponse;
@@ -16,6 +17,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
@@ -27,9 +29,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(path = "/api/v1/learn-vocabs")
 @RequiredArgsConstructor
 @Tag(name = "Learn Vocabs", description = "API học từ vựng")
+@Slf4j
 public class LearnVocabController {
 
     private final LearnVocabService learnVocabService;
+        private final StreakService streakService;
 
     @GetMapping("/vocabs")
     @Operation(summary = "Lấy từ vựng để học (tất cả topics)", description = """
@@ -332,6 +336,12 @@ public class LearnVocabController {
             @Valid @RequestBody ReviewVocabRequest request) {
 
         ReviewResultResponse response = learnVocabService.submitReview(user, request);
+
+                try {
+                        streakService.recordActivity(user);
+                } catch (Exception ex) {
+                        log.error("Không thể cập nhật streak sau khi submit learn vocab cho user {}: {}", user.getId(), ex.getMessage(), ex);
+                }
 
         return ResponseEntity.ok(ApiResponse.success(
                 "Ghi nhận kết quả học từ vựng thành công",
