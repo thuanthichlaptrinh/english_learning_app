@@ -1470,8 +1470,8 @@ Dự án này được cấp phép theo Giấy phép MIT - xem file [LICENSE](LI
 ## 👥 Nhóm Thực Hiện
 
 **Sinh viên:** Ngô Minh Thuận  
-**Trường:** Đại học Kỹ thuật - Công nghệ TP.HCM (HUTECH)  
-**Đồ án:** Khóa luận tốt nghiệp - Năm 4 HK1
+**Trường:** Trường Đại học Công Thương TP. Hồ Chí Minh (HUIT)
+**Đồ án:** Khóa luận tốt nghiệp
 
 ---
 
@@ -1496,7 +1496,7 @@ Tìm thấy lỗi? Vui lòng tạo issue trên GitHub với:
 
 ### Liên Hệ
 
--   Email: ngominhthuan@example.com
+-   Email: thuanthichlaptrinh@gmail.com
 -   GitHub: [@thuanthichlaptrinh](https://github.com/thuanthichlaptrinh)
 
 ---
