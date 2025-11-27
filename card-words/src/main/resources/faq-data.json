@@ -979,6 +979,146 @@
             "question": "App có quảng cáo không?",
             "answer": "KHÔNG! 100% miễn phí, không quảng cáo:\n\n**Cam kết:**\n✅ Không quảng cáo pop-up\n✅ Không quảng cáo video\n✅ Không banner ads\n✅ Không sponsored content\n\n**Tại sao miễn phí:**\n- Sứ mệnh: Giúp người Việt học tiếng Anh\n- Tài trợ từ tổ chức giáo dục\n- Duy trì bởi cộng đồng\n\n**Tương lai:**\n- Vẫn miễn phí mãi mãi\n- Có thể có Premium (optional):\n  + Offline full content\n  + Advanced statistics\n  + Priority support\n  + Exclusive features\n- Nhưng tính năng core luôn FREE!\n\n**So sánh:**\n- Duolingo: Ads mỗi bài\n- Memrise: Ads + Paywall\n- Card Words: 0 ADS!\n\n**Hỗ trợ app:**\n- Chia sẻ với bạn bè\n- Rate 5⭐ trên Store\n- Feedback cải thiện\n\nMiễn phí mãi mãi!",
             "keywords": ["quảng cáo", "ads", "advertisement", "free", "miễn phí"]
+        },
+        {
+            "id": 141,
+            "category": "game",
+            "question": "Phản xạ nhanh là gì?",
+            "answer": "Phản xạ nhanh (Quick Quiz) là game kiểm tra nhanh từ vựng:\n\n**Cách chơi:**\n1. Chọn chủ đề muốn chơi\n2. Câu hỏi hiển thị với 4 đáp án\n3. Chọn đáp án đúng trong thời gian giới hạn\n4. Trả lời càng nhanh, điểm càng cao\n\n**Tính năng:**\n- Thời gian mặc định: 10-15 giây/câu\n- Số câu hỏi: 10-20 câu (tùy cài đặt)\n- Combo streak: Đúng liên tiếp = Nhân điểm\n- Sound effects: Âm thanh khi đúng/sai\n\n**Lợi ích:**\n✅ Luyện phản xạ nhận từ\n✅ Củng cố từ đã học\n✅ Học dưới áp lực = Nhớ lâu hơn\n✅ Thú vị, không nhàm chán\n\n**Cài đặt cá nhân:**\n- Số câu hỏi: 5-30 câu\n- Thời gian: 5-30 giây/câu\n- Có/không có âm thanh\n\nPhản xạ nhanh = Kiểm tra từ vựng vui nhộn!",
+            "keywords": ["phản xạ nhanh", "quick quiz", "trả lời nhanh", "quiz nhanh", "tốc độ"]
+        },
+        {
+            "id": 142,
+            "category": "game",
+            "question": "Ghép hình với từ chơi như thế nào?",
+            "answer": "Ghép hình với từ (Image Word Matching) là game học từ qua hình ảnh:\n\n**Cách chơi:**\n1. Màn hình hiển thị nhiều cặp: hình ảnh và từ vựng\n2. Chọn 1 hình ảnh\n3. Chọn từ vựng tương ứng\n4. Nếu đúng, cặp biến mất\n5. Tiếp tục đến khi hết tất cả các cặp\n\n**Quy tắc:**\n- Mỗi lượt chơi có 4-8 cặp hình-từ\n- Thời gian giới hạn (tùy cài đặt)\n- Điểm theo thời gian và số lần sai\n- Combo khi ghép đúng liên tiếp\n\n**Lợi ích:**\n✅ Học từ qua hình ảnh trực quan\n✅ Kích thích trí nhớ thị giác\n✅ Phù hợp với người học visual\n✅ Vui vẻ, giống game memory\n\n**Cài đặt:**\n- Số cặp: 4-12 cặp\n- Có/không giới hạn thời gian\n\nHọc từ qua hình = Nhớ nhanh hơn!",
+            "keywords": ["ghép hình", "image matching", "hình ảnh", "image word", "matching game"]
+        },
+        {
+            "id": 143,
+            "category": "game",
+            "question": "Ghép từ với nghĩa là game gì?",
+            "answer": "Ghép từ với nghĩa (Word Definition Matching) là game nối từ với định nghĩa:\n\n**Cách chơi:**\n1. Màn hình hiển thị: Cột trái là từ tiếng Anh, cột phải là nghĩa tiếng Việt\n2. Kéo/Chọn từ ở cột trái\n3. Nối với nghĩa đúng ở cột phải\n4. Cặp đúng sẽ biến mất\n5. Hoàn thành khi nối hết tất cả\n\n**Độ khó:**\n- Easy: 4 cặp, nghĩa rõ ràng\n- Medium: 6 cặp, nghĩa gần nhau\n- Hard: 8+ cặp, nhiều từ đồng nghĩa\n\n**Tính điểm:**\n- Đúng ngay lần đầu: +10 điểm\n- Sai rồi đúng: +5 điểm\n- Bonus thời gian: +1-5 điểm/giây còn lại\n\n**Lợi ích:**\n✅ Học nghĩa từ chính xác\n✅ Phân biệt từ đồng nghĩa\n✅ Tăng tốc độ nhận biết từ\n✅ Ôn tập nhiều từ cùng lúc\n\nGhép từ nghĩa = Kiểm tra hiểu biết từ vựng!",
+            "keywords": ["ghép từ nghĩa", "word definition", "matching", "nối từ", "ghép nghĩa"]
+        },
+        {
+            "id": 144,
+            "category": "flashcard",
+            "question": "Ôn tập thông minh là gì?",
+            "answer": "Ôn tập thông minh (Smart Review) sử dụng AI để tối ưu việc học:\n\n**Cách hoạt động:**\n1. **AI phân tích:**\n   - Từ nào bạn hay quên\n   - Từ nào đã thuộc vững\n   - Thời điểm ôn tập tối ưu\n\n2. **Thuật toán SM-2:**\n   - Dựa trên lý thuyết Spaced Repetition\n   - Easy → Ôn lại sau 7 ngày\n   - Medium → Ôn lại sau 3 ngày\n   - Hard → Ôn lại ngày mai\n\n3. **Dự đoán AI (LightGBM):**\n   - Phân tích lịch sử học của bạn\n   - Dự đoán từ nào sẽ quên\n   - Đề xuất từ cần ôn ưu tiên\n\n**Lợi ích:**\n✅ Ôn đúng thời điểm = Nhớ lâu nhất\n✅ Không ôn từ đã thuộc (tiết kiệm thời gian)\n✅ Tập trung từ yếu\n✅ Cá nhân hóa cho từng người\n\n**Cách dùng:**\nVào Flashcard → Chọn 'Ôn tập thông minh'\n\nAI giúp bạn học thông minh hơn!",
+            "keywords": ["ôn tập thông minh", "smart review", "AI", "spaced repetition", "SM-2"]
+        },
+        {
+            "id": 145,
+            "category": "flashcard",
+            "question": "Học từ bằng Flash Card như thế nào?",
+            "answer": "Flash Card là phương pháp học từ vựng hiệu quả nhất:\n\n**Cách sử dụng:**\n1. **Chọn chủ đề/Topic** muốn học\n2. **Xem mặt trước thẻ:**\n   - Từ tiếng Anh\n   - Phiên âm IPA\n   - Loại từ (noun, verb, adj...)\n3. **Suy nghĩ nghĩa** trong đầu (5-10 giây)\n4. **Lật thẻ xem mặt sau:**\n   - Nghĩa tiếng Việt\n   - Giải thích tiếng Anh\n   - Câu ví dụ\n   - Hình ảnh minh họa\n5. **Tự đánh giá:**\n   - 😊 Easy: Nhớ ngay\n   - 😐 Medium: Nghĩ một chút\n   - 😓 Hard: Không nhớ/sai\n\n**Hệ thống tự động:**\n- Lên lịch ôn tập dựa trên đánh giá\n- Từ khó xuất hiện thường xuyên hơn\n- Từ dễ xuất hiện ít hơn\n\n**Tips:**\n- Học 15-20 từ mới/ngày\n- Ôn tập mỗi ngày\n- Đọc to khi học\n\nFlash Card = Phương pháp #1 học từ vựng!",
+            "keywords": ["flash card", "flashcard", "thẻ học", "học từ", "cách học flashcard"]
+        },
+        {
+            "id": 146,
+            "category": "learning",
+            "question": "Trình độ CEFR của tôi là gì?",
+            "answer": "QUAN TRỌNG: Kiểm tra database context để xem trình độ CEFR hiện tại của bạn.\n\n**CEFR là gì:**\nCEFR (Common European Framework of Reference) là khung tham chiếu ngôn ngữ châu Âu:\n\n**Các cấp độ:**\n- **A1 (Beginner):** Giao tiếp rất cơ bản\n- **A2 (Elementary):** Câu đơn giản hàng ngày\n- **B1 (Intermediate):** Giao tiếp công việc cơ bản\n- **B2 (Upper Intermediate):** Giao tiếp tự tin\n- **C1 (Advanced):** Thành thạo cao\n- **C2 (Proficient):** Gần như người bản xứ\n\n**Làm bài test:**\n- App có bài kiểm tra đầu vào\n- 20-30 câu hỏi\n- Tự động xác định level\n- Đề xuất từ vựng phù hợp\n\n**Lợi ích biết level:**\n✅ Học từ đúng trình độ\n✅ Không quá dễ (chán)\n✅ Không quá khó (nản)\n✅ Tiến bộ đều đặn\n\nHọc đúng level = Tiến bộ nhanh nhất!",
+            "keywords": ["cefr", "trình độ", "level", "cấp độ", "đánh giá trình độ"]
+        },
+        {
+            "id": 147,
+            "category": "learning",
+            "question": "Làm sao để nâng cấp trình độ CEFR?",
+            "answer": "Lộ trình nâng cấp level CEFR:\n\n**A1 → A2 (2-3 tháng):**\n- Học 300-500 từ cơ bản\n- Topics: Family, Food, Colors, Numbers\n- Duy trì streak 30+ ngày\n\n**A2 → B1 (3-4 tháng):**\n- Học 800-1200 từ\n- Topics: Travel, Work, Education\n- Quiz score: 80%+\n- Bắt đầu đọc bài đơn giản\n\n**B1 → B2 (4-6 tháng):**\n- Học 1500-2500 từ\n- Topics: Technology, Health, Business\n- Nghe podcast, xem phim\n- Speaking practice\n\n**B2 → C1 (6-12 tháng):**\n- Học 3000-5000 từ\n- Từ vựng academic, chuyên ngành\n- Đọc sách tiếng Anh\n- Viết essay\n\n**Tiêu chí lên level:**\n✅ Master 80%+ từ của level hiện tại\n✅ Quiz average 85%+\n✅ Streak 60+ ngày\n✅ Làm bài test lại\n\nKiên trì = Level up!",
+            "keywords": ["nâng cấp", "level up", "tăng level", "cefr", "lên trình độ"]
+        },
+        {
+            "id": 148,
+            "category": "account",
+            "question": "Làm sao đăng nhập bằng Google?",
+            "answer": "Đăng nhập Google (OAuth2) rất đơn giản:\n\n**Cách đăng nhập:**\n1. Mở app Card Words\n2. Chọn 'Đăng nhập'\n3. Tap 'Đăng nhập với Google'\n4. Chọn tài khoản Google\n5. Cho phép quyền truy cập\n6. Tự động đăng nhập!\n\n**Lợi ích:**\n✅ Không cần nhớ mật khẩu\n✅ Đăng nhập 1 click\n✅ Bảo mật cao (Google bảo vệ)\n✅ Tự động tạo tài khoản mới (nếu chưa có)\n\n**Quyền truy cập:**\n- Chỉ lấy: Email, Tên, Avatar\n- KHÔNG lấy: Mật khẩu, Contacts, Calendar\n\n**Lưu ý:**\n- Dùng cùng email = Sync dữ liệu\n- Đổi Gmail = Cần liên kết lại\n- Có thể liên kết thêm Email/Password sau\n\n**Bảo mật:**\nGoogle OAuth2 là chuẩn bảo mật cao nhất!\n\nĐăng nhập Google = Nhanh & An toàn!",
+            "keywords": ["google", "đăng nhập google", "oauth", "sign in google", "login google"]
+        },
+        {
+            "id": 149,
+            "category": "notification",
+            "question": "Thông báo nhắc nhở hoạt động như thế nào?",
+            "answer": "Hệ thống thông báo giúp bạn duy trì streak:\n\n**Loại thông báo:**\n1. **Nhắc học hàng ngày:**\n   - Thời gian tùy chỉnh\n   - \"Đừng quên học hôm nay!\"\n   - Push notification\n\n2. **Cảnh báo mất streak:**\n   - 3 giờ trước 0:00\n   - \"Streak sắp bị mất!\"\n   - Ưu tiên cao\n\n3. **Chúc mừng milestone:**\n   - Streak 7, 30, 100 ngày\n   - Hoàn thành topic\n   - Level up\n\n4. **Nhắc ôn tập:**\n   - \"10 từ cần ôn hôm nay\"\n   - Dựa trên thuật toán SRS\n\n**Cài đặt:**\n- Settings → Notifications\n- Bật/tắt từng loại\n- Chọn giờ nhắc\n- Chọn âm thanh\n\n**Giao thức:**\n- Push notification (mobile)\n- WebSocket real-time (web)\n- Email reminder (tùy chọn)\n\nThông báo = Không bao giờ quên học!",
+            "keywords": ["thông báo", "notification", "nhắc nhở", "reminder", "push notification"]
+        },
+        {
+            "id": 150,
+            "category": "leaderboard",
+            "question": "Bảng xếp hạng hoạt động như thế nào?",
+            "answer": "Bảng xếp hạng (Leaderboard) để cạnh tranh với người khác:\n\n**Các loại xếp hạng:**\n1. **Streak Ranking:**\n   - Ai có streak dài nhất\n   - Weekly/Monthly/All-time\n\n2. **XP Ranking:**\n   - Điểm kinh nghiệm tổng hợp\n   - Tính từ flashcard, quiz, game\n\n3. **Quiz Score:**\n   - Điểm trung bình quiz\n   - Theo topic hoặc tổng hợp\n\n4. **Words Mastered:**\n   - Số từ đã thuộc vững\n   - Theo level CEFR\n\n**Cách tính XP:**\n- Flashcard: 1 XP/thẻ\n- Quiz đúng: 10 XP/câu\n- Game: 5-20 XP tùy kết quả\n- Streak bonus: +10% mỗi ngày\n\n**Giải thưởng:**\n- Top 10: Badge đặc biệt\n- Top 3: Badge vàng + Featured\n- #1: Champion badge\n\n**Tips leo rank:**\n- Học đều đặn mỗi ngày\n- Duy trì streak cao\n- Làm quiz nhiều topic\n\nLeaderboard = Động lực cạnh tranh!",
+            "keywords": ["bảng xếp hạng", "leaderboard", "ranking", "xếp hạng", "top"]
+        },
+        {
+            "id": 151,
+            "category": "chatbot",
+            "question": "Chatbot AI này có thể làm gì?",
+            "answer": "AI Chatbot Card Words hỗ trợ học tập toàn diện:\n\n**Khả năng:**\n1. **Trả lời câu hỏi:**\n   - Cách sử dụng app\n   - Phương pháp học\n   - Giải thích tính năng\n\n2. **Tra cứu từ vựng:**\n   - Hỏi nghĩa từ\n   - Xem ví dụ câu\n   - Tìm từ theo chủ đề\n\n3. **Thống kê học tập:**\n   - Hỏi tiến độ cá nhân\n   - Số từ đã học\n   - Streak hiện tại\n   - Điểm quiz trung bình\n\n4. **Đề xuất cá nhân:**\n   - Từ nào nên ôn\n   - Topic phù hợp level\n   - Tips học hiệu quả\n\n**Cách hỏi:**\n- \"Tôi đã học được bao nhiêu từ?\"\n- \"Streak của tôi là bao nhiêu?\"\n- \"Từ 'amazing' nghĩa là gì?\"\n- \"Topic nào phù hợp với tôi?\"\n\n**Lưu ý:**\nChatbot trả lời dựa trên database và FAQ, không phải ChatGPT.\n\nHỏi gì cũng được, AI sẵn sàng giúp!",
+            "keywords": ["chatbot", "AI", "trợ lý", "hỏi đáp", "chat"]
+        },
+        {
+            "id": 152,
+            "category": "sync",
+            "question": "Đồng bộ offline hoạt động như thế nào?",
+            "answer": "Đồng bộ offline giúp học mọi lúc mọi nơi:\n\n**Cách hoạt động:**\n1. **Khi có mạng:**\n   - Download dữ liệu về máy\n   - Cập nhật từ server\n   - Sync progress\n\n2. **Khi offline:**\n   - Dùng dữ liệu đã tải\n   - Học flashcard, làm quiz\n   - Progress lưu local\n\n3. **Khi có mạng lại:**\n   - Tự động đồng bộ\n   - Upload progress lên server\n   - Merge dữ liệu thông minh\n\n**Dữ liệu offline:**\n✅ Flashcard đã tải\n✅ Quiz đã tải\n✅ Progress cá nhân\n❌ AI Chatbot (cần internet)\n❌ Leaderboard realtime\n\n**Cài đặt:**\n- Settings → Offline Mode\n- Chọn topics muốn tải\n- Auto-sync khi có wifi\n\n**Lưu ý:**\n- Lần đầu cần mạng để tải data\n- Streak vẫn được tính (sync sau)\n\nHọc offline = Không gián đoạn!",
+            "keywords": ["offline", "đồng bộ", "sync", "không mạng", "offline mode"]
+        },
+        {
+            "id": 153,
+            "category": "setting",
+            "question": "Làm sao thay đổi cài đặt game?",
+            "answer": "Tùy chỉnh game theo sở thích:\n\n**Cách truy cập:**\n1. Vào Settings (Cài đặt)\n2. Chọn 'Game Settings'\n3. Tùy chỉnh từng game\n\n**Quick Quiz:**\n- Số câu hỏi: 5-30 câu\n- Thời gian/câu: 5-30 giây\n- Có/không countdown\n- Âm thanh: On/Off\n\n**Image Word Matching:**\n- Số cặp: 4-12 cặp\n- Có/không timer\n- Hiệu ứng animation\n\n**Word Definition Matching:**\n- Số cặp: 4-12 cặp\n- Độ khó: Easy/Medium/Hard\n- Có/không gợi ý\n\n**Chung:**\n- Sound effects: On/Off\n- Vibration: On/Off\n- Show correct answer: Always/Never\n- Difficulty: Auto/Manual\n\n**Reset:**\nNút 'Reset to Default' để về mặc định\n\nCài đặt phù hợp = Học hiệu quả hơn!",
+            "keywords": ["cài đặt game", "game settings", "tùy chỉnh", "setting", "cấu hình"]
+        },
+        {
+            "id": 154,
+            "category": "account",
+            "question": "Tài khoản bị khóa phải làm sao?",
+            "answer": "Nếu tài khoản bị khóa (banned):\n\n**Nguyên nhân có thể:**\n❌ Vi phạm điều khoản sử dụng\n❌ Spam, gian lận\n❌ Tạo nhiều tài khoản giả\n❌ Nội dung không phù hợp\n\n**Cách khắc phục:**\n1. **Kiểm tra email:**\n   - Email thông báo lý do\n   - Hướng dẫn kháng cáo\n\n2. **Liên hệ Support:**\n   - Email: support@cardwords.com\n   - Gửi: Username, Email, Lý do kháng cáo\n   - Thời gian xử lý: 1-3 ngày\n\n3. **Cung cấp thông tin:**\n   - Giải thích tình huống\n   - Cam kết không tái phạm\n   - Bằng chứng (nếu có)\n\n**Kết quả:**\n- Mở khóa nếu vô tình\n- Cảnh cáo nếu lỗi nhẹ\n- Khóa vĩnh viễn nếu nghiêm trọng\n\n**Phòng tránh:**\n- Tuân thủ điều khoản\n- Không gian lận streak\n- Không tạo tài khoản fake\n\nHãy chơi fair, tài khoản an toàn!",
+            "keywords": ["khóa", "banned", "tài khoản bị khóa", "mở khóa", "unlock"]
+        },
+        {
+            "id": 155,
+            "category": "account",
+            "question": "Làm sao kích hoạt tài khoản?",
+            "answer": "Kích hoạt tài khoản sau đăng ký:\n\n**Các bước:**\n1. **Đăng ký:**\n   - Nhập email, mật khẩu, tên\n   - Submit form đăng ký\n\n2. **Nhận email:**\n   - Email từ Card Words\n   - Tiêu đề: 'Xác nhận tài khoản'\n   - Kiểm tra cả Spam/Junk\n\n3. **Click link:**\n   - Mở email\n   - Click link xác nhận\n   - Link có hiệu lực 24 giờ\n\n4. **Hoàn tất:**\n   - Trang xác nhận thành công\n   - Tự động đăng nhập\n\n**Không nhận email:**\n- Kiểm tra Spam folder\n- Chờ 5-10 phút\n- Click 'Gửi lại email'\n- Kiểm tra đúng email\n\n**Link hết hạn:**\n- Vào trang đăng nhập\n- Click 'Gửi lại email kích hoạt'\n- Dùng link mới\n\n**Lưu ý:**\nPhải kích hoạt mới dùng được đầy đủ tính năng!",
+            "keywords": ["kích hoạt", "activate", "xác nhận", "email xác nhận", "verify"]
+        },
+        {
+            "id": 156,
+            "category": "vocab",
+            "question": "Từ vựng có hình ảnh không?",
+            "answer": "CÓ! Hầu hết từ vựng đều có hình ảnh:\n\n**Loại hình ảnh:**\n- 📷 Ảnh thực tế (photo)\n- 🎨 Minh họa (illustration)\n- 🖼️ Icon đơn giản\n\n**Lợi ích học với hình:**\n✅ Ghi nhớ nhanh gấp 6 lần\n✅ Hiểu nghĩa trực quan\n✅ Không cần dịch qua tiếng Việt\n✅ Kích thích não bộ visual\n\n**Nơi có hình ảnh:**\n- Flashcard: Mặt sau có hình\n- Game Image Matching: Chơi với hình\n- Topic overview: Hình đại diện\n- Vocab detail: Hình minh họa\n\n**Từ không có hình:**\n- Từ trừu tượng (abstract concepts)\n- Từ ngữ pháp (grammar words)\n- Liên từ, giới từ...\n\n**Firebase Storage:**\nHình ảnh được lưu trên Firebase, load nhanh!\n\nHọc có hình = Nhớ lâu hơn!",
+            "keywords": ["hình ảnh", "image", "ảnh", "picture", "visual"]
+        },
+        {
+            "id": 157,
+            "category": "vocab",
+            "question": "Từ vựng có phát âm không?",
+            "answer": "CÓ! Mỗi từ đều có audio phát âm:\n\n**Thông tin phát âm:**\n- 🔊 File audio MP3\n- 📝 Phiên âm IPA\n- 🇺🇸🇬🇧 American/British accent\n\n**Cách nghe:**\n1. **Trong Flashcard:**\n   - Tap icon 🔊\n   - Auto-play khi lật thẻ (tùy setting)\n\n2. **Trong Vocab Detail:**\n   - Tap từ vựng\n   - Tap nút phát âm\n   - Nghe đi nghe lại\n\n3. **Trong Game:**\n   - Nghe trước khi chọn đáp án\n   - Listening challenge mode\n\n**Tips phát âm:**\n- Nghe → Lặp lại to (shadowing)\n- Chú ý IPA để nói chuẩn\n- So sánh US vs UK accent\n- Ghi âm và nghe lại\n\n**Lưu ý:**\n- Cần internet để load audio\n- Offline mode: Chỉ có từ đã cache\n\nNghe nhiều = Phát âm tốt!",
+            "keywords": ["phát âm", "audio", "pronunciation", "nghe", "âm thanh"]
+        },
+        {
+            "id": 158,
+            "category": "progress",
+            "question": "Trạng thái từ vựng có những loại nào?",
+            "answer": "Từ vựng có 4 trạng thái chính:\n\n**1. NEW (Mới):** 🆕\n- Chưa bao giờ học\n- Chưa xuất hiện trong flashcard\n- Màu xám\n\n**2. LEARNING (Đang học):** 📖\n- Đã bắt đầu học\n- Còn đang ôn tập\n- EF Factor < 2.5\n- Màu vàng\n\n**3. REVIEW (Cần ôn):** 🔄\n- Đã học nhưng cần củng cố\n- Đến lịch ôn tập\n- Interval > 1 ngày\n- Màu cam\n\n**4. MASTERED (Thành thạo):** ✅\n- Nhớ vững rồi\n- Đánh giá Easy 3+ lần\n- EF Factor ≥ 2.5\n- Interval ≥ 7 ngày\n- Màu xanh\n\n**Chuyển trạng thái:**\n- NEW → LEARNING: Học lần đầu\n- LEARNING → REVIEW: Đúng 2+ lần\n- REVIEW → MASTERED: Đúng Easy 3 lần\n- MASTERED → REVIEW: Quên (đánh Hard)\n\nTrạng thái giúp theo dõi tiến độ!",
+            "keywords": ["trạng thái", "status", "new", "learning", "mastered", "review"]
+        },
+        {
+            "id": 159,
+            "category": "learning",
+            "question": "Thuật toán SM-2 là gì?",
+            "answer": "SM-2 là thuật toán Spaced Repetition nổi tiếng:\n\n**Nguyên lý:**\n- Ôn tập đúng lúc bạn SẮP quên\n- Không ôn quá sớm (phí thời gian)\n- Không ôn quá muộn (đã quên rồi)\n\n**Công thức:**\n```\nEF = EF + (0.1 - (5-q) * (0.08 + (5-q) * 0.02))\nInterval = previousInterval * EF\n```\n\n**Trong đó:**\n- EF (Easiness Factor): Độ dễ nhớ (2.5 mặc định)\n- q (quality): Đánh giá của bạn (0-5)\n- Interval: Số ngày đến lần ôn tiếp\n\n**Ví dụ thực tế:**\n- Lần 1: Học ngày 1\n- Lần 2: Ôn ngày 2 (1 ngày sau)\n- Lần 3: Ôn ngày 5 (3 ngày sau)\n- Lần 4: Ôn ngày 12 (7 ngày sau)\n- Lần 5: Ôn ngày 30 (18 ngày sau)\n...\n\n**Lợi ích:**\n✅ Học ít nhưng nhớ lâu\n✅ Tối ưu thời gian\n✅ Cá nhân hóa cho từng từ\n\nSM-2 = Nền tảng của flashcard thông minh!",
+            "keywords": ["sm-2", "spaced repetition", "thuật toán", "algorithm", "ôn tập"]
+        },
+        {
+            "id": 160,
+            "category": "admin",
+            "question": "Admin có thể làm gì?",
+            "answer": "Dành cho quản trị viên hệ thống:\n\n**Quản lý người dùng:**\n- Xem danh sách users\n- Khóa/Mở khóa tài khoản\n- Reset mật khẩu\n- Xem thống kê hoạt động\n\n**Quản lý nội dung:**\n- Thêm/Sửa/Xóa từ vựng\n- Thêm/Sửa/Xóa topics\n- Upload hình ảnh, audio\n- Quản lý types (loại từ)\n\n**Quản lý game:**\n- Cấu hình quiz\n- Thêm câu hỏi mới\n- Xem thống kê game\n\n**Báo cáo & Analytics:**\n- Dashboard tổng quan\n- Người dùng hoạt động\n- Từ vựng phổ biến\n- Top streak users\n\n**Hệ thống:**\n- Xem logs hoạt động\n- Backup database\n- Cấu hình thông báo\n- Quản lý FAQ chatbot\n\n**Truy cập:**\nAdmin Dashboard tại `/admin`\nYêu cầu role ADMIN\n\nAdmin = Quản lý toàn bộ hệ thống!",
+            "keywords": ["admin", "quản trị", "administrator", "quản lý"]
         }
     ]
 }
