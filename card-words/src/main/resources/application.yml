@@ -60,12 +60,13 @@ spring:
                 smtp:
                     auth: true
                     starttls:
-                        enable: true
+                        enable: ${MAIL_STARTTLS_ENABLE:true}
                     ssl:
+                        enable: ${MAIL_SSL_ENABLE:false}
                         trust: smtp.gmail.com
-                    connectiontimeout: 5000
-                    timeout: 3000
-                    writetimeout: 5000
+                    connectiontimeout: 10000
+                    timeout: 10000
+                    writetimeout: 10000
 
 springdoc:
     api-docs:

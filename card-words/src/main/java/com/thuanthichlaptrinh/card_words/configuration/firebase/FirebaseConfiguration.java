@@ -27,6 +27,9 @@ public class FirebaseConfiguration {
     @Value("${FIREBASE_CREDENTIALS:#{null}}")
     private String firebaseCredentialsJson;
 
+    // @Value("${firebase.storage.service-account-path}")
+    // private String serviceAccountPath;
+
     @Bean
     public FirebaseApp initializeFirebase() throws IOException {
         if (!FirebaseApp.getApps().isEmpty()) {
