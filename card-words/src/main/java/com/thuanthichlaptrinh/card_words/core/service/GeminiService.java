@@ -3,7 +3,8 @@ package com.thuanthichlaptrinh.card_words.core.service;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.thuanthichlaptrinh.card_words.configuration.GeminiConfig;
+import com.thuanthichlaptrinh.card_words.configuration.gemini.GeminiConfig;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;

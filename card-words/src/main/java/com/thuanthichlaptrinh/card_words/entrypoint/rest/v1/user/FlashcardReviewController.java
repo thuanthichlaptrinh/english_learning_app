@@ -74,7 +74,8 @@ public class FlashcardReviewController {
                 try {
                         streakService.recordActivity(user);
                 } catch (Exception ex) {
-                        log.error("Không thể cập nhật streak sau khi submit flashcard cho user {}: {}", user.getId(), ex.getMessage(),
+                        log.error("Không thể cập nhật streak sau khi submit flashcard cho user {}: {}", user.getId(),
+                                        ex.getMessage(),
                                         ex);
                 }
 

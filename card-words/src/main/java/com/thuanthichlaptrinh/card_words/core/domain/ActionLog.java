@@ -3,6 +3,12 @@ package com.thuanthichlaptrinh.card_words.core.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -18,7 +24,23 @@ import java.util.UUID;
         @Index(name = "idx_action_log_status", columnList = "status"),
         @Index(name = "idx_action_log_created_at", columnList = "created_at")
 })
-public class ActionLog extends BaseLongEntity {
+public class ActionLog implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
 
     @Column(name = "user_id")
     private UUID userId;

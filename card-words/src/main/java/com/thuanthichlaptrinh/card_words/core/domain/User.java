@@ -3,17 +3,21 @@ package com.thuanthichlaptrinh.card_words.core.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.thuanthichlaptrinh.card_words.common.enums.CEFRLevel;
 
+import java.io.Serial;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Getter
@@ -30,7 +34,23 @@ import java.util.stream.Collectors;
         @Index(name = "idx_user_current_streak", columnList = "current_streak"),
         @Index(name = "idx_user_last_activity", columnList = "last_activity_date")
 })
-public class User extends BaseUUIDEntity implements UserDetails {
+public class User implements UserDetails {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", updatable = false, nullable = false, columnDefinition = "uuid")
+    private UUID id;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
 
     @Column(nullable = false, length = 100)
     private String name;

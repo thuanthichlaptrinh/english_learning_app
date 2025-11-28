@@ -276,13 +276,13 @@ public class FlashcardReviewService {
             // Send notification for excellent performance (quality 3 or higher)
             if (quality >= 3) {
                 String qualityText = quality == 5 ? "Hoàn Hảo" : "Xuất Sắc";
-                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = 
-                    com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest.builder()
+                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest
+                        .builder()
                         .userId(user.getId())
                         .title(String.format("🌟 %s!", qualityText))
-                        .content(String.format("Bạn đã nhớ từ '%s' rất tốt! Độ khó hiện tại: %.2f", 
-                            progress.getVocab().getWord(), progress.getEfFactor()))
-                        .type("flashcard_review")
+                        .content(String.format("Bạn đã nhớ từ '%s' rất tốt! Độ khó hiện tại: %.2f",
+                                progress.getVocab().getWord(), progress.getEfFactor()))
+                        .type(com.thuanthichlaptrinh.card_words.common.constants.NotificationConstants.STUDY_PROGRESS)
                         .build();
                 notificationService.createNotification(request);
             }

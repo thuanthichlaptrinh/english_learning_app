@@ -1,4 +1,4 @@
-package com.thuanthichlaptrinh.card_words.configuration;
+package com.thuanthichlaptrinh.card_words.configuration.security;
 
 import java.util.List;
 

@@ -830,27 +830,28 @@ public class LearnVocabService {
     private void sendReviewMilestoneNotification(User user, UserVocabProgress progress) {
         try {
             int totalReviewed = progress.getTimesCorrect() + progress.getTimesWrong();
-            
+
             // Milestone: 10 reviews
             if (totalReviewed == 10) {
-                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = 
-                    com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest.builder()
+                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest
+                        .builder()
                         .userId(user.getId())
                         .title("📚 10 Lần Ôn Tập!")
-                        .content(String.format("Bạn đã ôn tập từ '%s' được 10 lần. Tiếp tục phấn đấu nhé!", progress.getVocab().getWord()))
-                        .type("learning_milestone")
+                        .content(String.format("Bạn đã ôn tập từ '%s' được 10 lần. Tiếp tục phấn đấu nhé!",
+                                progress.getVocab().getWord()))
+                        .type(com.thuanthichlaptrinh.card_words.common.constants.NotificationConstants.STUDY_PROGRESS)
                         .build();
                 notificationService.createNotification(request);
             }
-            
+
             // Milestone: Mastered status
             if (progress.getStatus() == VocabStatus.MASTERED && progress.getTimesCorrect() >= 5) {
-                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = 
-                    com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest.builder()
+                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest
+                        .builder()
                         .userId(user.getId())
                         .title("🏆 Thành Thạo!")
-                        .content(String.format("Chúc mừng! Bạn đã thành thạo từ '%s' với %d lần trả lời đúng!", 
-                            progress.getVocab().getWord(), progress.getTimesCorrect()))
+                        .content(String.format("Chúc mừng! Bạn đã thành thạo từ '%s' với %d lần trả lời đúng!",
+                                progress.getVocab().getWord(), progress.getTimesCorrect()))
                         .type("achievement")
                         .build();
                 notificationService.createNotification(request);
@@ -870,11 +871,11 @@ public class LearnVocabService {
         try {
             LocalDate today = LocalDate.now();
             long reviewedToday = userVocabProgressRepository.countByUserIdAndLastReviewed(user.getId(), today);
-            
+
             // Milestone notifications for daily goals
             if (reviewedToday == 10) {
-                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = 
-                    com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest.builder()
+                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest
+                        .builder()
                         .userId(user.getId())
                         .title("🎯 Hoàn Thành 10 Từ!")
                         .content("Tuyệt vời! Bạn đã ôn tập được 10 từ hôm nay! Tiếp tục duy trì nhé!")
@@ -882,8 +883,8 @@ public class LearnVocabService {
                         .build();
                 notificationService.createNotification(request);
             } else if (reviewedToday == 20) {
-                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = 
-                    com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest.builder()
+                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest
+                        .builder()
                         .userId(user.getId())
                         .title("🌟 Ôn 20 Từ Trong Ngày!")
                         .content("Xuất sắc! Bạn đã ôn tập 20 từ hôm nay. Bạn đang học rất chăm chỉ!")
@@ -891,8 +892,8 @@ public class LearnVocabService {
                         .build();
                 notificationService.createNotification(request);
             } else if (reviewedToday == 50) {
-                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = 
-                    com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest.builder()
+                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest
+                        .builder()
                         .userId(user.getId())
                         .title("🔥 50 Từ Trong Một Ngày!")
                         .content("Không thể tin được! Bạn đã ôn tập 50 từ hôm nay! Bạn là siêu sao học tập! ⭐")

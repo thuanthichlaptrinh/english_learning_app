@@ -1,4 +1,4 @@
-package com.thuanthichlaptrinh.card_words.configuration;
+package com.thuanthichlaptrinh.card_words.configuration.gemini;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

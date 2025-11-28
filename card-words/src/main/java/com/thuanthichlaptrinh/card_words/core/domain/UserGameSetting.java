@@ -3,6 +3,14 @@ package com.thuanthichlaptrinh.card_words.core.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 @Getter
 @Setter
 @Builder
@@ -13,7 +21,23 @@ import lombok.*;
                 "user_id" }), indexes = {
                                 @Index(name = "idx_ugs_user_id", columnList = "user_id")
                 })
-public class UserGameSetting extends BaseUUIDEntity {
+public class UserGameSetting implements Serializable {
+
+        @Serial
+        private static final long serialVersionUID = 1L;
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.UUID)
+        @Column(name = "id", updatable = false, nullable = false, columnDefinition = "uuid")
+        private UUID id;
+
+        @CreationTimestamp
+        @Column(name = "created_at", nullable = false, updatable = false)
+        private LocalDateTime createdAt;
+
+        @UpdateTimestamp
+        @Column(name = "updated_at", nullable = false)
+        private LocalDateTime updatedAt;
 
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "user_id", nullable = false)
