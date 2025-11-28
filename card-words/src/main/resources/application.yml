@@ -109,9 +109,9 @@ gemini:
 # Resend Email API (for Railway - SMTP blocked)
 resend:
     api:
-        key: ${RESEND_API_KEY:}
+        key: ${RESEND_API_KEY}
     from:
-        email: ${RESEND_FROM_EMAIL:onboarding@resend.dev}
+        email: ${RESEND_FROM_EMAIL}
 
 logging:
     level:
