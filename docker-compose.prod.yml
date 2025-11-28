@@ -1,0 +1,235 @@
+# docker-compose.prod.yml - Optimized for VPS 2GB RAM (Demo only)
+# Usage: docker compose -f docker-compose.prod.yml up -d
+
+services:
+    # ============================================
+    # DATABASE SERVICES
+    # ============================================
+
+    # PostgreSQL Database (Optimized for low memory)
+    postgres:
+        container_name: card-words-postgres
+        image: postgres:16-alpine
+        environment:
+            - POSTGRES_USER=${POSTGRES_USER}
+            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+            - POSTGRES_DB=${POSTGRES_DB}
+        ports:
+            - '${POSTGRES_EXTERNAL_PORT}:5432'
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        networks:
+            - card-words-network
+        healthcheck:
+            test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
+            interval: 30s
+            timeout: 5s
+            retries: 5
+        restart: unless-stopped
+        # Memory limit for PostgreSQL
+        deploy:
+            resources:
+                limits:
+                    memory: 256M
+                reservations:
+                    memory: 128M
+        # PostgreSQL tuning for low memory
+        command: >
+            postgres
+            -c shared_buffers=64MB
+            -c effective_cache_size=128MB
+            -c maintenance_work_mem=16MB
+            -c work_mem=4MB
+            -c max_connections=30
+
+    # ============================================
+    # CACHE SERVICES
+    # ============================================
+
+    # Redis Cache (Lightweight)
+    redis:
+        image: redis:7-alpine
+        container_name: card-words-redis
+        ports:
+            - '${REDIS_EXTERNAL_PORT}:6379'
+        volumes:
+            - redis_data:/data
+        networks:
+            - card-words-network
+        healthcheck:
+            test: ['CMD', 'redis-cli', 'ping']
+            interval: 30s
+            timeout: 3s
+            retries: 5
+        # Memory limit for Redis
+        command: redis-server --appendonly yes --maxmemory 64mb --maxmemory-policy allkeys-lru
+        restart: unless-stopped
+        deploy:
+            resources:
+                limits:
+                    memory: 96M
+                reservations:
+                    memory: 64M
+
+    # ============================================
+    # APPLICATION SERVICES
+    # ============================================
+
+    # Spring Boot Backend API (Memory optimized)
+    card-words-api:
+        build:
+            context: ./card-words
+            dockerfile: Dockerfile
+        container_name: card-words-api
+        environment:
+            # JVM Memory Settings (CRITICAL for 2GB VPS)
+            - JAVA_OPTS=-Xms256m -Xmx384m -XX:+UseG1GC -XX:MaxGCPauseMillis=100 -XX:+UseStringDeduplication
+
+            # Server
+            - SERVER_PORT=${SERVER_SPRING_PORT}
+
+            # Database
+            - POSTGRES_HOST=${POSTGRES_HOST}
+            - POSTGRES_PORT=${POSTGRES_PORT}
+            - POSTGRES_DB=${POSTGRES_DB}
+            - POSTGRES_USER=${POSTGRES_USER}
+            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+            # Redis
+            - REDIS_HOST=${REDIS_HOST}
+            - REDIS_PORT=${REDIS_PORT}
+            - REDIS_DB=${REDIS_DB}
+            - REDIS_PASSWORD=${REDIS_PASSWORD}
+            - REDIS_TIMEOUT=${REDIS_TIMEOUT}
+
+            # JWT
+            - JWT_SECRET=${JWT_SECRET}
+            - JWT_EXPIRATION_TIME=${JWT_EXPIRATION_TIME}
+            - JWT_REFRESH_TOKEN_EXPIRATION=${JWT_REFRESH_TOKEN_EXPIRATION}
+
+            # Email
+            - MAIL_HOST=${MAIL_HOST}
+            - MAIL_PORT=${MAIL_PORT}
+            - MAIL_USERNAME=${MAIL_USERNAME}
+            - MAIL_PASSWORD=${MAIL_PASSWORD}
+
+            # Google OAuth2
+            - GOOGLE_OAUTH_CLIENT_ID=${GOOGLE_OAUTH_CLIENT_ID}
+            - GOOGLE_OAUTH_CLIENT_SECRET=${GOOGLE_OAUTH_CLIENT_SECRET}
+            - GOOGLE_OAUTH_REDIRECT_URI=${GOOGLE_OAUTH_REDIRECT_URI}
+
+            # Activation
+            - ACTIVATION_EXPIRED_TIME=${ACTIVATION_EXPIRED_TIME}
+            - ACTIVATION_RESEND_INTERVAL=${ACTIVATION_RESEND_INTERVAL}
+
+            # Firebase
+            - FIREBASE_STORAGE_BUCKET=${FIREBASE_STORAGE_BUCKET}
+            - FIREBASE_SERVICE_ACCOUNT_PATH=${FIREBASE_SERVICE_ACCOUNT_PATH}
+
+            # AI Service URL
+            - AI_SERVICE_URL=${AI_SERVICE_URL}
+
+            # Gemini AI
+            - GEMINI_API_KEY=${GEMINI_API_KEY}
+
+        ports:
+            - '${SERVER_SPRING_PORT}:${SERVER_SPRING_PORT}'
+        depends_on:
+            postgres:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+        networks:
+            - card-words-network
+        restart: unless-stopped
+        deploy:
+            resources:
+                limits:
+                    memory: 512M
+                reservations:
+                    memory: 384M
+        healthcheck:
+            test: ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://localhost:8080/actuator/health']
+            interval: 60s
+            timeout: 10s
+            retries: 3
+            start_period: 90s
+
+    # Python AI Service (Memory optimized)
+    card-words-ai:
+        build:
+            context: ./card-words-ai
+            dockerfile: Dockerfile
+        container_name: card-words-ai
+        environment:
+            # Database
+            - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+
+            # Redis
+            - REDIS_URL=redis://${REDIS_HOST}:${REDIS_PORT}/${REDIS_AI_DB}
+
+            # Model Configuration
+            - MODEL_PATH=/app/models/xgboost_model_v1.pkl
+            - SCALER_PATH=/app/models/scaler_v1.pkl
+            - MODEL_VERSION=v1.0.0
+            - RF_MODEL_PATH=/app/models/random_forest_model_v1.pkl
+            - RF_SCALER_PATH=/app/models/rf_scaler_v1.pkl
+            - RF_MODEL_VERSION=v1.0.0
+            - ACTIVE_MODEL_TYPE=${ACTIVE_MODEL_TYPE}
+
+            # API Configuration
+            - API_HOST=${API_HOST}
+            - API_PORT=${SERVER_FLASH_PORT}
+            - LOG_LEVEL=WARNING
+
+            # JWT
+            - JWT_SECRET=${JWT_SECRET}
+            - JWT_ALGORITHM=HS256
+
+            # Keys
+            - ADMIN_API_KEY=${ADMIN_API_KEY:-your-admin-api-key}
+            - INTERNAL_API_KEY=${INTERNAL_API_KEY:-your-internal-api-key}
+
+            # Performance (reduced for demo)
+            - CACHE_TTL=600
+            - RATE_LIMIT_PER_MINUTE=30
+            - MAX_CONCURRENT_REQUESTS=10
+
+        ports:
+            - '${SERVER_FLASH_PORT}:${SERVER_FLASH_PORT}'
+        volumes:
+            - ./card-words-ai/models:/app/models
+        depends_on:
+            postgres:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+        networks:
+            - card-words-network
+        restart: unless-stopped
+        deploy:
+            resources:
+                limits:
+                    memory: 384M
+                reservations:
+                    memory: 256M
+        healthcheck:
+            test: ['CMD', 'curl', '-f', 'http://localhost:8001/health']
+            interval: 60s
+            timeout: 10s
+            retries: 3
+            start_period: 60s
+
+# ============================================
+# VOLUMES (Không dùng external để dễ setup)
+# ============================================
+volumes:
+    postgres_data:
+    redis_data:
+
+# ============================================
+# NETWORKS
+# ============================================
+networks:
+    card-words-network:
+        driver: bridge
