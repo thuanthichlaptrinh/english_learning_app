@@ -16,44 +16,67 @@ import jakarta.mail.internet.MimeMessage;
 public class EmailService {
 
     private final JavaMailSender mailSender;
+    private final ResendEmailService resendEmailService;
 
     @Value("${spring.mail.username}")
     private String fromEmail;
 
     public void sendWelcomeEmailWithPassword(String toEmail, String name, String password) {
+        String subject = "🎉 Chào mừng bạn đến với Card Words!";
+        String htmlContent = buildWelcomeEmailContent(name, toEmail, password);
+        
+        // Try Resend API first (works on Railway)
+        if (resendEmailService.isEnabled()) {
+            if (resendEmailService.sendEmail(toEmail, subject, htmlContent)) {
+                log.info("✅ Welcome email sent via Resend to: {}", toEmail);
+                return;
+            }
+            log.warn("Resend failed, falling back to SMTP...");
+        }
+        
+        // Fallback to SMTP
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setFrom(fromEmail);
             helper.setTo(toEmail);
-            helper.setSubject("🎉 Chào mừng bạn đến với Card Words!");
-
-            String htmlContent = buildWelcomeEmailContent(name, toEmail, password);
+            helper.setSubject(subject);
             helper.setText(htmlContent, true);
 
             mailSender.send(message);
+            log.info("✅ Welcome email sent via SMTP to: {}", toEmail);
 
         } catch (Exception e) {
             log.error("Lỗi khi gửi email đến {}: {}", toEmail, e.getMessage());
             log.error("THÔNG TIN ĐĂNG NHẬP (Do lỗi email):");
             log.error("Email: {}", toEmail);
             log.error("Mật khẩu: {}", password);
-            log.error("Vui lòng cấu hình SMTP hoặc tạo App Password cho Gmail!");
+            log.error("Vui lòng cấu hình Resend API hoặc SMTP!");
         }
     }
 
     // Gửi email kích hoạt tài khoản
     public void sendActivationEmail(String toEmail, String name, String activationKey) {
+        String subject = "Kích hoạt tài khoản Card Words";
+        String htmlContent = buildActivationEmailContent(name, activationKey);
+        
+        // Try Resend API first
+        if (resendEmailService.isEnabled()) {
+            if (resendEmailService.sendEmail(toEmail, subject, htmlContent)) {
+                log.info("✅ Activation email sent via Resend to: {}", toEmail);
+                return;
+            }
+        }
+        
+        // Fallback to SMTP
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setFrom(fromEmail);
             helper.setTo(toEmail);
-            helper.setSubject("Kích hoạt tài khoản Card Words");
-
-            String htmlContent = buildActivationEmailContent(name, activationKey);
+            helper.setSubject(subject);
             helper.setText(htmlContent, true);
 
             mailSender.send(message);
@@ -64,15 +87,25 @@ public class EmailService {
 
     // Gửi email thông báo kích hoạt thành công
     public void sendActivationSuccessEmail(String toEmail, String name) {
+        String subject = "Tài khoản Card Words đã được kích hoạt";
+        String htmlContent = buildActivationSuccessEmailContent(name);
+        
+        // Try Resend API first
+        if (resendEmailService.isEnabled()) {
+            if (resendEmailService.sendEmail(toEmail, subject, htmlContent)) {
+                log.info("✅ Activation success email sent via Resend to: {}", toEmail);
+                return;
+            }
+        }
+        
+        // Fallback to SMTP
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setFrom(fromEmail);
             helper.setTo(toEmail);
-            helper.setSubject("Tài khoản Card Words đã được kích hoạt");
-
-            String htmlContent = buildActivationSuccessEmailContent(name);
+            helper.setSubject(subject);
             helper.setText(htmlContent, true);
 
             mailSender.send(message);
@@ -243,15 +276,25 @@ public class EmailService {
 
     // Gửi email với mật khẩu mới khi quên mật khẩu
     public void sendNewPasswordEmail(String toEmail, String name, String newPassword) {
+        String subject = "🔐 Mật khẩu mới cho tài khoản Card Words";
+        String htmlContent = buildNewPasswordEmailContent(name, toEmail, newPassword);
+        
+        // Try Resend API first
+        if (resendEmailService.isEnabled()) {
+            if (resendEmailService.sendEmail(toEmail, subject, htmlContent)) {
+                log.info("✅ New password email sent via Resend to: {}", toEmail);
+                return;
+            }
+        }
+        
+        // Fallback to SMTP
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setFrom(fromEmail);
             helper.setTo(toEmail);
-            helper.setSubject("🔐 Mật khẩu mới cho tài khoản Card Words");
-
-            String htmlContent = buildNewPasswordEmailContent(name, toEmail, newPassword);
+            helper.setSubject(subject);
             helper.setText(htmlContent, true);
 
             mailSender.send(message);
@@ -341,15 +384,25 @@ public class EmailService {
 
     // Gửi email nhắc nhở streak
     public void sendStreakReminderEmail(String toEmail, String name, int streak) {
+        String subject = "🔥 Don't Break Your " + streak + "-Day Streak!";
+        String htmlContent = buildStreakReminderEmailContent(name, streak);
+        
+        // Try Resend API first
+        if (resendEmailService.isEnabled()) {
+            if (resendEmailService.sendEmail(toEmail, subject, htmlContent)) {
+                log.info("✅ Streak reminder email sent via Resend to: {}", toEmail);
+                return;
+            }
+        }
+        
+        // Fallback to SMTP
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setFrom(fromEmail);
             helper.setTo(toEmail);
-            helper.setSubject("🔥 Don't Break Your " + streak + "-Day Streak!");
-
-            String htmlContent = buildStreakReminderEmailContent(name, streak);
+            helper.setSubject(subject);
             helper.setText(htmlContent, true);
 
             mailSender.send(message);

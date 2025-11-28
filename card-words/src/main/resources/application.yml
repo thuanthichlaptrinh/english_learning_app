@@ -51,9 +51,9 @@ spring:
             time-to-live: 3600000 # 1 giờ (1 * 60 * 60 * 1000ms)
 
     mail:
-        host: ${MAIL_HOST}
-        port: ${MAIL_PORT}
-        username: ${MAIL_USERNAME}
+        host: ${MAIL_HOST:smtp.resend.com}
+        port: ${MAIL_PORT:587}
+        username: ${MAIL_USERNAME:resend}
         password: ${MAIL_PASSWORD}
         properties:
             mail:
@@ -63,10 +63,10 @@ spring:
                         enable: ${MAIL_STARTTLS_ENABLE:true}
                     ssl:
                         enable: ${MAIL_SSL_ENABLE:false}
-                        trust: smtp.gmail.com
-                    connectiontimeout: 10000
-                    timeout: 10000
-                    writetimeout: 10000
+                        trust: ${MAIL_HOST:smtp.resend.com}
+                    connectiontimeout: 30000
+                    timeout: 30000
+                    writetimeout: 30000
 
 springdoc:
     api-docs:
@@ -105,6 +105,13 @@ gemini:
         base-url: https://generativelanguage.googleapis.com/v1beta/models
         max-tokens: 8192
         temperature: 0.7
+
+# Resend Email API (for Railway - SMTP blocked)
+resend:
+    api:
+        key: ${RESEND_API_KEY:}
+    from:
+        email: ${RESEND_FROM_EMAIL:onboarding@resend.dev}
 
 logging:
     level:
