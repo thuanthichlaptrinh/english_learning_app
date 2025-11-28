@@ -16,45 +16,52 @@ import jakarta.mail.internet.MimeMessage;
 public class EmailService {
 
     private final JavaMailSender mailSender;
+    private final ResendEmailService resendEmailService;
 
     @Value("${spring.mail.username}")
     private String fromEmail;
 
     public void sendWelcomeEmailWithPassword(String toEmail, String name, String password) {
+        String subject = "🎉 Chào mừng bạn đến với Card Words!";
+        String htmlContent = buildWelcomeEmailContent(name, toEmail, password);
+        
+        // Try Resend first (works on Railway)
+        if (resendEmailService.isEnabled() && resendEmailService.sendEmail(toEmail, subject, htmlContent)) {
+            return;
+        }
+        
+        // Fallback to SMTP
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
             helper.setFrom(fromEmail);
             helper.setTo(toEmail);
-            helper.setSubject("🎉 Chào mừng bạn đến với Card Words!");
-
-            String htmlContent = buildWelcomeEmailContent(name, toEmail, password);
+            helper.setSubject(subject);
             helper.setText(htmlContent, true);
-
             mailSender.send(message);
-
         } catch (Exception e) {
             log.error("Lỗi khi gửi email đến {}: {}", toEmail, e.getMessage());
             log.error("THÔNG TIN ĐĂNG NHẬP (Do lỗi email):");
             log.error("Email: {}", toEmail);
             log.error("Mật khẩu: {}", password);
-            log.error("Vui lòng cấu hình SMTP hoặc tạo App Password cho Gmail!");
         }
     }
 
     public void sendActivationEmail(String toEmail, String name, String activationKey) {
+        String subject = "Kích hoạt tài khoản Card Words";
+        String htmlContent = buildActivationEmailContent(name, activationKey);
+        
+        if (resendEmailService.isEnabled() && resendEmailService.sendEmail(toEmail, subject, htmlContent)) {
+            return;
+        }
+        
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
             helper.setFrom(fromEmail);
             helper.setTo(toEmail);
-            helper.setSubject("Kích hoạt tài khoản Card Words");
-
-            String htmlContent = buildActivationEmailContent(name, activationKey);
+            helper.setSubject(subject);
             helper.setText(htmlContent, true);
-
             mailSender.send(message);
         } catch (MessagingException e) {
             throw new RuntimeException("Không thể gửi email kích hoạt", e);
@@ -63,63 +70,66 @@ public class EmailService {
 
 
     public void sendActivationSuccessEmail(String toEmail, String name) {
+        String subject = "Tài khoản Card Words đã được kích hoạt";
+        String htmlContent = buildActivationSuccessEmailContent(name);
+        
+        if (resendEmailService.isEnabled() && resendEmailService.sendEmail(toEmail, subject, htmlContent)) {
+            return;
+        }
+        
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
             helper.setFrom(fromEmail);
             helper.setTo(toEmail);
-            helper.setSubject("Tài khoản Card Words đã được kích hoạt");
-
-            String htmlContent = buildActivationSuccessEmailContent(name);
+            helper.setSubject(subject);
             helper.setText(htmlContent, true);
-
             mailSender.send(message);
-
         } catch (MessagingException e) {
             throw new RuntimeException("Không thể gửi email thông báo", e);
         }
     }
 
     public void sendNewPasswordEmail(String toEmail, String name, String newPassword) {
+        String subject = "🔐 Mật khẩu mới cho tài khoản Card Words";
+        String htmlContent = buildNewPasswordEmailContent(name, toEmail, newPassword);
+        
+        if (resendEmailService.isEnabled() && resendEmailService.sendEmail(toEmail, subject, htmlContent)) {
+            return;
+        }
+        
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
             helper.setFrom(fromEmail);
             helper.setTo(toEmail);
-            helper.setSubject("🔐 Mật khẩu mới cho tài khoản Card Words");
-
-            String htmlContent = buildNewPasswordEmailContent(name, toEmail, newPassword);
+            helper.setSubject(subject);
             helper.setText(htmlContent, true);
-
             mailSender.send(message);
             log.info("Đã gửi email mật khẩu mới đến: {}", toEmail);
-
         } catch (Exception e) {
             log.error("Lỗi khi gửi email mật khẩu mới đến {}: {}", toEmail, e.getMessage());
-            log.error("THÔNG TIN MẬT KHẨU MỚI (Do lỗi email):");
-            log.error("Email: {}", toEmail);
-            log.error("Mật khẩu mới: {}", newPassword);
             throw new RuntimeException("Không thể gửi email mật khẩu mới", e);
         }
     }
 
     public void sendStreakReminderEmail(String toEmail, String name, int streak) {
+        String subject = "🔥 Don't Break Your " + streak + "-Day Streak!";
+        String htmlContent = buildStreakReminderEmailContent(name, streak);
+        
+        if (resendEmailService.isEnabled() && resendEmailService.sendEmail(toEmail, subject, htmlContent)) {
+            return;
+        }
+        
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
             helper.setFrom(fromEmail);
             helper.setTo(toEmail);
-            helper.setSubject("🔥 Don't Break Your " + streak + "-Day Streak!");
-
-            String htmlContent = buildStreakReminderEmailContent(name, streak);
+            helper.setSubject(subject);
             helper.setText(htmlContent, true);
-
             mailSender.send(message);
             log.info("✅ Streak reminder email sent to: {}", toEmail);
-
         } catch (Exception e) {
             log.error("❌ Failed to send streak reminder email to {}: {}", toEmail, e.getMessage());
             throw new RuntimeException("Không thể gửi email nhắc nhở streak", e);
