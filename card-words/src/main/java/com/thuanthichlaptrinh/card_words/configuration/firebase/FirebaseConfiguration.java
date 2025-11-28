@@ -12,8 +12,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Configuration
@@ -22,8 +24,8 @@ public class FirebaseConfiguration {
     @Value("${firebase.storage.bucket-name}")
     private String bucketName;
 
-    @Value("${firebase.storage.service-account-path}")
-    private String serviceAccountPath;
+    @Value("${FIREBASE_CREDENTIALS:#{null}}")
+    private String firebaseCredentialsJson;
 
     @Bean
     public FirebaseApp initializeFirebase() throws IOException {
@@ -34,9 +36,7 @@ public class FirebaseConfiguration {
 
         log.info("Initializing Firebase with bucket: {}", bucketName);
 
-        Resource resource = new ClassPathResource("firebase-service-account.json");
-
-        try (InputStream serviceAccount = resource.getInputStream()) {
+        try (InputStream serviceAccount = getFirebaseCredentials()) {
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                     .setStorageBucket(bucketName)
@@ -49,6 +49,18 @@ public class FirebaseConfiguration {
             log.error("Failed to initialize Firebase: {}", e.getMessage());
             throw e;
         }
+    }
+
+    private InputStream getFirebaseCredentials() throws IOException {
+        // Try environment variable first (for Railway/cloud deployment)
+        if (firebaseCredentialsJson != null && !firebaseCredentialsJson.isBlank()) {
+            log.info("Loading Firebase credentials from FIREBASE_CREDENTIALS env variable");
+            return new ByteArrayInputStream(firebaseCredentialsJson.getBytes(StandardCharsets.UTF_8));
+        }
+        // Fallback to classpath file (for local development)
+        log.info("Loading Firebase credentials from classpath file");
+        Resource resource = new ClassPathResource("firebase-service-account.json");
+        return resource.getInputStream();
     }
 
     @Bean

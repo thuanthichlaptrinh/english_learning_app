@@ -19,17 +19,20 @@ WORKDIR /app
 
 # Create non-root user for security
 RUN addgroup -S spring && adduser -S spring -G spring
-USER spring:spring
 
 # Copy jar from build stage
 COPY --from=build /app/target/*.jar app.jar
 
-# Expose port (Railway will auto-detect)
+# Change ownership
+RUN chown -R spring:spring /app
+USER spring:spring
+
+# Expose port (Railway will auto-detect from PORT env)
 EXPOSE 8080
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1
 
-# Run application with memory optimization
+# Run application - Railway sets PORT env automatically
 ENTRYPOINT ["java", "-Xms256m", "-Xmx512m", "-XX:+UseG1GC", "-jar", "-Dspring.profiles.active=prod", "app.jar"]
