@@ -1643,6 +1643,61 @@ docker-compose -f docker-compose.test.yml up --abort-on-container-exit
 
 ---
 
+## 🚀 Deploy lên Production
+
+### Deploy lên VPS
+
+Sau khi sửa code và push lên GitHub, deploy lên VPS rất đơn giản:
+
+#### Cách 1: Deploy từ máy local (Windows)
+```powershell
+# Push code
+git push origin main
+
+# Deploy tự động
+.\scripts\deploy-from-local.ps1
+```
+
+#### Cách 2: Deploy từ máy local (Linux/Mac)
+```bash
+# Push code
+git push origin main
+
+# Deploy tự động
+bash scripts/deploy-from-local.sh
+```
+
+#### Cách 3: SSH thủ công
+```bash
+# Push code (trên máy local)
+git push origin main
+
+# SSH vào VPS
+ssh root@103.9.77.220
+
+# Deploy
+cd /opt/card-words-services
+bash scripts/deploy-vps.sh
+```
+
+### Tài liệu Deploy chi tiết
+
+- **Quick Reference**: `DEPLOY-QUICK-REFERENCE.md` - Các lệnh thường dùng
+- **Full Guide**: `docs/DEPLOY-GUIDE.md` - Hướng dẫn đầy đủ
+- **HTTPS Setup**: `docs/HTTPS-SETUP-GUIDE.md` - Cài đặt SSL/HTTPS
+
+### Scripts Deploy có sẵn
+
+| Script | Mô tả | Chạy ở đâu |
+|--------|-------|------------|
+| `deploy-vps.sh` | Deploy đầy đủ (rebuild images) | VPS |
+| `quick-deploy.sh` | Deploy nhanh (không rebuild) | VPS |
+| `deploy-from-local.sh` | Deploy từ máy Linux/Mac | Local |
+| `deploy-from-local.ps1` | Deploy từ máy Windows | Local |
+| `setup-https.sh` | Cài đặt HTTPS/SSL | VPS |
+
+---
+
 ## 📄 Giấy Phép
 
 Dự án này được cấp phép theo Giấy phép MIT - xem file [LICENSE](LICENSE) để biết chi tiết.
