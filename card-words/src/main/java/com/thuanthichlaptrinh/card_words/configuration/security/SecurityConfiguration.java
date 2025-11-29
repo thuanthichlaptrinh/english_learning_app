@@ -57,6 +57,7 @@ public class SecurityConfiguration {
                         "/api-test.html",
                         "/google-test.html",
                         "/actuator/**",
+                        "https://card-b1260.web.app/**",
                         "https://accounts.google.com/signin/oauth2/**",
                         "https://developers.google.com/oauthplayground/**"
         };
@@ -81,19 +82,6 @@ public class SecurityConfiguration {
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .authenticationProvider(authenticationProvider)
                                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                                // .exceptionHandling(exceptionHandling -> exceptionHandling
-                                // .authenticationEntryPoint((request, response, authException) -> {
-                                // response.setStatus(HttpStatus.FORBIDDEN.value());
-                                // response.setContentType("application/json");
-                                // response.getWriter()
-                                // .write("{\"status\":\"403\",\"message\":\"Access Denied\",\"data\":null}");
-                                // })
-                                // .accessDeniedHandler((request, response, accessDeniedException) -> {
-                                // response.setStatus(HttpStatus.FORBIDDEN.value());
-                                // response.setContentType("application/json");
-                                // response.getWriter()
-                                // .write("{\"status\":\"403\",\"message\":\"Access Denied\",\"data\":null}");
-                                // }))
                                 .exceptionHandling(exceptionHandling -> exceptionHandling
                                                 .authenticationEntryPoint((request, response, authException) -> {
                                                         response.setStatus(HttpStatus.UNAUTHORIZED.value());

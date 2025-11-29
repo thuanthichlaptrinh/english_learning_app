@@ -113,6 +113,7 @@ build/
 .env
 .env.docker
 .env.local
+.env.production
 .env.example
 .env.development.local
 .env.test.local 
