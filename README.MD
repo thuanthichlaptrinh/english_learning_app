@@ -1031,56 +1031,238 @@ Import collection từ: `docs/postman/Card-Words-API.postman_collection.json`
 
 ### Danh Mục API Endpoint
 
-#### Authentication (`/api/v1/auth`)
+#### 🔐 Authentication (`/api/v1/auth`)
 
--   `POST /register` - Đăng ký người dùng
--   `POST /signin` - Xác thực JWT
--   `POST /google` - Đăng nhập OAuth2
--   `POST /refresh` - Refresh token
--   `POST /forgot-password` - Yêu cầu đặt lại mật khẩu
--   `POST /reset-password` - Đặt lại mật khẩu với token
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| `POST` | `/signup` | Đăng ký tài khoản mới |
+| `POST` | `/signin` | Đăng nhập bằng email/password |
+| `POST` | `/signout` | Đăng xuất |
+| `POST` | `/google` | Đăng nhập bằng Google OAuth2 |
+| `POST` | `/refresh-token` | Làm mới access token |
+| `POST` | `/forgot-password` | Yêu cầu đặt lại mật khẩu |
 
-#### Vocabularies (`/api/v1/vocabs`)
+#### 👤 User (`/api/v1/users`)
 
--   `GET /` - Danh sách từ vựng (phân trang, lọc)
--   `GET /{id}` - Lấy chi tiết từ vựng
--   `POST /` - Tạo từ vựng (ADMIN)
--   `PUT /{id}` - Cập nhật từ vựng (ADMIN)
--   `DELETE /{id}` - Xóa từ vựng (ADMIN)
--   `GET /search` - Tìm kiếm từ vựng
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| `GET` | `/` | Lấy thông tin profile |
+| `PUT` | `/` | Cập nhật thông tin profile |
+| `PUT` | `/avatar` | Upload avatar |
+| `POST` | `/change-password` | Đổi mật khẩu |
+| `GET` | `/games/history` | Lịch sử chơi game |
+| `GET` | `/games/stats` | Thống kê game tổng quan |
 
-#### Games (`/api/v1/games`)
+#### 🔥 User Streak (`/api/v1/user/streak`)
 
--   `GET /` - Danh sách game khả dụng
--   `POST /sessions` - Bắt đầu phiên game
--   `POST /sessions/{id}/answers` - Gửi câu trả lời
--   `POST /sessions/{id}/complete` - Hoàn thành phiên
--   `GET /sessions/{id}` - Lấy kết quả phiên
--   `GET /leaderboard` - Bảng xếp hạng toàn cầu
--   `GET /{gameId}/leaderboard` - Bảng xếp hạng theo game
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| `GET` | `/` | Lấy thông tin streak hiện tại |
+| `POST` | `/record` | Ghi nhận hoạt động học |
 
-#### Notifications (`/api/v1/notifications`)
+#### 📚 Vocabulary (`/api/v1/vocabs`)
 
--   `GET /` - Danh sách thông báo người dùng
--   `GET /unread-count` - Lấy số lượng chưa đọc
--   `PATCH /{id}/read` - Đánh dấu đã đọc
--   `PATCH /read-all` - Đánh dấu tất cả đã đọc
--   `DELETE /{id}` - Xóa thông báo
--   `DELETE /batch` - Xóa hàng loạt
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| `GET` | `/` | Danh sách từ vựng (phân trang) |
+| `GET` | `/{id}` | Lấy từ vựng theo ID |
+| `GET` | `/word/{word}` | Lấy từ vựng theo từ |
+| `GET` | `/search` | Tìm kiếm từ vựng |
+| `GET` | `/cefr/{cefr}` | Lấy từ vựng theo CEFR level |
+| `GET` | `/{id}/media` | Lấy URL hình ảnh/âm thanh |
+| `GET` | `/word/{word}/media` | Lấy media theo từ |
 
-#### Admin (`/api/v1/admin`)
+#### 📂 Topics (`/api/v1/topics`)
 
--   `GET /users` - Danh sách tất cả người dùng
--   `GET /dashboard/stats` - Thống kê Dashboard
--   `GET /action-logs` - Nhật ký hoạt động người dùng
--   `POST /notifications` - Tạo thông báo
--   `POST /notifications/broadcast` - Broadcast tới tất cả users
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| `GET` | `/` | Danh sách chủ đề |
+| `GET` | `/{id}` | Chi tiết chủ đề |
 
-#### Offline Sync (`/api/v1/offline`)
+#### 🔔 Notifications (`/api/v1/notifications`)
 
--   `GET /user-vocab-progress` - Tải xuống tất cả tiến trình
--   `GET /user-vocab-progress/topic/{id}` - Tải xuống theo chủ đề
--   `GET /user-vocab-progress/due-review` - Tải xuống các từ cần ôn tập
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| `GET` | `/` | Danh sách thông báo |
+| `GET` | `/summary` | Tổng quan thông báo |
+| `PUT` | `/{id}/read` | Đánh dấu đã đọc |
+| `PUT` | `/read-all` | Đánh dấu tất cả đã đọc |
+| `DELETE` | `/{id}` | Xóa thông báo |
+| `DELETE` | `/selected` | Xóa nhiều thông báo |
+
+#### 🎮 Quick Quiz (`/api/v1/games/quick-quiz`)
+
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| `POST` | `/start` | Bắt đầu game |
+| `POST` | `/start-auto` | Bắt đầu game tự động |
+| `POST` | `/answer` | Trả lời câu hỏi |
+| `POST` | `/skip` | Bỏ qua câu hỏi |
+| `GET` | `/session/{sessionId}` | Xem kết quả game |
+| `GET` | `/instructions` | Hướng dẫn chơi |
+| `GET` | `/leaderboard` | Bảng xếp hạng |
+
+#### 🖼️ Image-Word Matching (`/api/v1/games/image-word-matching`)
+
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| `POST` | `/start` | Bắt đầu game |
+| `POST` | `/start-auto` | Bắt đầu game tự động |
+| `POST` | `/answer` | Trả lời câu hỏi |
+| `GET` | `/session/{sessionId}` | Xem kết quả game |
+| `GET` | `/instructions` | Hướng dẫn chơi |
+| `GET` | `/leaderboard` | Bảng xếp hạng |
+
+#### 📖 Word-Definition Matching (`/api/v1/games/word-definition-matching`)
+
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| `POST` | `/start` | Bắt đầu game |
+| `POST` | `/start-auto` | Bắt đầu game tự động |
+| `POST` | `/answer` | Trả lời câu hỏi |
+| `GET` | `/session/{sessionId}` | Xem kết quả game |
+| `GET` | `/instructions` | Hướng dẫn chơi |
+| `GET` | `/leaderboard` | Bảng xếp hạng |
+
+#### 🏆 Leaderboard (`/api/v1/leaderboard`)
+
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| `GET` | `/` | Bảng xếp hạng tổng |
+| `GET` | `/game/{gameId}` | Bảng xếp hạng theo game |
+
+#### 📊 User Stats (`/api/v1/user-stats`)
+
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| `GET` | `/` | Thống kê học tập |
+
+#### 📝 Flashcard Review (`/api/v1/flashcard-review`)
+
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| `GET` | `/due` | Lấy từ cần ôn tập |
+| `POST` | `/review` | Ghi nhận kết quả ôn tập |
+
+#### 📈 User Vocab Progress (`/api/v1/user-vocab-progress`)
+
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| `GET` | `/` | Tiến độ học từ vựng |
+| `GET` | `/topic/{topicId}` | Tiến độ theo chủ đề |
+
+#### 🤖 Chatbot (`/api/v1/chatbot`)
+
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| `POST` | `/chat` | Chat với AI |
+
+#### ⚙️ Game Settings (`/api/v1/game-settings`)
+
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| `GET` | `/` | Lấy cài đặt game |
+| `PUT` | `/` | Cập nhật cài đặt game |
+
+#### 📱 Offline Sync (`/api/v1/offline-sync`)
+
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| `GET` | `/download` | Tải dữ liệu offline |
+| `POST` | `/upload` | Đồng bộ dữ liệu |
+
+---
+
+### 🔧 Admin API Endpoints
+
+#### 👥 User Admin (`/api/v1/admin/users`)
+
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| `GET` | `/` | Danh sách người dùng |
+| `GET` | `/{id}` | Chi tiết người dùng |
+| `GET` | `/email/{email}` | Tìm theo email |
+| `GET` | `/search` | Tìm kiếm người dùng |
+| `GET` | `/statistics` | Thống kê người dùng |
+| `GET` | `/registration-chart` | Biểu đồ đăng ký |
+| `GET` | `/system-overview` | Tổng quan hệ thống |
+| `GET` | `/game-stats` | Thống kê game |
+| `PUT` | `/{id}/ban` | Khóa/mở khóa tài khoản |
+| `PUT` | `/{id}/activate` | Kích hoạt tài khoản |
+| `PUT` | `/{id}/roles` | Cập nhật role |
+| `POST` | `/{id}/reset-password` | Reset mật khẩu |
+| `DELETE` | `/{id}` | Xóa người dùng |
+
+#### 📚 Vocab Admin (`/api/v1/admin/vocabs`)
+
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| `GET` | `/` | Danh sách từ vựng |
+| `GET` | `/{id}` | Chi tiết từ vựng |
+| `GET` | `/word/{word}` | Tìm theo từ |
+| `GET` | `/search` | Tìm kiếm từ vựng |
+| `GET` | `/cefr/{cefr}` | Lọc theo CEFR |
+| `POST` | `/` | Thêm từ vựng |
+| `POST` | `/bulk-import` | Import hàng loạt |
+| `PUT` | `/{id}` | Cập nhật từ vựng |
+| `PUT` | `/word/{word}` | Cập nhật theo từ |
+| `DELETE` | `/{id}` | Xóa từ vựng |
+| `GET` | `/export/excel` | Xuất Excel |
+
+#### 📂 Topic Admin (`/api/v1/admin/topics`)
+
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| `GET` | `/` | Danh sách chủ đề |
+| `POST` | `/` | Thêm chủ đề |
+| `PUT` | `/{id}` | Cập nhật chủ đề |
+| `DELETE` | `/{id}` | Xóa chủ đề |
+
+#### 🏷️ Type Admin (`/api/v1/admin/types`)
+
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| `GET` | `/` | Danh sách loại từ |
+| `POST` | `/` | Thêm loại từ |
+| `PUT` | `/{id}` | Cập nhật loại từ |
+| `DELETE` | `/{id}` | Xóa loại từ |
+
+#### 🎮 Game Admin (`/api/v1/admin/games`)
+
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| `GET` | `/` | Danh sách game |
+| `GET` | `/stats` | Thống kê game |
+
+#### 🔔 Notification Admin (`/api/v1/admin/notifications`)
+
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| `POST` | `/` | Tạo thông báo |
+| `POST` | `/broadcast` | Broadcast tới tất cả |
+
+#### 📝 Action Logs (`/api/v1/admin/action-logs`)
+
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| `GET` | `/` | Danh sách action logs |
+| `GET` | `/statistics` | Thống kê logs |
+| `GET` | `/export` | Export logs |
+| `DELETE` | `/cleanup` | Xóa logs cũ |
+
+#### 📈 Vocab Progress Admin (`/api/v1/admin/vocab-progress`)
+
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| `GET` | `/` | Tiến độ học của users |
+| `GET` | `/user/{userId}` | Tiến độ theo user |
+
+#### 🗄️ Firebase Storage (`/api/v1/admin/storage`)
+
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| `POST` | `/upload` | Upload file |
+| `DELETE` | `/delete` | Xóa file |
 
 ### WebSocket Endpoints
 

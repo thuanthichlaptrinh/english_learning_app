@@ -14,7 +14,7 @@ spring:
 
     # Flyway Configuration
     flyway:
-        enabled: true
+        enabled: false
         baseline-on-migrate: true
         validate-on-migrate: false
         locations: classpath:db/migration
@@ -64,8 +64,8 @@ spring:
                     ssl:
                         trust: smtp.gmail.com
                     connectiontimeout: 60000
-                    timeout: 60000
-                    writetimeout: 60000
+                    timeout: 10000
+                    writetimeout: 10000
 
 springdoc:
     api-docs:
