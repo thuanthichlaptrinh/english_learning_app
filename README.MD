@@ -31,10 +31,10 @@
 
 ## 🌟 Tổng Quan
 
-**Card Words Platform** là một hệ thống học từ vựng toàn diện kết hợp:
+**Card Words services** là một hệ thống học từ vựng toàn diện kết hợp:
 
 -   **Spring Boot Backend**: RESTful API với thông báo thời gian thực qua WebSocket.
--   **AI Service**: Dự đoán ôn tập thông minh sử dụng LightGBM.
+-   **AI Service**: Dự đoán ôn tập thông minh sử dụng XGBoost/Random Forest.
 -   **PostgreSQL**: Cơ sở dữ liệu quan hệ mạnh mẽ với Flyway migrations.
 -   **Redis**: Caching hiệu năng cao và quản lý session.
 -   **Firebase Storage**: Lưu trữ hình ảnh từ vựng và avatar người dùng.
@@ -59,7 +59,7 @@
 ### Cấu Trúc Dự Án
 
 ```
-card-words-platform/
+card-words-services/
 ├── 📁 card-words/              # Spring Boot Backend API
 │   ├── src/
 │   │   ├── main/
@@ -67,17 +67,17 @@ card-words-platform/
 │   │   │   └── resources/       # Cấu hình & migrations
 │   │   └── test/                # Unit & integration tests
 │   ├── pom.xml                  # Maven dependencies
-│   ├── Dockerfile               # Multi-stage build
-│   └── docker-compose.yml       # Service-specific compose
+│   └── Dockerfile               # Multi-stage build
 │
 ├── 📁 card-words-ai/           # Python AI Service
 │   ├── app/
 │   │   ├── api/                 # FastAPI endpoints
-│   │   ├── core/                # Business logic
+│   │   ├── core/                # Business logic & ML models
 │   │   ├── db/                  # Kết nối Database
 │   │   └── middleware/          # Authentication & logging
-│   ├── models/                  # LightGBM trained models
+│   ├── models/                  # XGBoost & Random Forest trained models
 │   ├── pyproject.toml           # Poetry dependencies
+│   ├── requirements.txt         # Pip dependencies
 │   └── Dockerfile               # Python container build
 │
 ├── 📁 docs/                    # Tài liệu chi tiết
@@ -88,7 +88,10 @@ card-words-platform/
 │   └── ...                      # Tài liệu tính năng cụ thể
 │
 ├── docker-compose.yml           # 🔥 Root orchestration (tất cả services)
+├── docker-compose.prod.yml      # Production compose file
+├── deploy-vps.sh                # Script deploy lên VPS
 ├── .env                         # 🔐 Biến môi trường (gitignored)
+├── .env.example                 # Template biến môi trường
 ├── .gitignore                   # Git exclusions
 └── README.MD                    # File này
 ```
@@ -100,7 +103,7 @@ card-words-platform/
 | **Backend API**   | Spring Boot  | 3.2.5     | RESTful API & WebSocket server |
 | **Ngôn ngữ**      | Java         | 17        | Ngôn ngữ lập trình chính       |
 | **AI Service**    | FastAPI      | Mới nhất  | ML prediction endpoints        |
-| **ML Engine**     | LightGBM     | Mới nhất  | Dự đoán ôn tập thông minh      |
+| **ML Engine**     | XGBoost      | 2.0+      | Dự đoán ôn tập thông minh      |
 | **Database**      | PostgreSQL   | 16        | Lưu trữ dữ liệu chính          |
 | **Cache**         | Redis        | 7         | Session & performance caching  |
 | **Storage**       | Firebase     | -         | Lưu trữ hình ảnh (Cloud)       |
@@ -133,8 +136,8 @@ card-words-platform/
 #### 1. Clone Repository
 
 ```bash
-git clone https://github.com/yourusername/card-words-platform.git
-cd card-words-platform
+git clone https://github.com/yourusername/card-words-services.git
+cd card-words-services
 ```
 
 #### 2. Cấu Hình Môi Trường
@@ -165,10 +168,10 @@ docker-compose ps
 
 ```bash
 # Backend API health
-curl http://localhost:8080/actuator/health
+curl http://103.9.77.220:8080/actuator/health
 
 # AI Service health
-curl http://localhost:8001/health
+curl http://103.9.77.220:8001/health
 
 # Database connection
 docker-compose exec postgres pg_isready -U postgres
@@ -176,25 +179,25 @@ docker-compose exec postgres pg_isready -U postgres
 
 ### Truy Cập Dịch Vụ
 
-| Dịch vụ             | URL                                   | Thông tin đăng nhập         |
-| ------------------- | ------------------------------------- | --------------------------- |
-| **Spring Boot API** | http://localhost:8080                 | Yêu cầu JWT token           |
-| Swagger UI          | http://localhost:8080/swagger-ui.html | -                           |
-| API Documentation   | http://localhost:8080/v3/api-docs     | -                           |
-| Actuator            | http://localhost:8080/actuator        | -                           |
-| **WebSocket**       | ws://localhost:8080/ws                | JWT trong handshake         |
-| **AI Service**      | http://localhost:8001                 | Shared JWT auth             |
-| AI Documentation    | http://localhost:8001/docs            | -                           |
-| **PostgreSQL**      | localhost:5433                        | `postgres` / xem `.env`     |
-| **Redis**           | localhost:6379                        | Không mật khẩu              |
-| **PgAdmin**         | http://localhost:5050                 | admin@cardwords.com / admin |
-| **Redis Insight**   | http://localhost:5540                 | -                           |
+| Dịch vụ             | URL                                      | Thông tin đăng nhập         |
+| ------------------- | ---------------------------------------- | --------------------------- |
+| **Spring Boot API** | http://103.9.77.220:8080                 | Yêu cầu JWT token           |
+| Swagger UI          | http://103.9.77.220:8080/swagger-ui.html | -                           |
+| API Documentation   | http://103.9.77.220:8080/v3/api-docs     | -                           |
+| Actuator            | http://103.9.77.220:8080/actuator        | -                           |
+| **WebSocket**       | ws://103.9.77.220:8080/ws                | JWT trong handshake         |
+| **AI Service**      | http://103.9.77.220:8001                 | Shared JWT auth             |
+| AI Documentation    | http://103.9.77.220:8001/docs            | -                           |
+| **PostgreSQL**      | 103.9.77.220:5433                        | `postgres` / xem `.env`     |
+| **Redis**           | 103.9.77.220:6379                        | Không mật khẩu              |
+| **PgAdmin**         | http://103.9.77.220:5050                 | admin@cardwords.com / admin |
+| **Redis Insight**   | http://103.9.77.220:5540                 | -                           |
 
 #### Ma Trận URL WebSocket
 
 | Ngữ cảnh                  | URL                           | Ghi chú                                                                                       |
 | ------------------------- | ----------------------------- | --------------------------------------------------------------------------------------------- |
-| Phát triển Local          | `ws://localhost:8080/ws`      | Mặc định khi chạy Spring Boot qua Maven hoặc Docker port mapping                              |
+| Phát triển Local          | `ws://103.9.77.220:8080/ws`   | Mặc định khi chạy Spring Boot qua Maven hoặc Docker port mapping                              |
 | Docker Compose networking | `ws://card-words-api:8080/ws` | Sử dụng tên service này khi container khác (frontend, AI, etc.) cần subscribe trong cùng mạng |
 | Production (HTTPS)        | `wss://<your-domain>/ws`      | Thay thế bằng domain public sau load balancer / reverse proxy; yêu cầu TLS termination        |
 
@@ -205,7 +208,7 @@ docker-compose exec postgres pg_isready -U postgres
 #### 1. Đăng Ký User
 
 ```bash
-curl -X POST http://localhost:8080/api/v1/auth/register \
+curl -X POST http://103.9.77.220:8080/api/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "name": "John Doe",
@@ -217,7 +220,7 @@ curl -X POST http://localhost:8080/api/v1/auth/register \
 #### 2. Đăng Nhập
 
 ```bash
-curl -X POST http://localhost:8080/api/v1/auth/signin \
+curl -X POST http://103.9.77.220:8080/api/v1/auth/signin \
   -H "Content-Type: application/json" \
   -d '{
     "email": "john@example.com",
@@ -239,7 +242,7 @@ curl -X POST http://localhost:8080/api/v1/auth/signin \
 #### 3. Test Endpoint Có Xác Thực
 
 ```bash
-curl -X GET http://localhost:8080/api/v1/vocabs \
+curl -X GET http://103.9.77.220:8080/api/v1/vocabs \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
@@ -343,7 +346,7 @@ Mở `test-websocket-events.html` trong trình duyệt:
 -   Đồng bộ Delta (chỉ thay đổi)
 -   Phản hồi tối ưu cho mobile
 
-**API Endpoints:** `http://localhost:8080/api/v1/`
+**API Endpoints:** `http://103.9.77.220:8080/api/v1/`
 
 **Tài liệu:**
 
@@ -361,7 +364,9 @@ Mở `test-websocket-events.html` trong trình duyệt:
 
 -   Python 3.11
 -   FastAPI (Framework API hiệu năng cao)
--   LightGBM (Thư viện ML Gradient boosting)
+-   XGBoost (Thư viện ML Gradient boosting chính)
+-   Random Forest (Mô hình ML dự phòng)
+-   Scikit-learn (Feature engineering & preprocessing)
 -   PostgreSQL (Truy cập database chỉ đọc)
 -   Redis (Caching dự đoán)
 -   SQLAlchemy (Database ORM)
@@ -372,7 +377,7 @@ Mở `test-websocket-events.html` trong trình duyệt:
 
 🤖 **Dự Đoán Ôn Tập Thông Minh**
 
--   Mô hình máy học LightGBM
+-   Mô hình máy học XGBoost (chính) và Random Forest (dự phòng)
 -   Dự đoán thời điểm ôn tập tối ưu
 -   Xem xét các mẫu hiệu suất của người dùng
 -   Thích ứng với đường cong học tập cá nhân
@@ -399,7 +404,7 @@ Mở `test-websocket-events.html` trong trình duyệt:
 -   Chỉ số hiệu suất người dùng
 -   Tính nhất quán của Streak
 
-**API Endpoints:** `http://localhost:8001/api/`
+**API Endpoints:** `http://103.9.77.220:8001/api/`
 
 **Tài liệu:**
 
@@ -535,7 +540,7 @@ spring.mail.password=your-app-password  # Dùng App Password, không phải mậ
 
 ### 3. Lặp Lại Ngắt Quãng Hỗ Trợ Bởi AI
 
-**Mô hình máy học LightGBM để lên lịch ôn tập cá nhân hóa.**
+**Mô hình máy học XGBoost/Random Forest để lên lịch ôn tập cá nhân hóa.**
 
 #### Thuật Toán: SM-2 Nâng Cấp với ML
 
@@ -555,7 +560,7 @@ spring.mail.password=your-app-password  # Dùng App Password, không phải mậ
 #### Quy Trình Dự Đoán
 
 ```
-User Request → Model Features → LightGBM Prediction → Redis Cache → Response
+User Request → Model Features → XGBoost Prediction → Redis Cache → Response
                 ↓
         [correctness_rate, time_since_last, vocab_difficulty, user_streak]
 ```
@@ -567,7 +572,9 @@ User Request → Model Features → LightGBM Prediction → Redis Cache → Resp
 -   **Tỷ lệ Cache Hit**: > 90%
 -   **Features**: 15 đặc trưng được kỹ thuật hóa
 
-**Huấn luyện mô hình:** `card-words-ai/train-model.sh`
+**Huấn luyện mô hình:**
+- XGBoost: `card-words-ai/train-model.sh` hoặc `train-model.ps1` (Windows)
+- Random Forest: `card-words-ai/train-rf-model.sh` hoặc `train-rf-model.ps1` (Windows)
 
 ---
 
@@ -701,7 +708,7 @@ MAIL_PASSWORD=your_gmail_app_password  # KHÔNG PHẢI mật khẩu Gmail của 
 #─────────────────────────────────────
 GOOGLE_OAUTH_CLIENT_ID=your_client_id.apps.googleusercontent.com
 GOOGLE_OAUTH_CLIENT_SECRET=your_client_secret
-GOOGLE_OAUTH_REDIRECT_URI=http://localhost:8080/api/v1/auth/google/callback
+GOOGLE_OAUTH_REDIRECT_URI=http://103.9.77.220:8080/api/v1/auth/google/callback
 
 #─────────────────────────────────────
 # Firebase Storage
@@ -712,8 +719,8 @@ FIREBASE_SERVICE_ACCOUNT_PATH=/path/to/service-account.json
 #─────────────────────────────────────
 # Admin Tools
 #─────────────────────────────────────
-PGADMIN_DEFAULT_EMAIL=admin@cardwords.com
-PGADMIN_DEFAULT_PASSWORD=admin
+PGADMIN_DEFAULT_EMAIL=your_pgadmin_email
+PGADMIN_DEFAULT_PASSWORD=your_pgadmin_password
 ```
 
 **⚠️ Lưu ý Bảo Mật:** Không bao giờ commit `.env` lên version control. Sử dụng `.env.example` làm mẫu.
@@ -740,7 +747,7 @@ mvn clean package -DskipTests
 java -jar target/card-words-0.0.1-SNAPSHOT.jar
 ```
 
-**Truy cập:** http://localhost:8080
+**Truy cập:** http://103.9.77.220:8080
 
 #### 2. AI Service
 
@@ -760,7 +767,7 @@ poetry shell
 poetry run uvicorn app.main:app --reload --port 8001
 ```
 
-**Truy cập:** http://localhost:8001
+**Truy cập:** http://103.9.77.220:8001
 
 #### 3. Thiết Lập Database
 
@@ -867,15 +874,19 @@ poetry run pytest tests/test_predictions.py
 
 #### Lịch Sử Migration
 
-| Phiên bản | Mô tả             | Bảng được thêm                                   |
-| --------- | ----------------- | ------------------------------------------------ |
-| V1        | Initial schema    | `users`, `roles`, `topics`, `vocabs`             |
-| V2        | Games system      | `games`, `game_sessions`, `game_session_details` |
-| V3        | Learning progress | `user_vocab_progress` (SM-2 algorithm)           |
-| V4        | Streak tracking   | `streak_records`                                 |
-| V5        | Leaderboards      | `leaderboards`, `game_leaderboards`              |
-| V6        | Notifications     | `notifications`                                  |
-| V7        | Admin tools       | `action_logs` + missing columns                  |
+| Phiên bản | Mô tả                                    | Thay đổi                                         |
+| --------- | ---------------------------------------- | ------------------------------------------------ |
+| V1        | Initial schema                           | `users`, `roles`, `topics`, `vocabs`, `games`, etc. |
+| V2        | Remove unique constraint topic_id        | Xóa constraint trên `topic_id`                   |
+| V3        | Force remove all topic unique constraints| Xóa tất cả unique constraints của topics         |
+| V4        | Add img column to topics                 | Thêm cột `img` vào bảng `topics`                 |
+| V5        | Remove game_name from user_game_settings | Xóa cột `game_name` khỏi `user_game_settings`    |
+| V6        | Insert initial games data                | Thêm dữ liệu games ban đầu                       |
+| V7        | Add action_logs table                    | Tạo bảng `action_logs`                           |
+| V8        | Create chat_messages table               | Tạo bảng `chat_messages` cho chatbot             |
+| V9        | Add performance indexes                  | Thêm indexes để tối ưu hiệu năng                 |
+| V10       | Add missing action_logs columns          | Bổ sung các cột còn thiếu cho `action_logs`      |
+| V11       | Change game_session_id to UUID           | Đổi kiểu `game_session_id` sang UUID             |
 
 #### Tạo Migration Mới
 
@@ -1266,7 +1277,7 @@ Import collection từ: `docs/postman/Card-Words-API.postman_collection.json`
 
 ### WebSocket Endpoints
 
-**Kết nối:** `ws://localhost:8080/ws`
+**Kết nối:** `ws://103.9.77.220:8080/ws`
 
 **Subscriptions:**
 
@@ -1386,7 +1397,7 @@ curl -i -N -H "Connection: Upgrade" \
   -H "Upgrade: websocket" \
   -H "Sec-WebSocket-Version: 13" \
   -H "Sec-WebSocket-Key: test" \
-  http://localhost:8080/ws
+  http://103.9.77.220:8080/ws
 
 # Bật debug logging
 # Thêm vào application.properties:
@@ -1407,7 +1418,7 @@ docker-compose logs card-words-ai
 docker-compose exec card-words-ai ls -la /app/models/
 
 # Test prediction endpoint
-curl http://localhost:8001/api/predict \
+curl http://103.9.77.220:8001/api/predict \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"user_id": "uuid", "vocab_id": "uuid"}'
@@ -1421,10 +1432,10 @@ cd card-words-ai
 
 ```bash
 # Spring Boot actuator
-curl http://localhost:8080/actuator/health | jq
+curl http://103.9.77.220:8080/actuator/health | jq
 
 # AI Service health
-curl http://localhost:8001/health | jq
+curl http://103.9.77.220:8001/health | jq
 
 # PostgreSQL
 docker-compose exec postgres pg_isready -U postgres
@@ -1440,7 +1451,7 @@ docker-compose ps
 
 ```bash
 # Spring Boot metrics
-curl http://localhost:8080/actuator/metrics | jq
+curl http://103.9.77.220:8080/actuator/metrics | jq
 
 # Hiệu năng Database
 docker-compose exec postgres psql -U postgres -d card_words -c '\
@@ -1649,35 +1660,23 @@ docker-compose -f docker-compose.test.yml up --abort-on-container-exit
 
 Sau khi sửa code và push lên GitHub, deploy lên VPS rất đơn giản:
 
-#### Cách 1: Deploy từ máy local (Windows)
-```powershell
-# Push code
-git push origin main
-
-# Deploy tự động
-.\scripts\deploy-from-local.ps1
-```
-
-#### Cách 2: Deploy từ máy local (Linux/Mac)
-```bash
-# Push code
-git push origin main
-
-# Deploy tự động
-bash scripts/deploy-from-local.sh
-```
-
-#### Cách 3: SSH thủ công
+#### Cách 1: SSH thủ công
 ```bash
 # Push code (trên máy local)
 git push origin main
 
 # SSH vào VPS
-ssh root@103.9.77.220
+ssh root@<your-vps-ip>
 
 # Deploy
 cd /opt/card-words-services
-bash scripts/deploy-vps.sh
+bash deploy-vps.sh
+```
+
+#### Cách 2: Sử dụng Docker Compose Production
+```bash
+# Build và deploy với production config
+docker-compose -f docker-compose.prod.yml up -d --build
 ```
 
 ### Tài liệu Deploy chi tiết
@@ -1685,16 +1684,15 @@ bash scripts/deploy-vps.sh
 - **Quick Reference**: `DEPLOY-QUICK-REFERENCE.md` - Các lệnh thường dùng
 - **Full Guide**: `docs/DEPLOY-GUIDE.md` - Hướng dẫn đầy đủ
 - **HTTPS Setup**: `docs/HTTPS-SETUP-GUIDE.md` - Cài đặt SSL/HTTPS
+- **Hướng dẫn tiếng Việt**: `HƯỚNG-DẪN-DEPLOY-NHANH.md`
 
 ### Scripts Deploy có sẵn
 
-| Script | Mô tả | Chạy ở đâu |
-|--------|-------|------------|
-| `deploy-vps.sh` | Deploy đầy đủ (rebuild images) | VPS |
-| `quick-deploy.sh` | Deploy nhanh (không rebuild) | VPS |
-| `deploy-from-local.sh` | Deploy từ máy Linux/Mac | Local |
-| `deploy-from-local.ps1` | Deploy từ máy Windows | Local |
-| `setup-https.sh` | Cài đặt HTTPS/SSL | VPS |
+| Script | Mô tả | Vị trí |
+|--------|-------|--------|
+| `deploy-vps.sh` | Deploy đầy đủ lên VPS | Root |
+| `docker-compose.prod.yml` | Production Docker Compose | Root |
+| `docker-compose.yml` | Development Docker Compose | Root |
 
 ---
 
@@ -1717,7 +1715,7 @@ Dự án này được cấp phép theo Giấy phép MIT - xem file [LICENSE](LI
 ### Tài Liệu
 
 -   **Tài liệu chính**: `docs/`
--   **Tham khảo API**: http://localhost:8080/swagger-ui.html
+-   **Tham khảo API**: http://103.9.77.220:8080/swagger-ui.html
 -   **Hướng dẫn WebSocket**: `docs/WEBSOCKET_EVENTS.md`
 -   **Triển khai**: `docs/docker/`
 
