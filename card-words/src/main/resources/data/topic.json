@@ -1,259 +1,126 @@
-{
-    "status": "200",
-    "message": "Upload hoàn tất. Thành công: 41/41, Thất bại: 0",
-    "data": {
-        "totalRequested": 41,
-        "successCount": 41,
-        "failedCount": 0,
-        "results": [
+[
             {
                 "id": 39,
-                "originalFilename": "tp_artarchitecture.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Fa83a2584-8a44-42a7-a2ee-121dda57258e.png?alt=media",
-                "fileSize": 23841,
-                "contentType": "image/png"
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Fa83a2584-8a44-42a7-a2ee-121dda57258e.png?alt=media"
             },
             {"id": 52,
-                "originalFilename": "tp_artcreativity.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Ffa2af46e-c44a-487e-a263-386f481000fa.png?alt=media",
-                "fileSize": 24817,
-                "contentType": "image/png"
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Ffa2af46e-c44a-487e-a263-386f481000fa.png?alt=media"
             },
             {"id": 19,
-                "originalFilename": "tp_artliterature.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Fc6591460-49a4-4d6a-aabb-ba94cc021da3.png?alt=media",
-                "fileSize": 24580,
-                "contentType": "image/png"
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Fc6591460-49a4-4d6a-aabb-ba94cc021da3.png?alt=media"
             },
             {  "id": 59,
-                "originalFilename": "tp_businesseconomy.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Ffccf2c4f-4e43-4c15-954e-4c0137704aa7.png?alt=media",
-                "fileSize": 27859,
-                "contentType": "image/png"
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Ffccf2c4f-4e43-4c15-954e-4c0137704aa7.png?alt=media"
             },
             { "id": 34,
-                "originalFilename": "tp_artculture.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Faedcc578-8be8-4b77-845f-dd0d4c60a537.png?alt=media",
-                "fileSize": 28588,
-                "contentType": "image/png"
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Faedcc578-8be8-4b77-845f-dd0d4c60a537.png?alt=media"
             },
             { "id": 29,
-                "originalFilename": "tp_businessmanagement.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F93c1181e-0b4a-4e07-a920-f4ba4be9f5f4.png?alt=media",
-                "fileSize": 31704,
-                "contentType": "image/png"
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F93c1181e-0b4a-4e07-a920-f4ba4be9f5f4.png?alt=media"
             },
             {"id": 32,
-                "originalFilename": "tp_communityvolunteering.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F614f5328-fdd9-40fa-8349-3c300f791555.png?alt=media",
-                "fileSize": 21980,
-                "contentType": "image/png"
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F614f5328-fdd9-40fa-8349-3c300f791555.png?alt=media"
             },
             {"id": 54,
-                "originalFilename": "tp_danceperformance.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Fae37b4fe-4132-4046-b240-6c2ea84be08b.png?alt=media",
-                "fileSize": 29275,
-                "contentType": "image/png"
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Fae37b4fe-4132-4046-b240-6c2ea84be08b.png?alt=media"
             },
             {"id": 16,
-                "originalFilename": "tp_educationlearning.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F5e1ebbc7-9cc9-4b5e-a50c-d40a766685f8.png?alt=media",
-                "fileSize": 31087,
-                "contentType": "image/png"
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F5e1ebbc7-9cc9-4b5e-a50c-d40a766685f8.png?alt=media"
             },
             {"id": 30,
-                "originalFilename": "tp_culturesociety.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F9b38a1be-342f-4d28-ba36-f6d76a37f526.png?alt=media",
-                "fileSize": 27842,
-                "contentType": "image/png"
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F9b38a1be-342f-4d28-ba36-f6d76a37f526.png?alt=media"
             },
             {"id": 48,
-                "originalFilename": "tp_environmentagriculture.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F7e7d463b-3945-459c-b93b-1e7b57c1659e.png?alt=media",
-                "fileSize": 27870,
-                "contentType": "image/png"
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F7e7d463b-3945-459c-b93b-1e7b57c1659e.png?alt=media"
             },
             { "id": 57,
-                "originalFilename": "tp_fashiondesign.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F649af4ad-6c54-4ea5-b47f-fe7135633aa1.png?alt=media",
-                "fileSize": 19540,
-                "contentType": "image/png"
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F649af4ad-6c54-4ea5-b47f-fe7135633aa1.png?alt=media"
             },
             { "id": 47,
-                "originalFilename": "tp_environmentecology.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F69bdb9fd-3586-4019-814d-5cfb84d173e1.png?alt=media",
-                "fileSize": 32193,
-                "contentType": "image/png"
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F69bdb9fd-3586-4019-814d-5cfb84d173e1.png?alt=media"
             },
-            {
-                "originalFilename": "tp_fashiontrends.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F2479ff95-cdad-48c8-a691-49fce104a4ab.png?alt=media",
-                "fileSize": 20751,
-                "contentType": "image/png"
+            {"id": 24,
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F2479ff95-cdad-48c8-a691-49fce104a4ab.png?alt=media"
             },
-            {
-                "originalFilename": "tp_eventscelebrations.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F2c34cdff-fc09-40e8-99ad-e6d8a610ef7f.png?alt=media",
-                "fileSize": 22622,
-                "contentType": "image/png"
+            {"id": 22,
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F2c34cdff-fc09-40e8-99ad-e6d8a610ef7f.png?alt=media"
             },
-            {
-                "originalFilename": "tp_filmmedia.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Fb6c3cecb-c576-49d5-8785-73d548e3c609.png?alt=media",
-                "fileSize": 28771,
-                "contentType": "image/png"
+            {"id": 55,
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Fb6c3cecb-c576-49d5-8785-73d548e3c609.png?alt=media"
             },
-            {
-                "originalFilename": "tp_geography.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Fed9b5ca4-f46b-4165-bacc-e8b4a7c7abaf.png?alt=media",
-                "fileSize": 26450,
-                "contentType": "image/png"
+            {"id": 25,
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Fed9b5ca4-f46b-4165-bacc-e8b4a7c7abaf.png?alt=media"
             },
-            {
-                "originalFilename": "tp_foodcooking.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Faca647ab-82c4-4d09-8525-daa77cd17353.png?alt=media",
-                "fileSize": 25749,
-                "contentType": "image/png"
+            {"id": 27,
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Faca647ab-82c4-4d09-8525-daa77cd17353.png?alt=media"
             },
-            {
-                "originalFilename": "tp_healthpsychology.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F4849ff8f-9b44-4612-90b1-c2c290fc1c90.png?alt=media",
-                "fileSize": 21268,
-                "contentType": "image/png"
+            {"id": 49,
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F4849ff8f-9b44-4612-90b1-c2c290fc1c90.png?alt=media"
             },
-            {
-                "originalFilename": "tp_healthmedicine.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Fe50fb459-3c75-48d7-a1d1-499b02adfab5.png?alt=media",
-                "fileSize": 27588,
-                "contentType": "image/png"
+            {"id": 23,
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Fe50fb459-3c75-48d7-a1d1-499b02adfab5.png?alt=media"
             },
-            {
-                "originalFilename": "tp_hobbiesleisure.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F3b4a0361-ad9d-4207-ba8a-e5e7201b6444.png?alt=media",
-                "fileSize": 23091,
-                "contentType": "image/png"
+            {"id": 26,
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F3b4a0361-ad9d-4207-ba8a-e5e7201b6444.png?alt=media"
             },
-            {
-                "originalFilename": "tp_literaturestorytelling.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F4d90dafc-e00b-4cc9-abf8-b5d8602edd01.png?alt=media",
-                "fileSize": 23843,
-                "contentType": "image/png"
+            {"id": 35,
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F4d90dafc-e00b-4cc9-abf8-b5d8602edd01.png?alt=media"
             },
-            {
-                "originalFilename": "tp_mediabroadcasting.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Fef2a44d6-03a2-4907-b6f5-f3a5eee72ffb.png?alt=media",
-                "fileSize": 28145,
-                "contentType": "image/png"
+            { "id": 37,
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Fef2a44d6-03a2-4907-b6f5-f3a5eee72ffb.png?alt=media"
             },
-            {
-                "originalFilename": "tp_mediaadvertising.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F454b9e92-a73f-473f-b693-6088756b92c2.png?alt=media",
-                "fileSize": 17357,
-                "contentType": "image/png"
+            { "id": 31,
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F454b9e92-a73f-473f-b693-6088756b92c2.png?alt=media"
             },
-            {
-                "originalFilename": "tp_literaturearts.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F105110a7-52f3-41ba-929f-6869864998d3.png?alt=media",
-                "fileSize": 22291,
-                "contentType": "image/png"
+            {"id": 51,
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F105110a7-52f3-41ba-929f-6869864998d3.png?alt=media"
             },
-            {
-                "originalFilename": "tp_mediasociety.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Feb98685a-0cf4-4626-a600-d4b63fed9499.png?alt=media",
-                "fileSize": 28143,
-                "contentType": "image/png"
+            { "id": 38,
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Feb98685a-0cf4-4626-a600-d4b63fed9499.png?alt=media"
             },
-            {
-                "originalFilename": "tp_scienceastronomy.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F8ad3d875-f3c7-4265-8309-8e640c2ac198.png?alt=media",
-                "fileSize": 29356,
-                "contentType": "image/png"
+            {"id": 45,
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F8ad3d875-f3c7-4265-8309-8e640c2ac198.png?alt=media"
             },
-            {
-                "originalFilename": "tp_photographymedia.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F6fe430c6-bf60-4663-8a5d-763d483b85a0.png?alt=media",
-                "fileSize": 28202,
-                "contentType": "image/png"
+            { "id": 56,
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F6fe430c6-bf60-4663-8a5d-763d483b85a0.png?alt=media"
             },
-            {
-                "originalFilename": "tp_publishingmedia.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F2f3f7540-cc14-4399-9bbb-eccf6872a9ef.png?alt=media",
-                "fileSize": 25070,
-                "contentType": "image/png"
+            { "id": 36,
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F2f3f7540-cc14-4399-9bbb-eccf6872a9ef.png?alt=media"
             },
-            {
-                "originalFilename": "tp_musicperformance.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F7f3d83bc-50d6-4dc4-ba9d-583ca02d9415.png?alt=media",
-                "fileSize": 27900,
-                "contentType": "image/png"
+            { "id": 53,
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F7f3d83bc-50d6-4dc4-ba9d-583ca02d9415.png?alt=media"
             },
-            {
-                "originalFilename": "tp_scienceengineering.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F4e311423-59ca-445b-9b11-b2b4ede3bd0b.png?alt=media",
-                "fileSize": 26459,
-                "contentType": "image/png"
+            { "id": 46,
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F4e311423-59ca-445b-9b11-b2b4ede3bd0b.png?alt=media"
             },
-            {
-                "originalFilename": "tp_sciencechemistry.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Fbb942321-5f78-4f37-9dd1-cd1ce317efbb.png?alt=media",
-                "fileSize": 27740,
-                "contentType": "image/png"
+            {"id": 43,
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Fbb942321-5f78-4f37-9dd1-cd1ce317efbb.png?alt=media"
             },
-            {
-                "originalFilename": "tp_sciencebiology.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F5ba022dc-b409-4bcd-b05d-6529f487c31d.png?alt=media",
-                "fileSize": 29588,
-                "contentType": "image/png"
+            {"id": 41,
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F5ba022dc-b409-4bcd-b05d-6529f487c31d.png?alt=media"
             },
-            {
-                "originalFilename": "tp_sciencegeology.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F7e757644-0454-4588-81c3-8edb692942d7.png?alt=media",
-                "fileSize": 29759,
-                "contentType": "image/png"
+            {"id": 44,
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F7e757644-0454-4588-81c3-8edb692942d7.png?alt=media"
             },
-            {
-                "originalFilename": "tp_sciencephysics.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Fe3a62116-4c38-4f7e-a080-a8fb52be7db0.png?alt=media",
-                "fileSize": 25104,
-                "contentType": "image/png"
+            { "id": 42,
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Fe3a62116-4c38-4f7e-a080-a8fb52be7db0.png?alt=media"
             },
-            {
-                "originalFilename": "tp_sciencespace.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F638efb27-09e4-47a9-9723-3d68b4075837.png?alt=media",
-                "fileSize": 30081,
-                "contentType": "image/png"
+            {"id": 40,
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F638efb27-09e4-47a9-9723-3d68b4075837.png?alt=media"
             },
-            {
-                "originalFilename": "tp_socialmediacommunication.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F1f149217-e8e3-4498-9d9d-928d5ecdf336.png?alt=media",
-                "fileSize": 30187,
-                "contentType": "image/png"
+            {"id": 20,
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F1f149217-e8e3-4498-9d9d-928d5ecdf336.png?alt=media"
             },
-            {
-                "originalFilename": "tp_sciencetechnology.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Fab2d8991-e609-45e4-b965-62b5df1d38dc.png?alt=media",
-                "fileSize": 27526,
-                "contentType": "image/png"
+            {"id": 21,
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Fab2d8991-e609-45e4-b965-62b5df1d38dc.png?alt=media"
             },
-            {
-                "originalFilename": "tp_sportsfitness.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Ffbae6daa-79bb-4a14-a9ac-ca88e58ae3ee.png?alt=media",
-                "fileSize": 21886,
-                "contentType": "image/png"
+            {"id": 33,
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Ffbae6daa-79bb-4a14-a9ac-ca88e58ae3ee.png?alt=media"
             },
-            {
-                "originalFilename": "tp_technologyinnovation.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Fed646b47-8c28-4d53-b292-0fe30581d8a6.png?alt=media",
-                "fileSize": 25495,
-                "contentType": "image/png"
+            { "id": 58,
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Fed646b47-8c28-4d53-b292-0fe30581d8a6.png?alt=media"
             },
-            {
-                "originalFilename": "tp_workemployment.png",
-                "url": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Fb140f956-2824-48a6-8927-916607814872.png?alt=media",
-                "fileSize": 22438,
-                "contentType": "image/png"
+            { "id": 28,
+                "imageUrl": "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2Fb140f956-2824-48a6-8927-916607814872.png?alt=media"
             }
-        ],
-        "errors": []
-    }
-}
+        ]

@@ -83,6 +83,7 @@ public class AuthenticationService {
                 .orElseThrow(() -> new ErrorException("Role USER không tồn tại"));
 
         String generatedPassword = PasswordGenerator.generatePassword(); // Tạo mật khẩu ngẫu nhiên
+        String avatar = "https://firebasestorage.googleapis.com/v0/b/card-b1260.firebasestorage.app/o/vocab%2Fimages%2F82309cc1-c31b-48ea-9852-09675f0b0075.jpg?alt=media";
 
         Set<Role> roles = new HashSet<>();
         roles.add(userRole);
@@ -91,7 +92,7 @@ public class AuthenticationService {
                 .name(request.getName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(generatedPassword))
-                .avatar(null)
+                .avatar(avatar)
                 .gender(request.getGender() != null ? request.getGender() : null)
                 .dateOfBirth(request.getDateOfBirth())
                 .currentLevel(request.getCurrentLevel() != null ? request.getCurrentLevel() : CEFRLevel.A1)

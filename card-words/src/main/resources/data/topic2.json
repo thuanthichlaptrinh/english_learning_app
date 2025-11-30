@@ -1,0 +1,114 @@
+[
+    {
+        "id": 50,
+        "name": "education & learning",
+        "description": "Auto-generated from vocab creation",
+        "img": null,
+        "progress": null
+    },
+    {
+        "id": 62,
+        "name": "entertainment",
+        "description": "Auto-generated from vocab creation",
+        "img": null,
+        "progress": null
+    },
+    {
+        "id": 63,
+        "name": "art",
+        "description": "Auto-generated from vocab creation",
+        "img": null,
+        "progress": null
+    },
+    {
+        "id": 64,
+        "name": "history",
+        "description": "Auto-generated from vocab creation",
+        "img": null,
+        "progress": null
+    },
+    {
+        "id": 65,
+        "name": "physics",
+        "description": "Auto-generated from vocab creation",
+        "img": null,
+        "progress": null
+    },
+    {
+        "id": 66,
+        "name": "medicine",
+        "description": "Auto-generated from vocab creation",
+        "img": null,
+        "progress": null
+    },
+    {
+        "id": 67,
+        "name": "religion",
+        "description": "Auto-generated from vocab creation",
+        "img": null,
+        "progress": null
+    },
+    {
+        "id": 68,
+        "name": "information technology",
+        "description": "Auto-generated from vocab creation",
+        "img": null,
+        "progress": null
+    },
+    {
+        "id": 69,
+        "name": "industry",
+        "description": "Auto-generated from vocab creation",
+        "img": null,
+        "progress": null
+    },
+    {
+        "id": 70,
+        "name": "space",
+        "description": "Auto-generated from vocab creation",
+        "img": null,
+        "progress": null
+    },
+    {
+        "id": 71,
+        "name": "education",
+        "description": "Auto-generated from vocab creation",
+        "img": null,
+        "progress": null
+    },
+    {
+        "id": 72,
+        "name": "engineering",
+        "description": "Auto-generated from vocab creation",
+        "img": null,
+        "progress": null
+    },
+    {
+        "id": 73,
+        "name": "math",
+        "description": "Auto-generated from vocab creation",
+        "img": null,
+        "progress": null
+    },
+    {
+        "id": 74,
+        "name": "society",
+        "description": "Auto-generated from vocab creation",
+        "img": null,
+        "progress": null
+    },
+    {
+        "id": 75,
+        "name": "geology",
+        "description": "Auto-generated from vocab creation",
+        "img": null,
+        "progress": null
+    },
+    {
+        "id": 76,
+        "name": "astronomy",
+        "description": "Auto-generated from vocab creation",
+        "img": null,
+        "progress": null
+    }
+]

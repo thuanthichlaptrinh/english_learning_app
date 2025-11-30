@@ -1,6 +1,3 @@
-# docker-compose.prod.yml - Optimized for VPS 2GB RAM (Demo only)
-# Usage: docker compose -f docker-compose.prod.yml up -d
-
 services:
     # ============================================
     # DATABASE SERVICES
