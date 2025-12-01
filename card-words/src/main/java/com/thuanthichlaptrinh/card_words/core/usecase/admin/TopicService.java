@@ -28,6 +28,7 @@ public class TopicService {
 
     private final TopicRepository topicRepository;
     private final FirebaseStorageService firebaseStorageService;
+    private final ActionLogService actionLogService;
 
     /**
      * Create new topic with optional image
@@ -63,6 +64,24 @@ public class TopicService {
 
         Topic savedTopic = topicRepository.save(topic);
         log.info("Topic created successfully with ID: {}", savedTopic.getId());
+
+        // ✅ Log action: TOPIC_CREATE
+        try {
+            actionLogService.logAction(
+                    null,
+                    null,
+                    "SYSTEM",
+                    "TOPIC_CREATE",
+                    "CONTENT",
+                    "Topic",
+                    savedTopic.getId().toString(),
+                    "Created new topic: " + savedTopic.getName(),
+                    "SUCCESS",
+                    null,
+                    null);
+        } catch (Exception e) {
+            log.warn("Failed to log action: {}", e.getMessage());
+        }
 
         return mapToResponse(savedTopic);
     }
@@ -118,6 +137,24 @@ public class TopicService {
         Topic updatedTopic = topicRepository.save(topic);
         log.info("Topic updated successfully: {}", updatedTopic.getId());
 
+        // ✅ Log action: TOPIC_UPDATE
+        try {
+            actionLogService.logAction(
+                    null,
+                    null,
+                    "SYSTEM",
+                    "TOPIC_UPDATE",
+                    "CONTENT",
+                    "Topic",
+                    updatedTopic.getId().toString(),
+                    "Updated topic: " + updatedTopic.getName(),
+                    "SUCCESS",
+                    null,
+                    null);
+        } catch (Exception e) {
+            log.warn("Failed to log action: {}", e.getMessage());
+        }
+
         return mapToResponse(updatedTopic);
     }
 
@@ -150,6 +187,8 @@ public class TopicService {
         Topic topic = topicRepository.findById(topicId)
                 .orElseThrow(() -> new ErrorException("Không tìm thấy chủ đề với ID: " + topicId));
 
+        String topicName = topic.getName();
+
         // Delete image from Firebase if exists
         if (topic.getImg() != null && !topic.getImg().isEmpty()) {
             try {
@@ -162,6 +201,24 @@ public class TopicService {
 
         topicRepository.delete(topic);
         log.info("Topic deleted successfully: {}", topicId);
+
+        // ✅ Log action: TOPIC_DELETE
+        try {
+            actionLogService.logAction(
+                    null,
+                    null,
+                    "SYSTEM",
+                    "TOPIC_DELETE",
+                    "CONTENT",
+                    "Topic",
+                    topicId.toString(),
+                    "Deleted topic: " + topicName,
+                    "SUCCESS",
+                    null,
+                    null);
+        } catch (Exception e) {
+            log.warn("Failed to log action: {}", e.getMessage());
+        }
     }
 
     /**

@@ -5,6 +5,7 @@ import com.thuanthichlaptrinh.card_words.common.exceptions.ErrorException;
 import com.thuanthichlaptrinh.card_words.core.domain.User;
 import com.thuanthichlaptrinh.card_words.core.domain.UserVocabProgress;
 import com.thuanthichlaptrinh.card_words.core.domain.Vocab;
+import com.thuanthichlaptrinh.card_words.core.usecase.admin.ActionLogService;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.UserVocabProgressRepository;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.VocabRepository;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.ReviewFlashcardRequest;
@@ -29,6 +30,7 @@ public class FlashcardReviewService {
     private final UserVocabProgressRepository userVocabProgressRepository;
     private final VocabRepository vocabRepository;
     private final NotificationService notificationService;
+    private final ActionLogService actionLogService;
 
     // Get all flashcards due for review today
     @Transactional(readOnly = true)
@@ -126,6 +128,24 @@ public class FlashcardReviewService {
 
         // Send notification for review completion
         sendFlashcardReviewNotification(user, request.getQuality(), progress);
+
+        // ✅ Log action: FLASHCARD_REVIEW
+        try {
+            actionLogService.logAction(
+                    user.getId(),
+                    user.getEmail(),
+                    user.getName(),
+                    "FLASHCARD_REVIEW",
+                    "LEARNING",
+                    "Flashcard Review",
+                    progress.getVocab().getId().toString(),
+                    "Reviewed flashcard: " + progress.getVocab().getWord() + " with quality " + request.getQuality(),
+                    "SUCCESS",
+                    null,
+                    null);
+        } catch (Exception e) {
+            log.warn("Failed to log action: {}", e.getMessage());
+        }
 
         // Get remaining due cards
         int remainingDue = userVocabProgressRepository

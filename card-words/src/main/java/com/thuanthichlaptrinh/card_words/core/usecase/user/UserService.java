@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.thuanthichlaptrinh.card_words.common.exceptions.ErrorException;
 import com.thuanthichlaptrinh.card_words.core.domain.User;
+import com.thuanthichlaptrinh.card_words.core.usecase.admin.ActionLogService;
 import com.thuanthichlaptrinh.card_words.core.usecase.admin.FirebaseStorageService;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.UserRepository;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.request.user.UpdateUserRequest;
@@ -25,6 +26,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final FirebaseStorageService firebaseStorageService;
     private final PasswordEncoder passwordEncoder;
+    private final ActionLogService actionLogService;
 
     @Transactional
     public UserProfileResponse updateUserProfile(String userEmail, UpdateUserRequest request,
@@ -64,6 +66,24 @@ public class UserService {
 
         user = userRepository.save(user);
 
+        // ✅ Log action: USER_PROFILE_UPDATE
+        try {
+            actionLogService.logAction(
+                    user.getId(),
+                    user.getEmail(),
+                    user.getName(),
+                    "USER_PROFILE_UPDATE",
+                    "USER",
+                    "User Profile",
+                    user.getId().toString(),
+                    "User updated profile",
+                    "SUCCESS",
+                    null,
+                    null);
+        } catch (Exception e) {
+            log.warn("Failed to log action: {}", e.getMessage());
+        }
+
         return UserProfileResponse.builder()
                 .email(user.getEmail())
                 .name(user.getName())
@@ -71,11 +91,11 @@ public class UserService {
                 .gender(user.getGender())
                 .dateOfBirth(user.getDateOfBirth())
                 .currentLevel(user.getCurrentLevel())
-            .currentStreak(user.getCurrentStreak())
-            .longestStreak(user.getLongestStreak())
-            .totalStudyDays(user.getTotalStudyDays())
-            .lastActivityDate(user.getLastActivityDate())
-            .status(user.getStatus())
+                .currentStreak(user.getCurrentStreak())
+                .longestStreak(user.getLongestStreak())
+                .totalStudyDays(user.getTotalStudyDays())
+                .lastActivityDate(user.getLastActivityDate())
+                .status(user.getStatus())
                 .build();
     }
 
@@ -92,11 +112,11 @@ public class UserService {
                 .gender(user.getGender())
                 .dateOfBirth(user.getDateOfBirth())
                 .currentLevel(user.getCurrentLevel())
-            .currentStreak(user.getCurrentStreak())
-            .longestStreak(user.getLongestStreak())
-            .totalStudyDays(user.getTotalStudyDays())
-            .lastActivityDate(user.getLastActivityDate())
-            .status(user.getStatus())
+                .currentStreak(user.getCurrentStreak())
+                .longestStreak(user.getLongestStreak())
+                .totalStudyDays(user.getTotalStudyDays())
+                .lastActivityDate(user.getLastActivityDate())
+                .status(user.getStatus())
                 .build();
     }
 
@@ -126,6 +146,24 @@ public class UserService {
         String encodedPassword = passwordEncoder.encode(newPassword);
         user.setPassword(encodedPassword);
         userRepository.save(user);
+
+        // ✅ Log action: USER_PASSWORD_CHANGE
+        try {
+            actionLogService.logAction(
+                    user.getId(),
+                    user.getEmail(),
+                    user.getName(),
+                    "USER_PASSWORD_CHANGE",
+                    "USER",
+                    "User Profile",
+                    user.getId().toString(),
+                    "User changed password",
+                    "SUCCESS",
+                    null,
+                    null);
+        } catch (Exception e) {
+            log.warn("Failed to log action: {}", e.getMessage());
+        }
 
         log.info("Đã đổi mật khẩu thành công cho user: {}", userEmail);
     }

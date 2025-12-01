@@ -16,6 +16,7 @@ import com.thuanthichlaptrinh.card_words.core.domain.Type;
 import com.thuanthichlaptrinh.card_words.core.domain.Topic;
 import com.thuanthichlaptrinh.card_words.core.domain.Vocab;
 import com.thuanthichlaptrinh.card_words.core.mapper.VocabMapper;
+import com.thuanthichlaptrinh.card_words.core.usecase.admin.ActionLogService;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.TypeRepository;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.TopicRepository;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.VocabRepository;
@@ -41,6 +42,7 @@ public class VocabService {
     private final TypeRepository typeRepository;
     private final TopicRepository topicRepository;
     private final VocabMapper vocabMapper;
+    private final ActionLogService actionLogService;
 
     // Không dùng @Transactional ở đây để mỗi vocab có transaction riêng
     public BulkImportResponse bulkCreateVocabs(BulkCreateVocabRequest request) {
@@ -168,6 +170,24 @@ public class VocabService {
         vocab = vocabRepository.save(vocab);
         log.info("Đã tạo từ vựng thành công: {} với ID: {}", vocab.getWord(), vocab.getId());
 
+        // ✅ Log action: VOCAB_CREATE
+        try {
+            actionLogService.logAction(
+                    null,
+                    null,
+                    "SYSTEM",
+                    "VOCAB_CREATE",
+                    "CONTENT",
+                    "Vocabulary",
+                    vocab.getId().toString(),
+                    "Created new vocabulary: " + vocab.getWord(),
+                    "SUCCESS",
+                    null,
+                    null);
+        } catch (Exception e) {
+            log.warn("Failed to log action: {}", e.getMessage());
+        }
+
         return vocabMapper.toVocabResponse(vocab);
     }
 
@@ -225,12 +245,30 @@ public class VocabService {
     public void deleteVocab(UUID id) {
         log.info("Xóa từ vựng với ID: {}", id);
 
-        if (!vocabRepository.existsById(id)) {
-            throw new ErrorException("Không tìm thấy từ vựng với ID: " + id);
-        }
+        Vocab vocab = vocabRepository.findById(id)
+                .orElseThrow(() -> new ErrorException("Không tìm thấy từ vựng với ID: " + id));
 
+        String vocabWord = vocab.getWord();
         vocabRepository.deleteById(id);
         log.info("Đã xóa từ vựng thành công với ID: {}", id);
+
+        // ✅ Log action: VOCAB_DELETE
+        try {
+            actionLogService.logAction(
+                    null,
+                    null,
+                    "SYSTEM",
+                    "VOCAB_DELETE",
+                    "CONTENT",
+                    "Vocabulary",
+                    id.toString(),
+                    "Deleted vocabulary: " + vocabWord,
+                    "SUCCESS",
+                    null,
+                    null);
+        } catch (Exception e) {
+            log.warn("Failed to log action: {}", e.getMessage());
+        }
     }
 
     @Transactional
@@ -319,6 +357,24 @@ public class VocabService {
 
         Vocab updatedVocab = vocabRepository.save(vocab);
         log.info("Đã cập nhật từ vựng thành công: {}", updatedVocab.getWord());
+
+        // ✅ Log action: VOCAB_UPDATE
+        try {
+            actionLogService.logAction(
+                    null,
+                    null,
+                    "SYSTEM",
+                    "VOCAB_UPDATE",
+                    "CONTENT",
+                    "Vocabulary",
+                    updatedVocab.getId().toString(),
+                    "Updated vocabulary: " + updatedVocab.getWord(),
+                    "SUCCESS",
+                    null,
+                    null);
+        } catch (Exception e) {
+            log.warn("Failed to log action: {}", e.getMessage());
+        }
 
         return vocabMapper.toVocabResponse(updatedVocab);
     }
@@ -409,6 +465,24 @@ public class VocabService {
 
         Vocab updatedVocab = vocabRepository.save(vocab);
         log.info("Đã cập nhật từ vựng thành công: {}", updatedVocab.getWord());
+
+        // ✅ Log action: VOCAB_UPDATE (by word)
+        try {
+            actionLogService.logAction(
+                    null,
+                    null,
+                    "SYSTEM",
+                    "VOCAB_UPDATE",
+                    "CONTENT",
+                    "Vocabulary",
+                    updatedVocab.getId().toString(),
+                    "Updated vocabulary by word: " + updatedVocab.getWord(),
+                    "SUCCESS",
+                    null,
+                    null);
+        } catch (Exception e) {
+            log.warn("Failed to log action: {}", e.getMessage());
+        }
 
         return vocabMapper.toVocabResponse(updatedVocab);
     }

@@ -56,6 +56,7 @@ public class UserAdminService {
     private final com.thuanthichlaptrinh.card_words.dataprovider.repository.TokenRepository tokenRepository;
     private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
     private final com.thuanthichlaptrinh.card_words.core.usecase.user.EmailService emailService;
+    private final ActionLogService actionLogService;
 
     public Page<UserAdminResponse> getAllUsers(int page, int size, String sortBy, String sortDir) {
         log.info("Admin: Lấy danh sách người dùng - page: {}, size: {}, sortBy: {}, sortDir: {}",
@@ -108,6 +109,27 @@ public class UserAdminService {
         user.setBanned(banned);
         user = userRepository.save(user);
 
+        // ✅ Log action: USER_BAN or USER_UNBAN
+        try {
+            String actionType = banned ? "USER_BAN" : "USER_UNBAN";
+            String description = banned ? "Admin banned user: " + user.getEmail()
+                    : "Admin unbanned user: " + user.getEmail();
+            actionLogService.logAction(
+                    user.getId(),
+                    user.getEmail(),
+                    user.getName(),
+                    actionType,
+                    "ADMIN",
+                    "User Management",
+                    user.getId().toString(),
+                    description,
+                    "SUCCESS",
+                    null,
+                    null);
+        } catch (Exception e) {
+            log.warn("Failed to log action: {}", e.getMessage());
+        }
+
         return userMapper.toUserAdminResponse(user);
     }
 
@@ -141,6 +163,24 @@ public class UserAdminService {
 
         user = userRepository.save(user);
 
+        // ✅ Log action: USER_ROLE_UPDATE
+        try {
+            actionLogService.logAction(
+                    user.getId(),
+                    user.getEmail(),
+                    user.getName(),
+                    "USER_ROLE_UPDATE",
+                    "ADMIN",
+                    "User Management",
+                    user.getId().toString(),
+                    "Admin updated roles for user: " + user.getEmail() + " to " + request.getRoleNames(),
+                    "SUCCESS",
+                    null,
+                    null);
+        } catch (Exception e) {
+            log.warn("Failed to log action: {}", e.getMessage());
+        }
+
         return userMapper.toUserAdminResponse(user);
     }
 
@@ -148,11 +188,31 @@ public class UserAdminService {
     public void deleteUser(UUID id) {
         log.info("Admin: Xóa người dùng ID: {}", id);
 
-        if (!userRepository.existsById(id)) {
-            throw new ErrorException("Không tìm thấy người dùng");
-        }
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ErrorException("Không tìm thấy người dùng"));
+
+        String userEmail = user.getEmail();
+        String userName = user.getName();
 
         userRepository.deleteById(id);
+
+        // ✅ Log action: USER_DELETE
+        try {
+            actionLogService.logAction(
+                    id,
+                    userEmail,
+                    userName,
+                    "USER_DELETE",
+                    "ADMIN",
+                    "User Management",
+                    id.toString(),
+                    "Admin deleted user: " + userEmail,
+                    "SUCCESS",
+                    null,
+                    null);
+        } catch (Exception e) {
+            log.warn("Failed to log action: {}", e.getMessage());
+        }
     }
 
     public UserStatisticsResponse getUserStatistics() {
