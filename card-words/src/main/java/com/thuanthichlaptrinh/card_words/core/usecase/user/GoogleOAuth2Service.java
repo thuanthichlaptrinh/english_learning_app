@@ -44,6 +44,14 @@ public class GoogleOAuth2Service {
     @Value("${google.oauth2.client-id:your-google-client-id}")
     private String googleClientId;
 
+    // Android Client ID (nếu khác với Web Client ID)
+    @Value("${google.oauth2.android-client-id:${google.oauth2.client-id}}")
+    private String androidClientId;
+
+    // iOS Client ID (nếu khác với Web Client ID)
+    @Value("${google.oauth2.ios-client-id:${google.oauth2.client-id}}")
+    private String iosClientId;
+
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
 
     @Transactional
@@ -120,14 +128,28 @@ public class GoogleOAuth2Service {
             throws GeneralSecurityException, IOException {
 
         log.info("🔍 Verifying Google ID token...");
-        log.info("🔑 Google Client ID configured: {}", googleClientId);
+        log.info("🔑 Google Client IDs configured:");
+        log.info("   - Web: {}", googleClientId);
+        log.info("   - Android: {}", androidClientId);
+        log.info("   - iOS: {}", iosClientId);
         log.info("📏 ID Token length: {}", idToken != null ? idToken.length() : 0);
         log.info("📝 ID Token first 50 chars: {}",
                 idToken != null && idToken.length() > 50 ? idToken.substring(0, 50) + "..." : idToken);
 
+        // Tạo danh sách tất cả Client IDs (Web, Android, iOS)
+        java.util.List<String> allClientIds = new java.util.ArrayList<>();
+        allClientIds.add(googleClientId);
+        if (!androidClientId.equals(googleClientId)) {
+            allClientIds.add(androidClientId);
+        }
+        if (!iosClientId.equals(googleClientId) && !iosClientId.equals(androidClientId)) {
+            allClientIds.add(iosClientId);
+        }
+        log.info("📋 All valid audiences: {}", allClientIds);
+
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
                 new NetHttpTransport(), JSON_FACTORY)
-                .setAudience(Collections.singletonList(googleClientId))
+                .setAudience(allClientIds)
                 .build();
 
         GoogleIdToken token = null;
@@ -139,10 +161,21 @@ public class GoogleOAuth2Service {
         }
 
         if (token == null) {
+            // Decode token để xem thêm thông tin (không verify)
+            try {
+                String[] parts = idToken.split("\\.");
+                if (parts.length >= 2) {
+                    String payload = new String(java.util.Base64.getUrlDecoder().decode(parts[1]));
+                    log.error("🔍 Token payload (decoded, not verified): {}", payload);
+                }
+            } catch (Exception e) {
+                log.error("Cannot decode token payload: {}", e.getMessage());
+            }
+
             log.error("Token verification returned null. Possible reasons:");
             log.error("1. Token đã hết hạn");
-            log.error("2. Google Client ID không khớp (configured: {})", googleClientId);
-            log.error("3. Token không phải từ Google OAuth2");
+            log.error("2. Google Client ID không khớp. Valid audiences: {}", allClientIds);
+            log.error("3. Token không phải từ Google OAuth2 (có thể là access_token thay vì id_token)");
             log.error("4. Token đã bị thu hồi");
             throw new ErrorException("Token Google không hợp lệ - verify trả về null");
         }
