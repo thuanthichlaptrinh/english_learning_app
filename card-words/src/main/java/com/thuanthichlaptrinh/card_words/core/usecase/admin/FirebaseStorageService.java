@@ -398,6 +398,8 @@ public class FirebaseStorageService {
      * "500_theater.mp3" → "theater")
      * - Format 4: [word]_[number].[extension] → trả về "word" (e.g.,
      * "theater_500.mp3" → "theater")
+     * - Format 5: [number] [word].[extension] → trả về "word" (e.g.,
+     * "565 hypothesis.png" → "hypothesis")
      * 
      * @param filename Tên file cần extract
      * @return Tên từ vựng (lowercase, trimmed) hoặc null nếu không extract được
@@ -435,6 +437,26 @@ public class FirebaseStorageService {
                 }
 
                 // Check if part2 is a number (Format 4: [word]_[number])
+                if (part2.matches("\\d+")) {
+                    return part1.toLowerCase();
+                }
+
+                // Neither is a pure number, take part2 as word (prioritize second part)
+                return part2.toLowerCase();
+            }
+
+            // Try space separator (Format 5: [number] [word] - e.g., "565 hypothesis")
+            int firstSpaceIndex = nameWithoutExt.indexOf(' ');
+            if (firstSpaceIndex > 0) {
+                String part1 = nameWithoutExt.substring(0, firstSpaceIndex).trim();
+                String part2 = nameWithoutExt.substring(firstSpaceIndex + 1).trim();
+
+                // Check if part1 is a number (Format 5: [number] [word])
+                if (part1.matches("\\d+")) {
+                    return part2.toLowerCase();
+                }
+
+                // Check if part2 is a number ([word] [number])
                 if (part2.matches("\\d+")) {
                     return part1.toLowerCase();
                 }

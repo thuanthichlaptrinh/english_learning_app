@@ -166,11 +166,12 @@ public class FirebaseStorageController {
         @PostMapping(value = "/upload/media-and-update-vocab", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
         @Operation(summary = "Upload media và tự động cập nhật vocab", description = "Upload nhiều file (images + audios) và tự động cập nhật vào từ vựng tương ứng. "
                         +
-                        "Tên file hỗ trợ 4 format:\n" +
+                        "Tên file hỗ trợ 5 format:\n" +
                         "- Format 1: [word].[extension] (ví dụ: 'bread.jpg', 'milk.mp3')\n" +
                         "- Format 2: [số].[word].[extension] (ví dụ: '2.bread.jpg', '3.milk.mp3')\n" +
                         "- Format 3: [số]_[word].[extension] (ví dụ: '500_theater.mp3', '504_park.mp3')\n" +
                         "- Format 4: [word]_[số].[extension] (ví dụ: 'theater_500.mp3', 'park_504.mp3')\n" +
+                        "- Format 5: [số] [word].[extension] (ví dụ: '565 hypothesis.png', '608 shift.png')\n" +
                         "Hệ thống sẽ tự động extract tên từ, upload lên Firebase, và cập nhật vào database. " +
                         "Hỗ trợ images (jpg, png, gif, webp, max 5MB) và audios (mp3, wav, ogg, max 10MB)", security = @SecurityRequirement(name = "Bearer Authentication"))
         public ResponseEntity<ApiResponse<com.thuanthichlaptrinh.card_words.entrypoint.dto.response.BulkMediaUpdateResponse>> uploadMediaAndUpdateVocab(
