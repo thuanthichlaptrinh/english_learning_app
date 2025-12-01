@@ -34,6 +34,7 @@ public class SecurityConfiguration {
                         "/api/v1/auth/forgot-password",
                         "/api/v1/auth/refresh-token",
                         "/ws/**", // WebSocket endpoint
+                        "/api/v1/ws/**", // WebSocket endpoint với prefix api/v1
                         "/app/**", // WebSocket application prefix
                         "/topic/**", // WebSocket topic (broadcast)
                         "/queue/**", // WebSocket queue (point-to-point)
