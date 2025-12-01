@@ -39,23 +39,30 @@ public class FlashcardReviewService {
         log.info("Getting due flashcards for user: {}, limit: {}", user.getId(), limit);
 
         LocalDate today = LocalDate.now();
-        List<UserVocabProgress> dueProgress = userVocabProgressRepository.findDueForReview(user.getId(), today);
 
-        // Apply limit if specified
-        if (limit != null && limit > 0 && dueProgress.size() > limit) {
-            dueProgress = dueProgress.subList(0, limit);
+        // Lấy tất cả từ đến hạn (chưa cắt) để tính tổng thực tế
+        List<UserVocabProgress> allDueProgress = userVocabProgressRepository.findDueForReview(user.getId(), today);
+        int totalDue = allDueProgress.size();
+
+        // Đếm số từ đã ôn tập hôm nay
+        long reviewedToday = userVocabProgressRepository.countReviewedToday(user.getId(), today);
+
+        // Apply limit nếu có
+        List<UserVocabProgress> dueProgress = allDueProgress;
+        if (limit != null && limit > 0 && totalDue > limit) {
+            dueProgress = allDueProgress.subList(0, limit);
         }
 
         List<FlashcardResponse> flashcards = dueProgress.stream()
                 .map(this::mapToFlashcardResponse)
                 .collect(Collectors.toList());
 
-        int totalDue = dueProgress.size();
-        int remaining = Math.max(0, totalDue - (limit != null ? limit : totalDue));
+        // Tính số còn lại = tổng - số đã trả về trong response này
+        int remaining = Math.max(0, totalDue - dueProgress.size());
 
         return ReviewSessionResponse.builder()
                 .totalDueCards(totalDue)
-                .reviewedToday(0) // Will be calculated separately if needed
+                .reviewedToday((int) reviewedToday)
                 .remainingCards(remaining)
                 .flashcards(flashcards)
                 .build();

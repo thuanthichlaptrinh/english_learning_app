@@ -23,8 +23,17 @@ public interface UserVocabProgressRepository extends JpaRepository<UserVocabProg
 
         List<UserVocabProgress> findByUserIdOrderByNextReviewDateAsc(UUID userId);
 
-        @Query("SELECT uvp FROM UserVocabProgress uvp WHERE uvp.user.id = :userId AND uvp.nextReviewDate IS NOT NULL AND uvp.nextReviewDate <= :date ORDER BY uvp.nextReviewDate")
+        // Lấy từ cần ôn tập: chỉ NEW và UNKNOWN, có nextReviewDate <= today
+        @Query("SELECT uvp FROM UserVocabProgress uvp WHERE uvp.user.id = :userId " +
+                        "AND uvp.nextReviewDate IS NOT NULL AND uvp.nextReviewDate <= :date " +
+                        "AND uvp.status IN (com.thuanthichlaptrinh.card_words.common.enums.VocabStatus.NEW, " +
+                        "com.thuanthichlaptrinh.card_words.common.enums.VocabStatus.UNKNOWN) " +
+                        "ORDER BY uvp.nextReviewDate")
         List<UserVocabProgress> findDueForReview(@Param("userId") UUID userId, @Param("date") LocalDate date);
+
+        // Đếm số từ đã ôn tập hôm nay (lastReviewed = today)
+        @Query("SELECT COUNT(uvp) FROM UserVocabProgress uvp WHERE uvp.user.id = :userId AND uvp.lastReviewed = :date")
+        long countReviewedToday(@Param("userId") UUID userId, @Param("date") LocalDate date);
 
         long countByUserIdAndStatus(UUID userId, VocabStatus status);
 
