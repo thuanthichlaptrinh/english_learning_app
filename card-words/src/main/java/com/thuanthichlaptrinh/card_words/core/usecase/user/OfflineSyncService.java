@@ -663,19 +663,32 @@ public class OfflineSyncService {
 
     /**
      * Apply SM-2 Spaced Repetition Algorithm
-     * Quality: 5 (perfect) for correct, 0-2 for incorrect
+     * Quality: 5 (perfect) for correct, 1 for incorrect
+     * 
+     * Note: EF is only updated when quality >= 3 (per original SM-2 algorithm)
      */
     private void applySpacedRepetition(UserVocabProgress progress, Boolean isCorrect) {
         int quality = Boolean.TRUE.equals(isCorrect) ? 5 : 1; // 5 = perfect recall, 1 = incorrect
 
         if (quality >= 3) {
-            // Correct answer
+            // Correct answer - update EF and calculate interval
+            // SM-2 EF formula: EF' = EF + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02))
+            double newEF = progress.getEfFactor() + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
+            if (newEF < 1.3) {
+                newEF = 1.3; // Minimum EF
+            }
+            progress.setEfFactor(newEF);
+
+            // Calculate interval based on repetition count
             if (progress.getRepetition() == 0) {
                 progress.setIntervalDays(1);
             } else if (progress.getRepetition() == 1) {
                 progress.setIntervalDays(6);
             } else {
-                progress.setIntervalDays((int) Math.round(progress.getIntervalDays() * progress.getEfFactor()));
+                int newInterval = (int) Math.round(progress.getIntervalDays() * newEF);
+                if (newInterval < 1)
+                    newInterval = 1;
+                progress.setIntervalDays(newInterval);
             }
 
             progress.setRepetition(progress.getRepetition() + 1);
@@ -692,19 +705,12 @@ public class OfflineSyncService {
                 progress.setStatus(VocabStatus.UNKNOWN);
             }
         } else {
-            // Incorrect answer - reset
+            // Incorrect answer - reset repetition and interval, but keep EF unchanged (SM-2
+            // standard)
             progress.setRepetition(0);
             progress.setIntervalDays(1);
             progress.setStatus(VocabStatus.UNKNOWN);
         }
-
-        // Update EF (Ease Factor): EF' = EF + (0.1 - (5 - quality) * (0.08 + (5 -
-        // quality) * 0.02))
-        double newEF = progress.getEfFactor() + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
-        if (newEF < 1.3) {
-            newEF = 1.3; // Minimum EF
-        }
-        progress.setEfFactor(newEF);
 
         // Calculate next review date
         progress.setNextReviewDate(LocalDate.now().plusDays(progress.getIntervalDays()));

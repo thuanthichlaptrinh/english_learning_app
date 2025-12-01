@@ -31,6 +31,7 @@ public class FlashcardReviewService {
     private final VocabRepository vocabRepository;
     private final NotificationService notificationService;
     private final ActionLogService actionLogService;
+    private final CEFRUpgradeService cefrUpgradeService;
 
     // Get all flashcards due for review today
     @Transactional(readOnly = true)
@@ -147,6 +148,15 @@ public class FlashcardReviewService {
             log.warn("Failed to log action: {}", e.getMessage());
         }
 
+        try {
+            boolean upgraded = cefrUpgradeService.checkAndUpgradeCEFR(user.getId());
+            if (upgraded) {
+                log.info("🎉 User {} CEFR level upgraded after Flashcard Review!", user.getId());
+            }
+        } catch (Exception e) {
+            log.error("❌ Failed to check CEFR upgrade: {}", e.getMessage(), e);
+        }
+
         // Get remaining due cards
         int remainingDue = userVocabProgressRepository
                 .findDueForReview(user.getId(), LocalDate.now()).size();
@@ -173,6 +183,14 @@ public class FlashcardReviewService {
     /**
      * SM-2 Algorithm Implementation
      * Based on SuperMemo 2 algorithm
+     * 
+     * Quality ratings:
+     * - 5: Perfect response, no hesitation
+     * - 4: Correct response after hesitation
+     * - 3: Correct response with difficulty
+     * - 2: Incorrect response, but upon seeing answer it was easy to recall
+     * - 1: Incorrect response, but upon seeing answer it seemed familiar
+     * - 0: Complete blackout, no recall
      */
     private void updateProgressWithSM2(UserVocabProgress progress, int quality) {
         // Update review date
@@ -185,35 +203,45 @@ public class FlashcardReviewService {
             progress.setTimesWrong(progress.getTimesWrong() + 1);
         }
 
-        // Calculate new EF (Easiness Factor)
-        double newEF = progress.getEfFactor() + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
-
-        // EF should not be less than 1.3
-        if (newEF < 1.3) {
-            newEF = 1.3;
-        }
-        progress.setEfFactor(newEF);
-
-        // Calculate new interval
+        // Calculate new interval and repetition
         int newInterval;
         int newRepetition;
+        double currentEF = progress.getEfFactor();
 
         if (quality < 3) {
-            // If quality is less than 3, start over
+            // Incorrect response - reset repetition but keep EF unchanged (SM-2 standard)
             newRepetition = 0;
             newInterval = 1;
-            progress.setStatus(VocabStatus.UNKNOWN); // Chưa thuộc
+            progress.setStatus(VocabStatus.UNKNOWN);
+            // Note: EF is NOT updated when quality < 3 (per original SM-2)
         } else {
+            // Correct response - update EF and calculate new interval
+            // SM-2 EF formula: EF' = EF + (0.1 - (5-q) * (0.08 + (5-q) * 0.02))
+            double newEF = currentEF + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
+
+            // EF should not be less than 1.3
+            if (newEF < 1.3) {
+                newEF = 1.3;
+            }
+            progress.setEfFactor(newEF);
+            currentEF = newEF;
+
             newRepetition = progress.getRepetition() + 1;
 
             if (newRepetition == 1) {
                 newInterval = 1;
-                progress.setStatus(VocabStatus.KNOWN); // Đã thuộc
+                progress.setStatus(VocabStatus.KNOWN);
             } else if (newRepetition == 2) {
                 newInterval = 6;
                 progress.setStatus(VocabStatus.KNOWN);
             } else {
-                newInterval = (int) Math.round(progress.getIntervalDays() * newEF);
+                // For repetition >= 3: interval = previous_interval * EF
+                newInterval = (int) Math.round(progress.getIntervalDays() * currentEF);
+
+                // Ensure minimum interval of 1 day
+                if (newInterval < 1) {
+                    newInterval = 1;
+                }
 
                 // Mark as MASTERED if interval is greater than 21 days
                 if (newInterval > 21) {
@@ -228,8 +256,8 @@ public class FlashcardReviewService {
         progress.setIntervalDays(newInterval);
         progress.setNextReviewDate(LocalDate.now().plusDays(newInterval));
 
-        log.info("Updated progress - EF: {}, Interval: {} days, Next review: {}, Status: {}",
-                newEF, newInterval, progress.getNextReviewDate(), progress.getStatus());
+        log.info("SM-2 Update - Quality: {}, EF: {:.2f}, Repetition: {}, Interval: {} days, Next: {}, Status: {}",
+                quality, currentEF, newRepetition, newInterval, progress.getNextReviewDate(), progress.getStatus());
     }
 
     /**

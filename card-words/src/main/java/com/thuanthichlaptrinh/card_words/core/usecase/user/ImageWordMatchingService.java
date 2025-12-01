@@ -46,6 +46,7 @@ public class ImageWordMatchingService {
 
         // Redis cache service for distributed caching
         private final GameSessionCacheService gameSessionCacheService;
+        private final CEFRUpgradeService cefrUpgradeService;
         private static final String GAME_NAME = "Image-Word Matching";
         private static final int DEFAULT_PAIRS = 5;
 
@@ -161,9 +162,14 @@ public class ImageWordMatchingService {
                         saveGameSessionDetail(session, vocab, isCorrect);
                 }
 
-                // Calculate accuracy
-                double accuracy = sessionData.getVocabs().size() > 0
-                                ? (correctMatches * 100.0 / sessionData.getVocabs().size())
+                // Calculate wrong attempts from request
+                int wrongAttempts = request.getWrongAttempts() != null ? request.getWrongAttempts() : 0;
+
+                // Calculate accuracy: ghép đúng / (tổng lần ghép) * 100
+                // Tổng lần ghép = số cặp ghép đúng + số lần ghép sai
+                int totalAttempts = correctMatches + wrongAttempts;
+                double accuracy = totalAttempts > 0
+                                ? (correctMatches * 100.0 / totalAttempts)
                                 : 0;
 
                 // Calculate duration
@@ -188,8 +194,8 @@ public class ImageWordMatchingService {
                         }
                 }
 
-                // Calculate wrong penalty: mỗi lần sai trừ 2 điểm
-                int wrongAttempts = request.getWrongAttempts() != null ? request.getWrongAttempts() : 0;
+                // Calculate wrong penalty: mỗi lần sai trừ 2 điểm (wrongAttempts đã tính ở
+                // trên)
                 int wrongPenalty = wrongAttempts * 2;
 
                 // Total score = CEFR score + time bonus - wrong penalty (tối thiểu = 0)
@@ -211,6 +217,17 @@ public class ImageWordMatchingService {
 
                 // Send game completion notification
                 sendGameCompletionNotification(session, accuracy, totalScore);
+
+                // 🎯 CHECK CEFR UPGRADE after game finished
+                try {
+                        boolean upgraded = cefrUpgradeService.checkAndUpgradeCEFR(session.getUser().getId());
+                        if (upgraded) {
+                                log.info("🎉 User {} CEFR level upgraded after Image-Word Matching!",
+                                                session.getUser().getId());
+                        }
+                } catch (Exception e) {
+                        log.error("❌ Failed to check CEFR upgrade: {}", e.getMessage(), e);
+                }
 
                 log.info("Image-Word Matching completed: sessionId={}, cefrScore={}, timeBonus={}, wrongPenalty={}, totalScore={}, accuracy={}%",
                                 session.getId(), cefrScore, timeBonus, wrongPenalty, totalScore,

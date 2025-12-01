@@ -36,6 +36,7 @@ public class QuickQuizService {
     private final StreakService streakService;
     private final LeaderboardService leaderboardService;
     private final NotificationService notificationService;
+    private final CEFRUpgradeService cefrUpgradeService;
 
     // Redis services for distributed caching
     private final GameSessionCacheService gameSessionCacheService;
@@ -779,6 +780,16 @@ public class QuickQuizService {
             log.info("📊 Leaderboard updated for user: {}, score: {}", session.getUser().getId(), session.getScore());
         } catch (Exception e) {
             log.error("❌ Failed to update leaderboard: {}", e.getMessage(), e);
+        }
+
+        // 🎯 CHECK CEFR UPGRADE after game finished
+        try {
+            boolean upgraded = cefrUpgradeService.checkAndUpgradeCEFR(session.getUser().getId());
+            if (upgraded) {
+                log.info("🎉 User {} CEFR level upgraded after Quick Quiz!", session.getUser().getId());
+            }
+        } catch (Exception e) {
+            log.error("❌ Failed to check CEFR upgrade: {}", e.getMessage(), e);
         }
 
         // 🔔 CREATE ACHIEVEMENT NOTIFICATIONS

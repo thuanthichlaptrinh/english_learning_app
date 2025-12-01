@@ -35,6 +35,7 @@ public class LearnVocabService {
     private final UserVocabProgressRepository userVocabProgressRepository;
     private final VocabRepository vocabRepository;
     private final NotificationService notificationService;
+    private final CEFRUpgradeService cefrUpgradeService;
 
     /**
      * Lấy danh sách từ vựng cần ôn tập với phân trang
@@ -256,6 +257,16 @@ public class LearnVocabService {
         // Send notification for milestones
         sendReviewMilestoneNotification(user, progress);
 
+        // 🎯 CHECK CEFR UPGRADE after review
+        try {
+            boolean upgraded = cefrUpgradeService.checkAndUpgradeCEFR(user.getId());
+            if (upgraded) {
+                log.info("🎉 User {} CEFR level upgraded after Learn Vocab review!", user.getId());
+            }
+        } catch (Exception e) {
+            log.error("❌ Failed to check CEFR upgrade: {}", e.getMessage(), e);
+        }
+
         String message = generateMessage(request.getIsCorrect(), progress.getStatus());
 
         return ReviewResultResponse.builder()
@@ -365,26 +376,30 @@ public class LearnVocabService {
     }
 
     private void updateProgressWithSM2(UserVocabProgress progress, int quality) {
-        // SM-2 Algorithm
+        // SM-2 Algorithm - EF is only updated when quality >= 3
         if (quality >= 3) {
-            // Correct answer
+            // Correct answer - update EF first
+            double newEF = progress.getEfFactor() + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
+            progress.setEfFactor(Math.max(1.3, newEF));
+
+            // Calculate interval
             if (progress.getRepetition() == 0) {
                 progress.setIntervalDays(1);
             } else if (progress.getRepetition() == 1) {
                 progress.setIntervalDays(6);
             } else {
-                progress.setIntervalDays((int) Math.round(progress.getIntervalDays() * progress.getEfFactor()));
+                int newInterval = (int) Math.round(progress.getIntervalDays() * progress.getEfFactor());
+                if (newInterval < 1)
+                    newInterval = 1;
+                progress.setIntervalDays(newInterval);
             }
             progress.setRepetition(progress.getRepetition() + 1);
         } else {
-            // Wrong answer - reset
+            // Wrong answer - reset repetition and interval, but keep EF unchanged (SM-2
+            // standard)
             progress.setRepetition(0);
             progress.setIntervalDays(1);
         }
-
-        // Update EF Factor
-        double newEF = progress.getEfFactor() + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
-        progress.setEfFactor(Math.max(1.3, newEF));
 
         // Update next review date
         progress.setNextReviewDate(LocalDate.now().plusDays(progress.getIntervalDays()));

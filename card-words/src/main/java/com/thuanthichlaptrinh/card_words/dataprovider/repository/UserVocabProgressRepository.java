@@ -352,4 +352,30 @@ public interface UserVocabProgressRepository extends JpaRepository<UserVocabProg
                         "AND v.topic.id = :topicId " +
                         "AND (uvp.status = 'KNOWN' OR uvp.status = 'MASTERED')")
         long countLearnedVocabsByUserAndTopic(@Param("userId") UUID userId, @Param("topicId") Long topicId);
+
+        // === QUERIES FOR CEFR UPGRADE ===
+        // Count total words learned by user at a specific CEFR level
+        @Query("SELECT COUNT(uvp) FROM UserVocabProgress uvp " +
+                        "JOIN uvp.vocab v " +
+                        "WHERE uvp.user.id = :userId " +
+                        "AND UPPER(v.cefr) = UPPER(:cefrLevel)")
+        Long countByUserIdAndVocabCefr(@Param("userId") UUID userId, @Param("cefrLevel") String cefrLevel);
+
+        // Count MASTERED words by user at a specific CEFR level
+        @Query("SELECT COUNT(uvp) FROM UserVocabProgress uvp " +
+                        "JOIN uvp.vocab v " +
+                        "WHERE uvp.user.id = :userId " +
+                        "AND UPPER(v.cefr) = UPPER(:cefrLevel) " +
+                        "AND uvp.status = :status")
+        Long countByUserIdAndVocabCefrAndStatus(@Param("userId") UUID userId,
+                        @Param("cefrLevel") String cefrLevel,
+                        @Param("status") VocabStatus status);
+
+        // Get accuracy (total correct, total wrong) by user at a specific CEFR level
+        @Query("SELECT COALESCE(SUM(uvp.timesCorrect), 0), COALESCE(SUM(uvp.timesWrong), 0) " +
+                        "FROM UserVocabProgress uvp " +
+                        "JOIN uvp.vocab v " +
+                        "WHERE uvp.user.id = :userId " +
+                        "AND UPPER(v.cefr) = UPPER(:cefrLevel)")
+        Object[] getAccuracyByUserIdAndCefr(@Param("userId") UUID userId, @Param("cefrLevel") String cefrLevel);
 }

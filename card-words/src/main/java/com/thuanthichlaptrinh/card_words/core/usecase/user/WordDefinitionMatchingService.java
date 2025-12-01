@@ -49,6 +49,7 @@ public class WordDefinitionMatchingService {
 
     // Redis cache service for distributed caching
     private final GameSessionCacheService gameSessionCacheService;
+    private final CEFRUpgradeService cefrUpgradeService;
 
     private static final String GAME_NAME = "Word-Definition Matching";
     private static final int DEFAULT_PAIRS = 5;
@@ -191,7 +192,12 @@ public class WordDefinitionMatchingService {
         // Total score = CEFR score + time bonus - wrong penalty (tối thiểu = 0)
         int totalScore = Math.max(0, cefrScore + timeBonus - wrongPenalty);
 
-        double accuracy = ((double) correctMatches / sessionVocabs.size()) * 100;
+        // Calculate accuracy: ghép đúng / (tổng lần ghép) * 100
+        // Tổng lần ghép = số cặp ghép đúng + số lần ghép sai
+        int totalAttempts = correctMatches + wrongAttempts;
+        double accuracy = totalAttempts > 0
+                ? (correctMatches * 100.0 / totalAttempts)
+                : 0;
 
         session.setCorrectCount(correctMatches);
         session.setScore(totalScore);
@@ -206,6 +212,16 @@ public class WordDefinitionMatchingService {
 
         // Send achievement notification
         sendGameCompletionNotification(session, accuracy, totalScore);
+
+        // 🎯 CHECK CEFR UPGRADE after game finished
+        try {
+            boolean upgraded = cefrUpgradeService.checkAndUpgradeCEFR(session.getUser().getId());
+            if (upgraded) {
+                log.info("🎉 User {} CEFR level upgraded after Word-Definition Matching!", session.getUser().getId());
+            }
+        } catch (Exception e) {
+            log.error("❌ Failed to check CEFR upgrade: {}", e.getMessage(), e);
+        }
 
         log.info(
                 "Word-Definition Matching completed: sessionId={}, cefrScore={}, timeBonus={}, wrongPenalty={}, totalScore={}, accuracy={}%",
@@ -402,36 +418,39 @@ public class WordDefinitionMatchingService {
     private void sendGameCompletionNotification(GameSession session, double accuracy, int totalScore) {
         try {
             User user = session.getUser();
-            
+
             // Perfect score (100% accuracy)
             if (accuracy >= 100.0) {
-                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = 
-                    com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest.builder()
+                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest
+                        .builder()
                         .userId(user.getId())
                         .title("🎯 Hoàn Hảo!")
-                        .content(String.format("Bạn đã ghép đúng 100%% các từ trong Word Definition Matching! Điểm: %d", totalScore))
+                        .content(String.format("Bạn đã ghép đúng 100%% các từ trong Word Definition Matching! Điểm: %d",
+                                totalScore))
                         .type(com.thuanthichlaptrinh.card_words.common.constants.NotificationConstants.GAME_ACHIEVEMENT)
                         .build();
                 notificationService.createNotification(request);
             }
             // High score (>= 40 points)
             else if (totalScore >= 40) {
-                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = 
-                    com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest.builder()
+                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest
+                        .builder()
                         .userId(user.getId())
                         .title("🏆 Điểm Cao!")
-                        .content(String.format("Tuyệt vời! Bạn đạt %d điểm với %.1f%% độ chính xác!", totalScore, accuracy))
+                        .content(String.format("Tuyệt vời! Bạn đạt %d điểm với %.1f%% độ chính xác!", totalScore,
+                                accuracy))
                         .type(com.thuanthichlaptrinh.card_words.common.constants.NotificationConstants.ACHIEVEMENT)
                         .build();
                 notificationService.createNotification(request);
             }
             // Good performance (>= 80% accuracy)
             else if (accuracy >= 80.0) {
-                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = 
-                    com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest.builder()
+                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest
+                        .builder()
                         .userId(user.getId())
                         .title("👍 Làm Tốt!")
-                        .content(String.format("Bạn đã hoàn thành game với %.1f%% độ chính xác. Điểm: %d", accuracy, totalScore))
+                        .content(String.format("Bạn đã hoàn thành game với %.1f%% độ chính xác. Điểm: %d", accuracy,
+                                totalScore))
                         .type(com.thuanthichlaptrinh.card_words.common.constants.NotificationConstants.GAME_ACHIEVEMENT)
                         .build();
                 notificationService.createNotification(request);
