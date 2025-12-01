@@ -22,6 +22,7 @@ import com.thuanthichlaptrinh.card_words.configuration.jwt.JwtService;
 import com.thuanthichlaptrinh.card_words.core.domain.Role;
 import com.thuanthichlaptrinh.card_words.core.domain.Token;
 import com.thuanthichlaptrinh.card_words.core.domain.User;
+import com.thuanthichlaptrinh.card_words.core.usecase.admin.ActionLogService;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.RoleRepository;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.TokenRepository;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.UserRepository;
@@ -40,6 +41,7 @@ public class GoogleOAuth2Service {
     private final TokenRepository tokenRepository;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
+    private final ActionLogService actionLogService;
 
     @Value("${google.oauth2.client-id:your-google-client-id}")
     private String googleClientId;
@@ -96,6 +98,27 @@ public class GoogleOAuth2Service {
             saveUserToken(user, accessToken, refreshToken);
 
             log.info("Tạo và lưu tokens thành công cho user: {}", email);
+
+            // ✅ Log action: GOOGLE_LOGIN
+            try {
+                String actionType = isNewUser ? "GOOGLE_REGISTER" : "GOOGLE_LOGIN";
+                String description = isNewUser ? "New user registered via Google OAuth"
+                        : "User logged in via Google OAuth";
+                actionLogService.logAction(
+                        user.getId(),
+                        user.getEmail(),
+                        user.getName(),
+                        actionType,
+                        "SYSTEM",
+                        "Authentication System",
+                        user.getId().toString(),
+                        description,
+                        "SUCCESS",
+                        null,
+                        null);
+            } catch (Exception logError) {
+                log.warn("Failed to log action: {}", logError.getMessage());
+            }
 
             // Tách tên từ fullName để hiển thị
             String[] nameParts = user.getName().split(" ", 2);

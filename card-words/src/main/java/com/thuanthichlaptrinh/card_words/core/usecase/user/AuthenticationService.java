@@ -26,6 +26,7 @@ import com.thuanthichlaptrinh.card_words.core.domain.Role;
 import com.thuanthichlaptrinh.card_words.core.domain.Token;
 import com.thuanthichlaptrinh.card_words.core.domain.User;
 import com.thuanthichlaptrinh.card_words.core.service.redis.UserCacheService;
+import com.thuanthichlaptrinh.card_words.core.usecase.admin.ActionLogService;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.RoleRepository;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.TokenRepository;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.UserRepository;
@@ -57,6 +58,7 @@ public class AuthenticationService {
     private final UserCacheService userCacheService; // ← Thêm cache service
     private final SimpMessagingTemplate messagingTemplate;
     private final NotificationService notificationService;
+    private final ActionLogService actionLogService; // ← Thêm action log service
 
     private static final String ADMIN_REG_TOPIC = "/topic/admin/user-registrations";
 
@@ -109,6 +111,24 @@ public class AuthenticationService {
 
         // 🔔 Send welcome notification
         sendWelcomeNotification(user);
+
+        // ✅ Log action: USER_REGISTER
+        try {
+            actionLogService.logAction(
+                    user.getId(),
+                    user.getEmail(),
+                    user.getName(),
+                    "USER_REGISTER",
+                    "SYSTEM",
+                    "Authentication System",
+                    user.getId().toString(),
+                    "New user registered successfully",
+                    "SUCCESS",
+                    null,
+                    null);
+        } catch (Exception e) {
+            log.warn("Failed to log action USER_REGISTER: {}", e.getMessage());
+        }
 
         try {
             emailService.sendWelcomeEmailWithPassword(user.getEmail(), user.getName(), generatedPassword);
@@ -177,6 +197,25 @@ public class AuthenticationService {
         revokeAllUserTokens(user.getId().toString());
         saveUserToken(user, accessToken, refreshToken);
 
+        // ✅ Log action: USER_LOGIN
+        try {
+            actionLogService.logAction(
+                    user.getId(),
+                    user.getEmail(),
+                    user.getName(),
+                    "USER_LOGIN",
+                    "SYSTEM",
+                    "Authentication System",
+                    user.getId().toString(),
+                    "User logged in successfully",
+                    "SUCCESS",
+                    null, // IP address will be set by controller if needed
+                    null // User agent will be set by controller if needed
+            );
+        } catch (Exception e) {
+            log.warn("Failed to log action USER_LOGIN: {}", e.getMessage());
+        }
+
         return AuthenticationResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
@@ -203,6 +242,24 @@ public class AuthenticationService {
         userCacheService.markUserOffline(user.getId());
         log.debug("✅ User offline: {}, total online: {}",
                 user.getId(), userCacheService.getOnlineUsersCount());
+
+        // ✅ Log action: USER_LOGOUT
+        try {
+            actionLogService.logAction(
+                    user.getId(),
+                    user.getEmail(),
+                    user.getName(),
+                    "USER_LOGOUT",
+                    "SYSTEM",
+                    "Authentication System",
+                    user.getId().toString(),
+                    "User logged out successfully",
+                    "SUCCESS",
+                    null,
+                    null);
+        } catch (Exception e) {
+            log.warn("Failed to log action USER_LOGOUT: {}", e.getMessage());
+        }
 
         SecurityContextHolder.clearContext();
         log.info("Đăng xuất thành công cho user: {}", userEmail);
@@ -457,11 +514,13 @@ public class AuthenticationService {
      */
     private void sendWelcomeNotification(User user) {
         try {
-            com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = 
-                com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest.builder()
+            com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest
+                    .builder()
                     .userId(user.getId())
                     .title("🎉 Chào Mừng Đến Card Words!")
-                    .content(String.format("Xin chào %s! Chúc bạn có trải nghiệm học tập thú vị. Hãy bắt đầu xây dựng streak của bạn ngay hôm nay!", user.getName()))
+                    .content(String.format(
+                            "Xin chào %s! Chúc bạn có trải nghiệm học tập thú vị. Hãy bắt đầu xây dựng streak của bạn ngay hôm nay!",
+                            user.getName()))
                     .type("system_alert")
                     .build();
             notificationService.createNotification(request);
