@@ -20,8 +20,10 @@ import com.thuanthichlaptrinh.card_words.common.enums.CEFRLevel;
 import com.thuanthichlaptrinh.card_words.common.exceptions.ErrorException;
 import com.thuanthichlaptrinh.card_words.configuration.jwt.JwtService;
 import com.thuanthichlaptrinh.card_words.core.domain.Role;
+import com.thuanthichlaptrinh.card_words.core.domain.Token;
 import com.thuanthichlaptrinh.card_words.core.domain.User;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.RoleRepository;
+import com.thuanthichlaptrinh.card_words.dataprovider.repository.TokenRepository;
 import com.thuanthichlaptrinh.card_words.dataprovider.repository.UserRepository;
 import com.thuanthichlaptrinh.card_words.entrypoint.dto.response.auth.GoogleAuthResponse;
 
@@ -35,6 +37,7 @@ public class GoogleOAuth2Service {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final TokenRepository tokenRepository;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
 
@@ -80,7 +83,11 @@ public class GoogleOAuth2Service {
             String accessToken = jwtService.generateToken(user);
             String refreshToken = jwtService.generateRefreshToken(user);
 
-            log.info("Tạo tokens thành công cho user: {}", email);
+            // Lưu token vào database
+            revokeAllUserTokens(user);
+            saveUserToken(user, accessToken, refreshToken);
+
+            log.info("Tạo và lưu tokens thành công cho user: {}", email);
 
             // Tách tên từ fullName để hiển thị
             String[] nameParts = user.getName().split(" ", 2);
@@ -181,4 +188,29 @@ public class GoogleOAuth2Service {
             log.info("Cập nhật thông tin user từ Google: {}", user.getEmail());
         }
     }
+
+    private void saveUserToken(User user, String accessToken, String refreshToken) {
+        var token = Token.builder()
+                .user(user)
+                .token(accessToken)
+                .refreshToken(refreshToken)
+                .expired(false)
+                .revoked(false)
+                .build();
+        tokenRepository.save(token);
+        log.info("Đã lưu token vào database cho user: {}", user.getEmail());
+    }
+
+    private void revokeAllUserTokens(User user) {
+        var validUserTokens = tokenRepository.findAllByUserId(user.getId());
+        if (validUserTokens.isEmpty())
+            return;
+        validUserTokens.forEach(token -> {
+            token.setExpired(true);
+            token.setRevoked(true);
+        });
+        tokenRepository.saveAll(validUserTokens);
+        log.info("Đã thu hồi {} token cũ của user: {}", validUserTokens.size(), user.getEmail());
+    }
+
 }
