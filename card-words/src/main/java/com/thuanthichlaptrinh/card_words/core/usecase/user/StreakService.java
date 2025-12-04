@@ -152,8 +152,9 @@ public class StreakService {
             log.info("Activity recorded successfully for user: {}", user.getId());
         } else {
             log.info("User {} already studied today. No streak update needed.", user.getId());
-            // Vẫn sync data để đảm bảo consistency
+            // Vẫn sync data và lưu vào DB để đảm bảo consistency
             syncUserStreakData(user, calculation);
+            userRepository.save(user);
         }
 
         return StreakRecordResponse.builder()
