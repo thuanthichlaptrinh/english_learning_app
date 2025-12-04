@@ -127,6 +127,10 @@ services:
             # Gemini AI
             - GEMINI_API_KEY=${GEMINI_API_KEY}
 
+            # Swagger Authentication
+            - SWAGGER_USERNAME=${SWAGGER_USERNAME}
+            - SWAGGER_PASSWORD=${SWAGGER_PASSWORD}
+
         ports:
             - '${SERVER_SPRING_PORT}:${SERVER_SPRING_PORT}'
         depends_on:

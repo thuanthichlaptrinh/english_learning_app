@@ -18,6 +18,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 import com.thuanthichlaptrinh.card_words.configuration.jwt.JwtAuthenticationFilter;
+import com.thuanthichlaptrinh.card_words.configuration.swagger.SwaggerBasicAuthFilter;
 
 import lombok.RequiredArgsConstructor;
 
@@ -64,6 +65,7 @@ public class SecurityConfiguration {
         };
         private final JwtAuthenticationFilter jwtAuthFilter;
         private final AuthenticationProvider authenticationProvider;
+        private final SwaggerBasicAuthFilter swaggerBasicAuthFilter;
 
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -82,6 +84,7 @@ public class SecurityConfiguration {
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .authenticationProvider(authenticationProvider)
+                                .addFilterBefore(swaggerBasicAuthFilter, UsernamePasswordAuthenticationFilter.class)
                                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                                 .exceptionHandling(exceptionHandling -> exceptionHandling
                                                 .authenticationEntryPoint((request, response, authException) -> {

@@ -23,10 +23,10 @@ import java.util.Base64;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class SwaggerBasicAuthFilter extends OncePerRequestFilter {
 
-    @Value("${swagger.auth.username:cardwords_admin}")
+    @Value("${swagger.auth.username}")
     private String username;
 
-    @Value("${swagger.auth.password:Cw@Swagger2025!}")
+    @Value("${swagger.auth.password}")
     private String password;
 
     @Override
