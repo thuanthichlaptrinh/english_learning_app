@@ -37,12 +37,12 @@ public class StreakReminderScheduler {
     private final EmailService emailService;
 
     /**
-     * Chạy hàng ngày lúc 07:00 và 19:00
+     * Chạy hàng ngày lúc 07:00 và 19:00 (giờ Việt Nam)
      * Gửi email & notification cho users:
      * - Đã học hôm qua nhưng chưa học hôm nay
      * - Đang có streak >= 3 ngày (đáng để giữ)
      */
-    @Scheduled(cron = "0 0 7,19 * * *") // 07:00 và 19:00 hằng ngày
+    @Scheduled(cron = "0 0 7,19 * * *", zone = "Asia/Ho_Chi_Minh") // 07:00 và 19:00 giờ VN
     @Transactional(readOnly = true)
     public void sendStreakReminders() {
         log.info("🔔 Starting streak reminder job...");
@@ -97,9 +97,10 @@ public class StreakReminderScheduler {
     }
 
     /**
-     * Gửi thông báo nhắc người dùng khi chuỗi đã bị dừng (chỉ chạy 07:00 mỗi ngày)
+     * Gửi thông báo nhắc người dùng khi chuỗi đã bị dừng (chỉ chạy 07:00 giờ VN mỗi
+     * ngày)
      */
-    @Scheduled(cron = "0 0 7 * * *")
+    @Scheduled(cron = "0 0 7 * * *", zone = "Asia/Ho_Chi_Minh")
     @Transactional(readOnly = true)
     public void sendStreakStopAlerts() {
         log.info("🛑 Starting streak stop alert job...");
@@ -190,7 +191,8 @@ public class StreakReminderScheduler {
             CreateNotificationRequest notificationRequest = CreateNotificationRequest.builder()
                     .userId(user.getId())
                     .title("⚠️ Chuỗi học của bạn đã bị gián đoạn")
-                    .content("Bạn đã bỏ lỡ buổi học hôm qua. Hãy quay lại ôn tập để khởi động lại chuỗi mới ngay hôm nay!")
+                    .content(
+                            "Bạn đã bỏ lỡ buổi học hôm qua. Hãy quay lại ôn tập để khởi động lại chuỗi mới ngay hôm nay!")
                     .type(NotificationConstants.STREAK_BREAK)
                     .build();
 

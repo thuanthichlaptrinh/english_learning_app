@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -20,6 +21,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class StreakService {
+
+    private static final ZoneId VIETNAM_ZONE = ZoneId.of("Asia/Ho_Chi_Minh");
 
     private final UserRepository userRepository;
     private final UserVocabProgressRepository userVocabProgressRepository;
@@ -37,12 +40,12 @@ public class StreakService {
         // Lấy tất cả ngày học từ user_vocab_progress (based on created_at)
         List<UserVocabProgress> progressList = userVocabProgressRepository.findByUserIdWithVocab(user.getId());
 
-        // Extract unique dates from created_at
+        // Extract unique dates from created_at (chuyển sang timezone VN)
         Set<LocalDate> studyDates = progressList.stream()
-                .map(p -> p.getCreatedAt().toLocalDate())
+                .map(p -> p.getCreatedAt().atZone(VIETNAM_ZONE).toLocalDate())
                 .collect(Collectors.toCollection(TreeSet::new)); // TreeSet để sort tự động
 
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(VIETNAM_ZONE);
 
         // Tính toán streak từ study dates
         StreakCalculation calculation = calculateStreakFromDates(studyDates, today);
@@ -102,14 +105,14 @@ public class StreakService {
     public StreakRecordResponse recordActivity(User user) {
         log.info("Recording activity for user: {}", user.getId());
 
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(VIETNAM_ZONE);
 
         // Lấy tất cả ngày học từ user_vocab_progress
         List<UserVocabProgress> progressList = userVocabProgressRepository.findByUserIdWithVocab(user.getId());
 
-        // Extract unique dates
+        // Extract unique dates (chuyển sang timezone VN)
         Set<LocalDate> studyDates = progressList.stream()
-                .map(p -> p.getCreatedAt().toLocalDate())
+                .map(p -> p.getCreatedAt().atZone(VIETNAM_ZONE).toLocalDate())
                 .collect(Collectors.toCollection(TreeSet::new));
 
         // Check xem hôm nay đã có activity chưa
