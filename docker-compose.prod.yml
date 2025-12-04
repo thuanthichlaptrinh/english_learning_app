@@ -11,8 +11,7 @@ services:
             - POSTGRES_USER=${POSTGRES_USER}
             - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
             - POSTGRES_DB=${POSTGRES_DB}
-        ports:
-            - '${POSTGRES_EXTERNAL_PORT}:5432'
+
         volumes:
             - postgres_data:/var/lib/postgresql/data
         networks:
@@ -47,8 +46,7 @@ services:
     redis:
         image: redis:7-alpine
         container_name: card-words-redis
-        ports:
-            - '${REDIS_EXTERNAL_PORT}:6379'
+
         volumes:
             - redis_data:/data
         networks:

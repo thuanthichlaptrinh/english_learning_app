@@ -5,6 +5,7 @@
 ### 1. Setup Environment
 
 **Windows:**
+
 ```bash
 # Copy .env.example to .env
 copy .env.example .env
@@ -14,6 +15,7 @@ notepad .env
 ```
 
 **Linux/Mac:**
+
 ```bash
 cp .env.example .env
 nano .env  # or vim .env
@@ -22,7 +24,7 @@ nano .env  # or vim .env
 ### 2. Update GEMINI_API_KEY in .env
 
 ```env
-GEMINI_API_KEY=AIzaSyARBiuwzsy915sWLW4d0JYSLVeHiOR9PL4
+GEMINI_API_KEY=
 ```
 
 ### 3. Build & Run with Docker Compose
@@ -40,10 +42,10 @@ docker-compose logs -f app
 
 ### 4. Verify Services
 
-- **Application**: http://localhost:8080
-- **Swagger UI**: http://localhost:8080/swagger-ui.html
-- **PgAdmin**: http://localhost:5050
-- **Redis Insight**: http://localhost:5540
+-   **Application**: http://localhost:8080
+-   **Swagger UI**: http://localhost:8080/swagger-ui.html
+-   **PgAdmin**: http://localhost:5050
+-   **Redis Insight**: http://localhost:5540
 
 ### 5. Test Chatbot API
 
@@ -132,6 +134,7 @@ docker-compose down --rmi all
 ### Error: "Cannot connect to Gemini API"
 
 Check:
+
 1. GEMINI_API_KEY is set correctly in `.env`
 2. Container has internet access
 3. API key is valid: https://makersuite.google.com/app/apikey
@@ -147,8 +150,8 @@ Change ports in `docker-compose.yml`:
 
 ```yaml
 app:
-  ports:
-    - '8081:8080'  # Use 8081 instead of 8080
+    ports:
+        - '8081:8080' # Use 8081 instead of 8080
 ```
 
 ### Error: "Database migration failed"
@@ -210,14 +213,14 @@ Add to `docker-compose.yml`:
 
 ```yaml
 app:
-  deploy:
-    resources:
-      limits:
-        cpus: '2'
-        memory: 2G
-      reservations:
-        cpus: '1'
-        memory: 1G
+    deploy:
+        resources:
+            limits:
+                cpus: '2'
+                memory: 2G
+            reservations:
+                cpus: '1'
+                memory: 1G
 ```
 
 ## Architecture

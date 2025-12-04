@@ -1068,7 +1068,7 @@
             "id": 153,
             "category": "setting",
             "question": "Làm sao thay đổi cài đặt game?",
-            "answer": "Tùy chỉnh game theo sở thích:\n\n**Cách truy cập:**\n1. Vào Settings (Cài đặt)\n2. Chọn 'Game Settings'\n3. Tùy chỉnh từng game\n\n**Quick Quiz:**\n- Số câu hỏi: 5-30 câu\n- Thời gian/câu: 5-30 giây\n- Có/không countdown\n- Âm thanh: On/Off\n\n**Image Word Matching:**\n- Số cặp: 4-12 cặp\n- Có/không timer\n- Hiệu ứng animation\n\n**Word Definition Matching:**\n- Số cặp: 4-12 cặp\n- Độ khó: Easy/Medium/Hard\n- Có/không gợi ý\n\n**Chung:**\n- Sound effects: On/Off\n- Vibration: On/Off\n- Show correct answer: Always/Never\n- Difficulty: Auto/Manual\n\n**Reset:**\nNút 'Reset to Default' để về mặc định\n\nCài đặt phù hợp = Học hiệu quả hơn!",
+            "answer": "Tùy chỉnh game theo sở thích:\n\n**Cách truy cập:**\n1. Vào Profile (Thông tin cá nhân)\n2. Chọn 'Game Settings'\n3. Tùy chỉnh từng game\n\n**Quick Quiz:**\n- Số câu hỏi: 5-30 câu\n- Thời gian/câu: 5-30 giây\n- Có/không countdown\n- Âm thanh: On/Off\n\n**Image Word Matching:**\n- Số cặp: 4-12 cặp\n- Có/không timer\n- Hiệu ứng animation\n\n**Word Definition Matching:**\n- Số cặp: 4-12 cặp\n- Độ khó: Easy/Medium/Hard\n- Có/không gợi ý\n\n**Chung:**\n- Sound effects: On/Off\n- Vibration: On/Off\n- Show correct answer: Always/Never\n- Difficulty: Auto/Manual\n\n**Reset:**\nNút 'Reset to Default' để về mặc định\n\nCài đặt phù hợp = Học hiệu quả hơn!",
             "keywords": ["cài đặt game", "game settings", "tùy chỉnh", "setting", "cấu hình"]
         },
         {
@@ -1119,6 +1119,174 @@
             "question": "Admin có thể làm gì?",
             "answer": "Dành cho quản trị viên hệ thống:\n\n**Quản lý người dùng:**\n- Xem danh sách users\n- Khóa/Mở khóa tài khoản\n- Reset mật khẩu\n- Xem thống kê hoạt động\n\n**Quản lý nội dung:**\n- Thêm/Sửa/Xóa từ vựng\n- Thêm/Sửa/Xóa topics\n- Upload hình ảnh, audio\n- Quản lý types (loại từ)\n\n**Quản lý game:**\n- Cấu hình quiz\n- Thêm câu hỏi mới\n- Xem thống kê game\n\n**Báo cáo & Analytics:**\n- Dashboard tổng quan\n- Người dùng hoạt động\n- Từ vựng phổ biến\n- Top streak users\n\n**Hệ thống:**\n- Xem logs hoạt động\n- Backup database\n- Cấu hình thông báo\n- Quản lý FAQ chatbot\n\n**Truy cập:**\nAdmin Dashboard tại `/admin`\nYêu cầu role ADMIN\n\nAdmin = Quản lý toàn bộ hệ thống!",
             "keywords": ["admin", "quản trị", "administrator", "quản lý"]
+        },
+        {
+            "id": 161,
+            "category": "game",
+            "question": "Cách tính điểm Quick Quiz như thế nào?",
+            "answer": "Điểm Quick Quiz được tính dựa trên 3 yếu tố:\n1. **Điểm cơ bản:** 10 điểm cho mỗi câu trả lời đúng.\n2. **Streak Bonus:** Cộng thêm điểm khi trả lời đúng liên tiếp (5 * streak / 3).\n3. **Speed Bonus:** Cộng thêm 5 điểm nếu trả lời cực nhanh (dưới 1.5 giây).\n\nTrả lời sai hoặc bỏ qua sẽ không có điểm và reset streak.",
+            "keywords": ["tính điểm", "quick quiz", "score", "bonus", "cách tính"]
+        },
+        {
+            "id": 162,
+            "category": "game",
+            "question": "Game Image Word Matching chơi như thế nào?",
+            "answer": "Cách chơi Image Word Matching:\n1. Bạn sẽ thấy các hình ảnh và các từ vựng tương ứng.\n2. Nhiệm vụ là chọn một hình ảnh và ghép với từ vựng đúng của nó.\n3. Cố gắng hoàn thành càng nhanh càng tốt để nhận Time Bonus.\n4. Tránh ghép sai vì sẽ bị trừ điểm (Wrong Penalty).",
+            "keywords": ["image word matching", "cách chơi", "ghép hình", "luật chơi"]
+        },
+        {
+            "id": 163,
+            "category": "game",
+            "question": "Cách tính điểm Image Word Matching và Word Definition Matching?",
+            "answer": "Cả hai game này có cách tính điểm giống nhau:\n\n`Tổng điểm = Điểm CEFR + Time Bonus - Wrong Penalty`\n\n- **Điểm CEFR:** Dựa trên độ khó của từ (A1=1, A2=2... C2=6).\n- **Time Bonus:** Thưởng theo tốc độ hoàn thành (<10s: +50%, <20s: +30%...).\n- **Wrong Penalty:** Phạt điểm khi ghép sai (Số lần sai x 2).\n\nĐiểm tối thiểu là 0.",
+            "keywords": ["tính điểm", "image word matching", "word definition matching", "score", "công thức"]
+        },
+        {
+            "id": 164,
+            "category": "game",
+            "question": "Game Word Definition Matching là gì?",
+            "answer": "Word Definition Matching là trò chơi ghép từ với định nghĩa:\n- Bạn sẽ nhận được 2-5 cặp từ và nghĩa tiếng Việt.\n- Nhiệm vụ là ghép từ tiếng Anh với nghĩa tiếng Việt chính xác.\n- Giúp rèn luyện khả năng nhớ nghĩa của từ vựng.\n- Tính điểm dựa trên độ khó CEFR và tốc độ.",
+            "keywords": ["word definition matching", "ghép từ", "định nghĩa", "là gì"]
+        },
+        {
+            "id": 165,
+            "category": "game",
+            "question": "Làm sao để đạt điểm cao trong Quick Quiz?",
+            "answer": "Bí quyết đạt điểm cao Quick Quiz:\n1. **Trả lời đúng liên tục:** Để tận dụng Streak Bonus.\n2. **Phản xạ nhanh:** Trả lời dưới 1.5 giây để nhận Speed Bonus (+5 điểm/câu).\n3. **Ôn tập trước:** Học kỹ từ vựng trong topic trước khi chơi.\n4. **Giữ bình tĩnh:** Tránh bấm nhầm vì sẽ mất streak ngay lập tức.",
+            "keywords": ["điểm cao", "quick quiz", "mẹo", "tips", "high score"]
+        },
+        {
+            "id": 166,
+            "category": "game",
+            "question": "Có giới hạn số lần chơi game không?",
+            "answer": "Có, để đảm bảo sức khỏe và tránh spam:\n- **Quick Quiz:** Tối đa 10 lần chơi trong mỗi 5 phút.\n- Các game khác cũng có cơ chế rate limit tương tự.\n- Nếu chơi quá nhiều, hãy nghỉ ngơi một chút rồi quay lại nhé!",
+            "keywords": ["giới hạn", "số lần chơi", "limit", "rate limit"]
+        },
+        {
+            "id": 167,
+            "category": "game",
+            "question": "Game có giúp học từ vựng theo Spaced Repetition không?",
+            "answer": "Có! Đặc biệt là Quick Quiz:\n- Khi bạn trả lời đúng/sai, hệ thống sẽ cập nhật tiến độ học của từ đó.\n- Áp dụng thuật toán SM-2 rút gọn để tính toán thời điểm ôn tập tiếp theo.\n- Chơi game vừa giải trí vừa là một cách ôn tập hiệu quả.",
+            "keywords": ["spaced repetition", "sm-2", "ôn tập", "hiệu quả"]
+        },
+        {
+            "id": 168,
+            "category": "game",
+            "question": "Time Bonus trong game ghép từ tính như thế nào?",
+            "answer": "Time Bonus được tính dựa trên % tổng điểm CEFR:\n- Dưới 10s: +50%\n- Dưới 20s: +30%\n- Dưới 30s: +20%\n- Dưới 60s: +10%\n- Trên 60s: 0%\n\nNhanh tay lẹ mắt sẽ được điểm rất cao!",
+            "keywords": ["time bonus", "thưởng thời gian", "ghép từ", "tốc độ"]
+        },
+        {
+            "id": 169,
+            "category": "general",
+            "question": "Có thể học offline không?",
+            "answer": "Có! Ứng dụng hỗ trợ chế độ Offline:\n- Bạn có thể chơi game và học từ vựng khi không có mạng.\n- Dữ liệu sẽ được lưu trên thiết bị của bạn.\n- Khi có kết nối internet trở lại, hệ thống sẽ tự động đồng bộ (sync) kết quả lên server để cập nhật tiến độ.",
+            "keywords": ["offline", "không có mạng", "internet", "sync", "đồng bộ"]
+        },
+        {
+            "id": 170,
+            "category": "general",
+            "question": "Ứng dụng có thông báo không?",
+            "answer": "Có, hệ thống thông báo hoạt động real-time:\n- Nhắc nhở học tập để duy trì streak.\n- Thông báo khi có thành tích mới.\n- Cập nhật từ hệ thống.\nBạn có thể quản lý thông báo trong phần Settings.",
+            "keywords": ["thông báo", "notification", "nhắc nhở", "real-time"]
+        },
+        {
+            "id": 171,
+            "category": "ai",
+            "question": "Hệ thống AI hoạt động như thế nào?",
+            "answer": "Card Words sử dụng AI để cá nhân hóa việc học:\n- **XGBoost & Random Forest:** Dự đoán từ vựng bạn sắp quên để nhắc ôn tập.\n- **Phân tích hành vi:** Dựa trên lịch sử học, thời gian trả lời, và độ chính xác.\n- **Gợi ý thông minh:** Đề xuất từ vựng cần ôn ngay lập tức thay vì theo lịch cố định.",
+            "keywords": ["ai", "trí tuệ nhân tạo", "xgboost", "random forest", "gợi ý"]
+        },
+        {
+            "id": 172,
+            "category": "security",
+            "question": "Dữ liệu của tôi có an toàn không?",
+            "answer": "An toàn tuyệt đối! Chúng tôi áp dụng các biện pháp bảo mật hàng đầu:\n- **Mã hóa mật khẩu:** Sử dụng thuật toán mạnh để bảo vệ password.\n- **JWT Authentication:** Xác thực an toàn cho mọi request.\n- **Bảo mật đường truyền:** HTTPS/SSL cho toàn bộ kết nối.\n- **Dữ liệu riêng tư:** Không chia sẻ thông tin cá nhân với bên thứ ba.",
+            "keywords": ["bảo mật", "an toàn", "security", "mã hóa"]
+        },
+        {
+            "id": 173,
+            "category": "tech",
+            "question": "Ứng dụng được xây dựng bằng công nghệ gì?",
+            "answer": "Card Words được xây dựng trên nền tảng công nghệ hiện đại:\n- **Backend:** Java Spring Boot (Microservices)\n- **AI Service:** Python FastAPI (XGBoost/Random Forest)\n- **Database:** PostgreSQL (Lưu trữ chính) & Redis (Caching hiệu năng cao)\n- **Deployment:** Docker & Kubernetes trên VPS",
+            "keywords": ["công nghệ", "tech stack", "java", "python", "docker"]
+        },
+        {
+            "id": 174,
+            "category": "learning",
+            "question": "Làm sao để reset tiến độ học?",
+            "answer": "Hiện tại hệ thống chưa hỗ trợ reset toàn bộ tiến độ để tránh mất dữ liệu quan trọng. Tuy nhiên, bạn có thể:\n1. Học lại các từ đã thuộc (Mastered) bằng cách chuyển trạng thái về Learning.\n2. Tạo tài khoản mới nếu muốn bắt đầu lại từ đầu.",
+            "keywords": ["reset", "học lại", "xóa tiến độ", "bắt đầu lại"]
+        },
+        {
+            "id": 175,
+            "category": "account",
+            "question": "Tôi quên mật khẩu thì phải làm sao?",
+            "answer": "Đừng lo! Hãy làm theo các bước sau:\n1. Tại màn hình đăng nhập, chọn 'Forgot Password'.\n2. Nhập email đã đăng ký.\n3. Kiểm tra email để nhận link reset mật khẩu.\n4. Đặt lại mật khẩu mới và đăng nhập lại.",
+            "keywords": ["quên mật khẩu", "forgot password", "reset password", "lấy lại mật khẩu"]
+        },
+        {
+            "id": 176,
+            "category": "game",
+            "question": "Tại sao tôi không nhận được điểm khi chơi game?",
+            "answer": "Có thể do một số nguyên nhân:\n- **Chơi quá nhanh:** Hệ thống chặn các câu trả lời dưới 100ms (anti-cheat).\n- **Mất kết nối:** Kiểm tra lại mạng internet.\n- **Rate Limit:** Bạn đã chơi quá nhiều lần trong thời gian ngắn (10 lần/5 phút).\n- **Lỗi đồng bộ:** Nếu chơi offline, hãy kết nối mạng để sync điểm.",
+            "keywords": ["không nhận điểm", "lỗi điểm", "score bug", "tại sao"]
+        },
+        {
+            "id": 177,
+            "category": "general",
+            "question": "Làm sao để liên hệ hỗ trợ?",
+            "answer": "Nếu gặp vấn đề, bạn có thể:\n1. Gửi email đến: cardwordsgame@gmail.com\n2. Chat trực tiếp với Admin qua tính năng Chat Support.\n3. Báo lỗi trong phần Settings -> Report Bug.",
+            "keywords": ["hỗ trợ", "support", "liên hệ", "báo lỗi", "contact"]
+        },
+        {
+            "id": 178,
+            "category": "vocab",
+            "question": "Tôi có thể thêm từ vựng của riêng mình không?",
+            "answer": "Hiện tại tính năng này đang được phát triển! Trong tương lai, bạn sẽ có thể:\n- Tạo bộ từ vựng cá nhân (Custom Deck).\n- Thêm từ mới, hình ảnh và ví dụ riêng.\n- Chia sẻ bộ từ vựng với cộng đồng.",
+            "keywords": ["thêm từ", "từ riêng", "custom deck", "tự tạo"]
+        },
+        {
+            "id": 179,
+            "category": "ai",
+            "question": "Chatbot có thể giúp gì cho tôi?",
+            "answer": "Chatbot là trợ lý ảo thông minh của bạn:\n- Giải đáp thắc mắc về cách sử dụng app.\n- Tra cứu nghĩa từ vựng nhanh chóng.\n- Gợi ý lộ trình học tập phù hợp.\n- Trò chuyện luyện tập tiếng Anh (sắp ra mắt).",
+            "keywords": ["chatbot", "trợ lý", "ai help", "hỏi đáp"]
+        },
+        {
+            "id": 180,
+            "category": "streak",
+            "question": "Làm sao để khôi phục Streak bị mất?",
+            "answer": "Rất tiếc, Streak đã mất sẽ không thể khôi phục thủ công. Tuy nhiên:\n- Bạn có thể sử dụng 'Streak Freeze' (đang phát triển) để bảo vệ chuỗi ngày học.\n- Hãy cố gắng duy trì thói quen học ít nhất 1 từ mỗi ngày nhé!",
+            "keywords": ["khôi phục streak", "mất streak", "streak freeze", "lấy lại streak"]
+        },
+        {
+            "id": 181,
+            "category": "vocab",
+            "question": "Ứng dụng có bao nhiêu từ vựng?",
+            "answer": "Hiện tại Card Words có hơn **3000+ từ vựng** thông dụng, bao gồm các cấp độ từ A1 đến C2. Từ vựng được chia thành nhiều chủ đề đa dạng như Kinh doanh, Công nghệ, Du lịch, Y tế, v.v. để bạn dễ dàng lựa chọn.",
+            "keywords": ["bao nhiêu từ", "số lượng từ", "tổng số từ", "kho từ vựng", "bao nhiêu từ vựng"]
+        },
+        {
+            "id": 182,
+            "category": "game",
+            "question": "Có bao nhiêu trò chơi tất cả?",
+            "answer": "Hiện tại hệ thống có **3 trò chơi** chính giúp bạn ôn tập:\n1. **Quick Quiz:** Trắc nghiệm phản xạ nhanh.\n2. **Image Word Matching:** Ghép hình ảnh với từ vựng.\n3. **Word Definition Matching:** Ghép từ với định nghĩa.\n\nSắp tới sẽ có thêm các game mới như Spelling và Listening!",
+            "keywords": [
+                "bao nhiêu game",
+                "số lượng game",
+                "mấy trò chơi",
+                "tổng số game",
+                "bao trò chơi",
+                "có bao nhiêu trò chơi"
+            ]
+        },
+        {
+            "id": 183,
+            "category": "topic",
+            "question": "Danh sách các chủ đề từ vựng?",
+            "answer": "Card Words có hơn **20 chủ đề** phổ biến:\n- **Đời sống:** Gia đình, Mua sắm, Thể thao, Ẩm thực...\n- **Công việc:** Kinh doanh, Công nghệ, Marketing, Văn phòng...\n- **Học thuật:** Giáo dục, Khoa học, Môi trường...\nBạn có thể xem danh sách đầy đủ tại màn hình Topics.",
+            "keywords": ["danh sách chủ đề", "các topic", "chủ đề nào", "list topic", "bao nhiêu chủ đề"]
         }
     ]
 }
