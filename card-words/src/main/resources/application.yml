@@ -79,6 +79,12 @@ springdoc:
     swagger-ui:
         enabled: true
 
+# Swagger Basic Auth credentials
+swagger:
+    auth:
+        username: ${SWAGGER_USERNAME}
+        password: ${SWAGGER_PASSWORD}
+
 # JWT Configuration
 jwt:
     secret-key: ${JWT_SECRET}

@@ -1,0 +1,14 @@
+# Production Profile Configuration
+# Bảo mật Swagger UI bằng Basic Authentication
+
+springdoc:
+    api-docs:
+        enabled: true
+    swagger-ui:
+        enabled: true
+
+# Swagger Basic Auth credentials
+swagger:
+    auth:
+        username: ${SWAGGER_USERNAME}
+        password: ${SWAGGER_PASSWORD}
