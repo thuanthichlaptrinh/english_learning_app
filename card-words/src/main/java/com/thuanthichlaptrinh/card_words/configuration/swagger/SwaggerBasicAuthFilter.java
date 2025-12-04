@@ -81,6 +81,7 @@ public class SwaggerBasicAuthFilter extends OncePerRequestFilter {
      */
     private boolean isAuthenticated(String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Basic ")) {
+            log.debug("No Basic Auth header found");
             return false;
         }
 
@@ -92,13 +93,27 @@ public class SwaggerBasicAuthFilter extends OncePerRequestFilter {
             // Format: username:password
             String[] values = credentials.split(":", 2);
             if (values.length != 2) {
+                log.debug("Invalid credentials format");
                 return false;
             }
 
             String inputUsername = values[0];
             String inputPassword = values[1];
 
-            return username.equals(inputUsername) && password.equals(inputPassword);
+            // Debug log (chỉ log username, không log password)
+            log.debug("Swagger auth attempt - Input user: '{}', Expected user: '{}', Match: {}",
+                    inputUsername, username, username.equals(inputUsername) && password.equals(inputPassword));
+
+            boolean isValid = username.equals(inputUsername) && password.equals(inputPassword);
+
+            if (isValid) {
+                log.info("Swagger auth successful for user: {}", inputUsername);
+            } else {
+                log.warn("Swagger auth failed - username match: {}, password match: {}",
+                        username.equals(inputUsername), password.equals(inputPassword));
+            }
+
+            return isValid;
         } catch (Exception e) {
             log.error("Error decoding Basic Auth credentials: {}", e.getMessage());
             return false;
