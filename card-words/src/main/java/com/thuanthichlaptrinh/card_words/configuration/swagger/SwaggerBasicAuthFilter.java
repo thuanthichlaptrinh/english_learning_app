@@ -30,20 +30,20 @@ public class SwaggerBasicAuthFilter extends OncePerRequestFilter {
     private String password;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, 
-                                    HttpServletResponse response, 
-                                    FilterChain filterChain) throws ServletException, IOException {
-        
+    protected void doFilterInternal(HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain) throws ServletException, IOException {
+
         String requestURI = request.getRequestURI();
-        
+
         // Chỉ áp dụng cho Swagger endpoints
         if (isSwaggerPath(requestURI)) {
             String authHeader = request.getHeader("Authorization");
-            
+
             if (!isAuthenticated(authHeader)) {
-                log.warn("Unauthorized access attempt to Swagger: {} from IP: {}", 
+                log.warn("Unauthorized access attempt to Swagger: {} from IP: {}",
                         requestURI, request.getRemoteAddr());
-                
+
                 response.setHeader("WWW-Authenticate", "Basic realm=\"Swagger API Documentation\"");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json");
@@ -53,7 +53,7 @@ public class SwaggerBasicAuthFilter extends OncePerRequestFilter {
                 return;
             }
         }
-        
+
         filterChain.doFilter(request, response);
     }
 
@@ -61,10 +61,10 @@ public class SwaggerBasicAuthFilter extends OncePerRequestFilter {
      * Kiểm tra xem request có phải là Swagger path không
      */
     private boolean isSwaggerPath(String uri) {
-        return uri.contains("/swagger-ui") || 
-               uri.contains("/v3/api-docs") || 
-               uri.contains("/swagger-resources") ||
-               uri.contains("/swagger-ui.html");
+        return uri.contains("/swagger-ui") ||
+                uri.contains("/v3/api-docs") ||
+                uri.contains("/swagger-resources") ||
+                uri.contains("/swagger-ui.html");
     }
 
     /**
@@ -79,7 +79,7 @@ public class SwaggerBasicAuthFilter extends OncePerRequestFilter {
             String base64Credentials = authHeader.substring("Basic ".length()).trim();
             byte[] decodedBytes = Base64.getDecoder().decode(base64Credentials);
             String credentials = new String(decodedBytes, StandardCharsets.UTF_8);
-            
+
             // Format: username:password
             String[] values = credentials.split(":", 2);
             if (values.length != 2) {
