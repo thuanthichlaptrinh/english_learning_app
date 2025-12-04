@@ -23,16 +23,25 @@ import java.util.Base64;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class SwaggerBasicAuthFilter extends OncePerRequestFilter {
 
-    @Value("${swagger.auth.username}")
+    @Value("${swagger.auth.enabled:false}")
+    private boolean enabled;
+
+    @Value("${swagger.auth.username:}")
     private String username;
 
-    @Value("${swagger.auth.password}")
+    @Value("${swagger.auth.password:}")
     private String password;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
+
+        // Nếu không bật auth, cho qua luôn
+        if (!enabled) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         String requestURI = request.getRequestURI();
 

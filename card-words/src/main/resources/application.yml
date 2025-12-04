@@ -80,10 +80,11 @@ springdoc:
         enabled: true
 
 # Swagger Basic Auth credentials
+# Local: TẮT bảo mật (dev only) - không cần đăng nhập
+# Production: BẬT trong application-prod.yml, đọc credentials từ .env
 swagger:
     auth:
-        username: ${SWAGGER_USERNAME}
-        password: ${SWAGGER_PASSWORD}
+        enabled: false
 
 # JWT Configuration
 jwt:

@@ -8,7 +8,9 @@ springdoc:
         enabled: true
 
 # Swagger Basic Auth credentials
+# Đọc từ environment variables trong docker-compose.prod.yml
 swagger:
     auth:
+        enabled: true
         username: ${SWAGGER_USERNAME}
         password: ${SWAGGER_PASSWORD}
