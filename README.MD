@@ -1,6 +1,6 @@
 # 🎴 Nền Tảng Card Words
 
-> Nền tảng học từ vựng cấp doanh nghiệp với công nghệ lặp lại ngắt quãng (Spaced Repetition) hỗ trợ bởi AI, thông báo thời gian thực và các tính năng gamification.
+> Nền tảng học từ vựng tiếng Anh thông minh kết hợp Gamification (Phản xạ nhanh, Ghép từ, Flashcard) và công nghệ AI Lặp lại ngắt quãng (Spaced Repetition). Tối ưu hóa hiệu quả ghi nhớ với lộ trình cá nhân hóa và tương tác thời gian thực.
 
 [![Java](https://img.shields.io/badge/Java-17-orange)](https://www.oracle.com/java/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.5-brightgreen)](https://spring.io/projects/spring-boot)
