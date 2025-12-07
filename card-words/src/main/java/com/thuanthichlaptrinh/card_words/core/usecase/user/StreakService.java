@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -42,7 +43,8 @@ public class StreakService {
 
         // Extract unique dates from created_at (chuyển sang timezone VN)
         Set<LocalDate> studyDates = progressList.stream()
-                .map(p -> p.getCreatedAt().atZone(VIETNAM_ZONE).toLocalDate())
+                // created_at được lưu ở UTC -> chuyển đúng sang múi giờ VN để tránh lệch ngày
+                .map(p -> p.getCreatedAt().atZone(ZoneOffset.UTC).withZoneSameInstant(VIETNAM_ZONE).toLocalDate())
                 .collect(Collectors.toCollection(TreeSet::new)); // TreeSet để sort tự động
 
         LocalDate today = LocalDate.now(VIETNAM_ZONE);
@@ -112,7 +114,8 @@ public class StreakService {
 
         // Extract unique dates (chuyển sang timezone VN)
         Set<LocalDate> studyDates = progressList.stream()
-                .map(p -> p.getCreatedAt().atZone(VIETNAM_ZONE).toLocalDate())
+                // created_at được lưu ở UTC -> chuyển đúng sang múi giờ VN để tránh lệch ngày
+                .map(p -> p.getCreatedAt().atZone(ZoneOffset.UTC).withZoneSameInstant(VIETNAM_ZONE).toLocalDate())
                 .collect(Collectors.toCollection(TreeSet::new));
 
         // Check xem hôm nay đã có activity chưa
