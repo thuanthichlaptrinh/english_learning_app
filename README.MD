@@ -6,6 +6,7 @@
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.5-brightgreen)](https://spring.io/projects/spring-boot)
 [![Python](https://img.shields.io/badge/Python-3.11-blue)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-Latest-009688)](https://fastapi.tiangolo.com/)
+[![Gemini](https://img.shields.io/badge/AI-Gemini%202.5-8E44AD)](https://deepmind.google/technologies/gemini/)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED)](https://www.docker.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/Redis-7-DC382D)](https://redis.io/)
@@ -15,17 +16,18 @@
 
 ## 📖 Mục Lục
 
--   [Tổng Quan](#-tổng-quan)
--   [Kiến Trúc](#-kiến-trúc)
--   [Bắt Đầu Nhanh](#-bắt-đầu-nhanh)
--   [Dịch Vụ](#-dịch-vụ)
--   [Tính Năng Chính](#-tính-năng-chính)
--   [Cấu Hình](#️-cấu-hình)
--   [Phát Triển](#-phát-triển)
--   [Cơ Sở Dữ Liệu](#️-cơ-sở-dữ-liệu)
--   [Tài Liệu API](#-tài-liệu-api)
--   [Khắc Phục Sự Cố](#️-khắc-phục-sự-cố)
--   [Đóng Góp](#-đóng-góp)
+-   [1. Giới Thiệu & Tổng Quan](#-tổng-quan)
+-   [2. Kiến Trúc Hệ Thống](#-kiến-trúc)
+-   [3. Cài Đặt & Chạy Thử (Local)](#-bắt-đầu-nhanh)
+-   [4. Các Dịch Vụ (Backend & AI)](#-dịch-vụ)
+-   [5. Tính Năng Nổi Bật](#-tính-năng-chính)
+-   [6. Cấu Hình Môi Trường (.env)](#️-cấu-hình)
+-   [7. Hướng Dẫn Phát Triển (Dev)](#-phát-triển)
+-   [8. Cơ Sở Dữ Liệu & Migration](#️-cơ-sở-dữ-liệu)
+-   [9. Tài Liệu API & WebSocket](#-tài-liệu-api)
+-   [10. Triển Khai lên VPS (Production)](#-deploy-lên-production-vps-ubuntu)
+-   [11. Troubleshooting (Khắc Phục Lỗi)](#️-khắc-phục-sự-cố)
+-   [12. Đóng Góp & Hỗ Trợ](#-đóng-góp)
 
 ---
 
@@ -34,7 +36,7 @@
 **Card Words services** là một hệ thống học từ vựng toàn diện kết hợp:
 
 -   **Spring Boot Backend**: RESTful API với thông báo thời gian thực qua WebSocket.
--   **AI Service**: Dự đoán ôn tập thông minh sử dụng XGBoost/Random Forest.
+-   **AI Service**: Dự đoán ôn tập thông minh sử dụng XGBoost/Random Forest và Chatbot Gemini.
 -   **PostgreSQL**: Cơ sở dữ liệu quan hệ mạnh mẽ với Flyway migrations.
 -   **Redis**: Caching hiệu năng cao và quản lý session.
 -   **Firebase Storage**: Lưu trữ hình ảnh từ vựng và avatar người dùng.
@@ -48,6 +50,7 @@
 ✅ **Thông báo Thời gian thực** - Giao thức WebSocket + STOMP  
 ✅ **Gamification** - Nhiều chế độ chơi với bảng xếp hạng  
 ✅ **Ôn tập Hỗ trợ bởi AI** - Dự đoán Machine Learning  
+✅ **AI Chatbot** - Trợ lý ảo thông minh với Gemini & RAG
 ✅ **Nhắc nhở Tự động** - Email chuỗi hàng ngày qua scheduler  
 ✅ **Admin Dashboard** - Giám sát người dùng và phân tích  
 ✅ **Đồng bộ Offline** - Đồng bộ dữ liệu thân thiện với thiết bị di động
@@ -101,8 +104,9 @@ card-words-services/
 | Thành phần        | Công nghệ    | Phiên bản | Mục đích                       |
 | ----------------- | ------------ | --------- | ------------------------------ |
 | **Backend API**   | Spring Boot  | 3.2.5     | RESTful API & WebSocket server |
-| **Ngôn ngữ**      | Java         | 17        | Ngôn ngữ lập trình chính       |
 | **AI Service**    | FastAPI      | Mới nhất  | ML prediction endpoints        |
+| **LLM Model**     | Gemini 2.5   | Flash     | Chatbot & RAG                  |
+| **ML Engine**     | XGBoost      | 2.0+      | Dự đoán ôn tập thông minh      |
 | **ML Engine**     | XGBoost      | 2.0+      | Dự đoán ôn tập thông minh      |
 | **Database**      | PostgreSQL   | 16        | Lưu trữ dữ liệu chính          |
 | **Cache**         | Redis        | 7         | Session & performance caching  |
@@ -168,10 +172,10 @@ docker-compose ps
 
 ```bash
 # Backend API health
-curl http://103.9.77.220:8080/actuator/health
+curl https://card-words.io.vn/actuator/health
 
 # AI Service health
-curl http://103.9.77.220:8001/health
+curl https://card-words.io.vn/ai/health
 
 # Database connection
 docker-compose exec postgres pg_isready -U postgres
@@ -181,23 +185,24 @@ docker-compose exec postgres pg_isready -U postgres
 
 | Dịch vụ             | URL                                      | Thông tin đăng nhập         |
 | ------------------- | ---------------------------------------- | --------------------------- |
-| **Spring Boot API** | http://103.9.77.220:8080                 | Yêu cầu JWT token           |
-| Swagger UI          | http://103.9.77.220:8080/swagger-ui.html | -                           |
-| API Documentation   | http://103.9.77.220:8080/v3/api-docs     | -                           |
-| Actuator            | http://103.9.77.220:8080/actuator        | -                           |
-| **WebSocket**       | ws://103.9.77.220:8080/ws                | JWT trong handshake         |
-| **AI Service**      | http://103.9.77.220:8001                 | Shared JWT auth             |
-| AI Documentation    | http://103.9.77.220:8001/docs            | -                           |
-| **PostgreSQL**      | 103.9.77.220:5433                        | `postgres` / xem `.env`     |
-| **Redis**           | 103.9.77.220:6379                        | Không mật khẩu              |
-| **PgAdmin**         | http://103.9.77.220:5050                 | admin@cardwords.com / admin |
-| **Redis Insight**   | http://103.9.77.220:5540                 | -                           |
+| **Spring Boot API** | https://card-words.io.vn                 | Yêu cầu JWT token           |
+| Swagger UI          | https://card-words.io.vn/swagger-ui.html | -                           |
+| API Documentation   | https://card-words.io.vn/v3/api-docs     | -                           |
+| Actuator            | https://card-words.io.vn/actuator        | -                           |
+| **WebSocket**       | wss://card-words.io.vn/ws                | JWT trong handshake         |
+| **AI Service**      | https://card-words.io.vn/ai              | Shared JWT auth             |
+| AI Documentation    | https://card-words.io.vn/ai/docs         | -                           |
+| **PostgreSQL**      | card-words.io.vn:5433                    | `postgres` / xem `.env`     |
+| **Redis**           | card-words.io.vn:6379                    | Không mật khẩu              |
+| **PgAdmin**         | http://card-words.io.vn:5050             | admin@cardwords.com / admin |
+| **Redis Insight**   | http://card-words.io.vn:5540             | -                           |
 
 #### Ma Trận URL WebSocket
 
 | Ngữ cảnh                  | URL                           | Ghi chú                                                                                       |
 | ------------------------- | ----------------------------- | --------------------------------------------------------------------------------------------- |
-| Phát triển Local          | `ws://103.9.77.220:8080/ws`   | Mặc định khi chạy Spring Boot qua Maven hoặc Docker port mapping                              |
+| Production (VPS)          | `wss://card-words.io.vn/ws`   | Kết nối an toàn qua Nginx & SSL                                                               |
+| Phát triển Local          | `ws://localhost:8080/ws`      | Mặc định khi chạy Spring Boot qua Maven hoặc Docker port mapping                              |
 | Docker Compose networking | `ws://card-words-api:8080/ws` | Sử dụng tên service này khi container khác (frontend, AI, etc.) cần subscribe trong cùng mạng |
 | Production (HTTPS)        | `wss://<your-domain>/ws`      | Thay thế bằng domain public sau load balancer / reverse proxy; yêu cầu TLS termination        |
 
@@ -208,7 +213,7 @@ docker-compose exec postgres pg_isready -U postgres
 #### 1. Đăng Ký User
 
 ```bash
-curl -X POST http://103.9.77.220:8080/api/v1/auth/register \
+curl -X POST https://card-words.io.vn/api/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "name": "John Doe",
@@ -220,7 +225,7 @@ curl -X POST http://103.9.77.220:8080/api/v1/auth/register \
 #### 2. Đăng Nhập
 
 ```bash
-curl -X POST http://103.9.77.220:8080/api/v1/auth/signin \
+curl -X POST https://card-words.io.vn/api/v1/auth/signin \
   -H "Content-Type: application/json" \
   -d '{
     "email": "john@example.com",
@@ -242,7 +247,7 @@ curl -X POST http://103.9.77.220:8080/api/v1/auth/signin \
 #### 3. Test Endpoint Có Xác Thực
 
 ```bash
-curl -X GET http://103.9.77.220:8080/api/v1/vocabs \
+curl -X GET https://card-words.io.vn/api/v1/vocabs \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
@@ -346,7 +351,7 @@ Mở `test-websocket-events.html` trong trình duyệt:
 -   Đồng bộ Delta (chỉ thay đổi)
 -   Phản hồi tối ưu cho mobile
 
-**API Endpoints:** `http://103.9.77.220:8080/api/v1/`
+**API Endpoints:** `https://card-words.io.vn/api/v1/`
 
 **Tài liệu:**
 
@@ -404,7 +409,7 @@ Mở `test-websocket-events.html` trong trình duyệt:
 -   Chỉ số hiệu suất người dùng
 -   Tính nhất quán của Streak
 
-**API Endpoints:** `http://103.9.77.220:8001/api/`
+**API Endpoints:** `https://card-words.io.vn/ai/`
 
 **Tài liệu:**
 
@@ -573,12 +578,33 @@ User Request → Model Features → XGBoost Prediction → Redis Cache → Respo
 -   **Features**: 15 đặc trưng được kỹ thuật hóa
 
 **Huấn luyện mô hình:**
-- XGBoost: `card-words-ai/train-model.sh` hoặc `train-model.ps1` (Windows)
-- Random Forest: `card-words-ai/train-rf-model.sh` hoặc `train-rf-model.ps1` (Windows)
+
+-   XGBoost: `card-words-ai/train-model.sh` hoặc `train-model.ps1` (Windows)
+-   Random Forest: `card-words-ai/train-rf-model.sh` hoặc `train-rf-model.ps1` (Windows)
 
 ---
 
-### 4. Admin Dashboard
+### 4. AI Chatbot (Gemini Integration)
+
+**Trợ lý ảo thông minh hỗ trợ người dùng học tập.**
+
+#### Tính Năng
+
+-   **Hỏi đáp tự nhiên**: Giải đáp thắc mắc về ngữ pháp, từ vựng.
+-   **Context-Aware**: Hiểu ngữ cảnh bài học hiện tại của người dùng.
+-   **RAG (Retrieval-Augmented Generation)**: Truy xuất dữ liệu từ khóa học để đưa ra câu trả lời chính xác.
+
+#### Công Nghệ
+
+-   **Model**: Gemini 2.5 Flash
+-   **Kỹ thuật**: RAG, Prompt Engineering
+-   **Lưu trữ**: Lịch sử chat được lưu trong PostgreSQL (`chat_messages`)
+
+**Tài liệu:** `docs/chatbox/CHATBOT_SETUP.md`
+
+---
+
+### 5. Admin Dashboard
 
 **Công cụ giám sát và quản lý toàn diện.**
 
@@ -617,7 +643,7 @@ User Request → Model Features → XGBoost Prediction → Redis Cache → Respo
 
 ---
 
-### 5. Hệ Thống Gamification
+### 6. Hệ Thống Gamification
 
 **Nhiều chế độ chơi với tính điểm thông minh và bảng xếp hạng.**
 
@@ -708,7 +734,7 @@ MAIL_PASSWORD=your_gmail_app_password  # KHÔNG PHẢI mật khẩu Gmail của 
 #─────────────────────────────────────
 GOOGLE_OAUTH_CLIENT_ID=your_client_id.apps.googleusercontent.com
 GOOGLE_OAUTH_CLIENT_SECRET=your_client_secret
-GOOGLE_OAUTH_REDIRECT_URI=http://103.9.77.220:8080/api/v1/auth/google/callback
+GOOGLE_OAUTH_REDIRECT_URI=https://card-words.io.vn/api/v1/auth/google/callback
 
 #─────────────────────────────────────
 # Firebase Storage
@@ -747,7 +773,7 @@ mvn clean package -DskipTests
 java -jar target/card-words-0.0.1-SNAPSHOT.jar
 ```
 
-**Truy cập:** http://103.9.77.220:8080
+**Truy cập:** http://localhost:8080
 
 #### 2. AI Service
 
@@ -767,7 +793,7 @@ poetry shell
 poetry run uvicorn app.main:app --reload --port 8001
 ```
 
-**Truy cập:** http://103.9.77.220:8001
+**Truy cập:** http://localhost:8001
 
 #### 3. Thiết Lập Database
 
@@ -874,19 +900,19 @@ poetry run pytest tests/test_predictions.py
 
 #### Lịch Sử Migration
 
-| Phiên bản | Mô tả                                    | Thay đổi                                         |
-| --------- | ---------------------------------------- | ------------------------------------------------ |
-| V1        | Initial schema                           | `users`, `roles`, `topics`, `vocabs`, `games`, etc. |
-| V2        | Remove unique constraint topic_id        | Xóa constraint trên `topic_id`                   |
-| V3        | Force remove all topic unique constraints| Xóa tất cả unique constraints của topics         |
-| V4        | Add img column to topics                 | Thêm cột `img` vào bảng `topics`                 |
-| V5        | Remove game_name from user_game_settings | Xóa cột `game_name` khỏi `user_game_settings`    |
-| V6        | Insert initial games data                | Thêm dữ liệu games ban đầu                       |
-| V7        | Add action_logs table                    | Tạo bảng `action_logs`                           |
-| V8        | Create chat_messages table               | Tạo bảng `chat_messages` cho chatbot             |
-| V9        | Add performance indexes                  | Thêm indexes để tối ưu hiệu năng                 |
-| V10       | Add missing action_logs columns          | Bổ sung các cột còn thiếu cho `action_logs`      |
-| V11       | Change game_session_id to UUID           | Đổi kiểu `game_session_id` sang UUID             |
+| Phiên bản | Mô tả                                     | Thay đổi                                            |
+| --------- | ----------------------------------------- | --------------------------------------------------- |
+| V1        | Initial schema                            | `users`, `roles`, `topics`, `vocabs`, `games`, etc. |
+| V2        | Remove unique constraint topic_id         | Xóa constraint trên `topic_id`                      |
+| V3        | Force remove all topic unique constraints | Xóa tất cả unique constraints của topics            |
+| V4        | Add img column to topics                  | Thêm cột `img` vào bảng `topics`                    |
+| V5        | Remove game_name from user_game_settings  | Xóa cột `game_name` khỏi `user_game_settings`       |
+| V6        | Insert initial games data                 | Thêm dữ liệu games ban đầu                          |
+| V7        | Add action_logs table                     | Tạo bảng `action_logs`                              |
+| V8        | Create chat_messages table                | Tạo bảng `chat_messages` cho chatbot                |
+| V9        | Add performance indexes                   | Thêm indexes để tối ưu hiệu năng                    |
+| V10       | Add missing action_logs columns           | Bổ sung các cột còn thiếu cho `action_logs`         |
+| V11       | Change game_session_id to UUID            | Đổi kiểu `game_session_id` sang UUID                |
 
 #### Tạo Migration Mới
 
@@ -1044,143 +1070,143 @@ Import collection từ: `docs/postman/Card-Words-API.postman_collection.json`
 
 #### 🔐 Authentication (`/api/v1/auth`)
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| `POST` | `/signup` | Đăng ký tài khoản mới |
-| `POST` | `/signin` | Đăng nhập bằng email/password |
-| `POST` | `/signout` | Đăng xuất |
-| `POST` | `/google` | Đăng nhập bằng Google OAuth2 |
-| `POST` | `/refresh-token` | Làm mới access token |
-| `POST` | `/forgot-password` | Yêu cầu đặt lại mật khẩu |
+| Method | Endpoint           | Mô tả                         |
+| ------ | ------------------ | ----------------------------- |
+| `POST` | `/signup`          | Đăng ký tài khoản mới         |
+| `POST` | `/signin`          | Đăng nhập bằng email/password |
+| `POST` | `/signout`         | Đăng xuất                     |
+| `POST` | `/google`          | Đăng nhập bằng Google OAuth2  |
+| `POST` | `/refresh-token`   | Làm mới access token          |
+| `POST` | `/forgot-password` | Yêu cầu đặt lại mật khẩu      |
 
 #### 👤 User (`/api/v1/users`)
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| `GET` | `/` | Lấy thông tin profile |
-| `PUT` | `/` | Cập nhật thông tin profile |
-| `PUT` | `/avatar` | Upload avatar |
-| `POST` | `/change-password` | Đổi mật khẩu |
-| `GET` | `/games/history` | Lịch sử chơi game |
-| `GET` | `/games/stats` | Thống kê game tổng quan |
+| Method | Endpoint           | Mô tả                      |
+| ------ | ------------------ | -------------------------- |
+| `GET`  | `/`                | Lấy thông tin profile      |
+| `PUT`  | `/`                | Cập nhật thông tin profile |
+| `PUT`  | `/avatar`          | Upload avatar              |
+| `POST` | `/change-password` | Đổi mật khẩu               |
+| `GET`  | `/games/history`   | Lịch sử chơi game          |
+| `GET`  | `/games/stats`     | Thống kê game tổng quan    |
 
 #### 🔥 User Streak (`/api/v1/user/streak`)
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| `GET` | `/` | Lấy thông tin streak hiện tại |
-| `POST` | `/record` | Ghi nhận hoạt động học |
+| Method | Endpoint  | Mô tả                         |
+| ------ | --------- | ----------------------------- |
+| `GET`  | `/`       | Lấy thông tin streak hiện tại |
+| `POST` | `/record` | Ghi nhận hoạt động học        |
 
 #### 📚 Vocabulary (`/api/v1/vocabs`)
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| `GET` | `/` | Danh sách từ vựng (phân trang) |
-| `GET` | `/{id}` | Lấy từ vựng theo ID |
-| `GET` | `/word/{word}` | Lấy từ vựng theo từ |
-| `GET` | `/search` | Tìm kiếm từ vựng |
-| `GET` | `/cefr/{cefr}` | Lấy từ vựng theo CEFR level |
-| `GET` | `/{id}/media` | Lấy URL hình ảnh/âm thanh |
-| `GET` | `/word/{word}/media` | Lấy media theo từ |
+| Method | Endpoint             | Mô tả                          |
+| ------ | -------------------- | ------------------------------ |
+| `GET`  | `/`                  | Danh sách từ vựng (phân trang) |
+| `GET`  | `/{id}`              | Lấy từ vựng theo ID            |
+| `GET`  | `/word/{word}`       | Lấy từ vựng theo từ            |
+| `GET`  | `/search`            | Tìm kiếm từ vựng               |
+| `GET`  | `/cefr/{cefr}`       | Lấy từ vựng theo CEFR level    |
+| `GET`  | `/{id}/media`        | Lấy URL hình ảnh/âm thanh      |
+| `GET`  | `/word/{word}/media` | Lấy media theo từ              |
 
 #### 📂 Topics (`/api/v1/topics`)
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| `GET` | `/` | Danh sách chủ đề |
-| `GET` | `/{id}` | Chi tiết chủ đề |
+| Method | Endpoint | Mô tả            |
+| ------ | -------- | ---------------- |
+| `GET`  | `/`      | Danh sách chủ đề |
+| `GET`  | `/{id}`  | Chi tiết chủ đề  |
 
 #### 🔔 Notifications (`/api/v1/notifications`)
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| `GET` | `/` | Danh sách thông báo |
-| `GET` | `/summary` | Tổng quan thông báo |
-| `PUT` | `/{id}/read` | Đánh dấu đã đọc |
-| `PUT` | `/read-all` | Đánh dấu tất cả đã đọc |
-| `DELETE` | `/{id}` | Xóa thông báo |
-| `DELETE` | `/selected` | Xóa nhiều thông báo |
+| Method   | Endpoint     | Mô tả                  |
+| -------- | ------------ | ---------------------- |
+| `GET`    | `/`          | Danh sách thông báo    |
+| `GET`    | `/summary`   | Tổng quan thông báo    |
+| `PUT`    | `/{id}/read` | Đánh dấu đã đọc        |
+| `PUT`    | `/read-all`  | Đánh dấu tất cả đã đọc |
+| `DELETE` | `/{id}`      | Xóa thông báo          |
+| `DELETE` | `/selected`  | Xóa nhiều thông báo    |
 
 #### 🎮 Quick Quiz (`/api/v1/games/quick-quiz`)
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| `POST` | `/start` | Bắt đầu game |
-| `POST` | `/start-auto` | Bắt đầu game tự động |
-| `POST` | `/answer` | Trả lời câu hỏi |
-| `POST` | `/skip` | Bỏ qua câu hỏi |
-| `GET` | `/session/{sessionId}` | Xem kết quả game |
-| `GET` | `/instructions` | Hướng dẫn chơi |
-| `GET` | `/leaderboard` | Bảng xếp hạng |
+| Method | Endpoint               | Mô tả                |
+| ------ | ---------------------- | -------------------- |
+| `POST` | `/start`               | Bắt đầu game         |
+| `POST` | `/start-auto`          | Bắt đầu game tự động |
+| `POST` | `/answer`              | Trả lời câu hỏi      |
+| `POST` | `/skip`                | Bỏ qua câu hỏi       |
+| `GET`  | `/session/{sessionId}` | Xem kết quả game     |
+| `GET`  | `/instructions`        | Hướng dẫn chơi       |
+| `GET`  | `/leaderboard`         | Bảng xếp hạng        |
 
 #### 🖼️ Image-Word Matching (`/api/v1/games/image-word-matching`)
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| `POST` | `/start` | Bắt đầu game |
-| `POST` | `/start-auto` | Bắt đầu game tự động |
-| `POST` | `/answer` | Trả lời câu hỏi |
-| `GET` | `/session/{sessionId}` | Xem kết quả game |
-| `GET` | `/instructions` | Hướng dẫn chơi |
-| `GET` | `/leaderboard` | Bảng xếp hạng |
+| Method | Endpoint               | Mô tả                |
+| ------ | ---------------------- | -------------------- |
+| `POST` | `/start`               | Bắt đầu game         |
+| `POST` | `/start-auto`          | Bắt đầu game tự động |
+| `POST` | `/answer`              | Trả lời câu hỏi      |
+| `GET`  | `/session/{sessionId}` | Xem kết quả game     |
+| `GET`  | `/instructions`        | Hướng dẫn chơi       |
+| `GET`  | `/leaderboard`         | Bảng xếp hạng        |
 
 #### 📖 Word-Definition Matching (`/api/v1/games/word-definition-matching`)
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| `POST` | `/start` | Bắt đầu game |
-| `POST` | `/start-auto` | Bắt đầu game tự động |
-| `POST` | `/answer` | Trả lời câu hỏi |
-| `GET` | `/session/{sessionId}` | Xem kết quả game |
-| `GET` | `/instructions` | Hướng dẫn chơi |
-| `GET` | `/leaderboard` | Bảng xếp hạng |
+| Method | Endpoint               | Mô tả                |
+| ------ | ---------------------- | -------------------- |
+| `POST` | `/start`               | Bắt đầu game         |
+| `POST` | `/start-auto`          | Bắt đầu game tự động |
+| `POST` | `/answer`              | Trả lời câu hỏi      |
+| `GET`  | `/session/{sessionId}` | Xem kết quả game     |
+| `GET`  | `/instructions`        | Hướng dẫn chơi       |
+| `GET`  | `/leaderboard`         | Bảng xếp hạng        |
 
 #### 🏆 Leaderboard (`/api/v1/leaderboard`)
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| `GET` | `/` | Bảng xếp hạng tổng |
-| `GET` | `/game/{gameId}` | Bảng xếp hạng theo game |
+| Method | Endpoint         | Mô tả                   |
+| ------ | ---------------- | ----------------------- |
+| `GET`  | `/`              | Bảng xếp hạng tổng      |
+| `GET`  | `/game/{gameId}` | Bảng xếp hạng theo game |
 
 #### 📊 User Stats (`/api/v1/user-stats`)
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| `GET` | `/` | Thống kê học tập |
+| Method | Endpoint | Mô tả            |
+| ------ | -------- | ---------------- |
+| `GET`  | `/`      | Thống kê học tập |
 
 #### 📝 Flashcard Review (`/api/v1/flashcard-review`)
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| `GET` | `/due` | Lấy từ cần ôn tập |
+| Method | Endpoint  | Mô tả                   |
+| ------ | --------- | ----------------------- |
+| `GET`  | `/due`    | Lấy từ cần ôn tập       |
 | `POST` | `/review` | Ghi nhận kết quả ôn tập |
 
 #### 📈 User Vocab Progress (`/api/v1/user-vocab-progress`)
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| `GET` | `/` | Tiến độ học từ vựng |
-| `GET` | `/topic/{topicId}` | Tiến độ theo chủ đề |
+| Method | Endpoint           | Mô tả               |
+| ------ | ------------------ | ------------------- |
+| `GET`  | `/`                | Tiến độ học từ vựng |
+| `GET`  | `/topic/{topicId}` | Tiến độ theo chủ đề |
 
 #### 🤖 Chatbot (`/api/v1/chatbot`)
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| `POST` | `/chat` | Chat với AI |
+| Method | Endpoint | Mô tả       |
+| ------ | -------- | ----------- |
+| `POST` | `/chat`  | Chat với AI |
 
 #### ⚙️ Game Settings (`/api/v1/game-settings`)
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| `GET` | `/` | Lấy cài đặt game |
-| `PUT` | `/` | Cập nhật cài đặt game |
+| Method | Endpoint | Mô tả                 |
+| ------ | -------- | --------------------- |
+| `GET`  | `/`      | Lấy cài đặt game      |
+| `PUT`  | `/`      | Cập nhật cài đặt game |
 
 #### 📱 Offline Sync (`/api/v1/offline-sync`)
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| `GET` | `/download` | Tải dữ liệu offline |
-| `POST` | `/upload` | Đồng bộ dữ liệu |
+| Method | Endpoint    | Mô tả               |
+| ------ | ----------- | ------------------- |
+| `GET`  | `/download` | Tải dữ liệu offline |
+| `POST` | `/upload`   | Đồng bộ dữ liệu     |
 
 ---
 
@@ -1188,96 +1214,96 @@ Import collection từ: `docs/postman/Card-Words-API.postman_collection.json`
 
 #### 👥 User Admin (`/api/v1/admin/users`)
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| `GET` | `/` | Danh sách người dùng |
-| `GET` | `/{id}` | Chi tiết người dùng |
-| `GET` | `/email/{email}` | Tìm theo email |
-| `GET` | `/search` | Tìm kiếm người dùng |
-| `GET` | `/statistics` | Thống kê người dùng |
-| `GET` | `/registration-chart` | Biểu đồ đăng ký |
-| `GET` | `/system-overview` | Tổng quan hệ thống |
-| `GET` | `/game-stats` | Thống kê game |
-| `PUT` | `/{id}/ban` | Khóa/mở khóa tài khoản |
-| `PUT` | `/{id}/activate` | Kích hoạt tài khoản |
-| `PUT` | `/{id}/roles` | Cập nhật role |
-| `POST` | `/{id}/reset-password` | Reset mật khẩu |
-| `DELETE` | `/{id}` | Xóa người dùng |
+| Method   | Endpoint               | Mô tả                  |
+| -------- | ---------------------- | ---------------------- |
+| `GET`    | `/`                    | Danh sách người dùng   |
+| `GET`    | `/{id}`                | Chi tiết người dùng    |
+| `GET`    | `/email/{email}`       | Tìm theo email         |
+| `GET`    | `/search`              | Tìm kiếm người dùng    |
+| `GET`    | `/statistics`          | Thống kê người dùng    |
+| `GET`    | `/registration-chart`  | Biểu đồ đăng ký        |
+| `GET`    | `/system-overview`     | Tổng quan hệ thống     |
+| `GET`    | `/game-stats`          | Thống kê game          |
+| `PUT`    | `/{id}/ban`            | Khóa/mở khóa tài khoản |
+| `PUT`    | `/{id}/activate`       | Kích hoạt tài khoản    |
+| `PUT`    | `/{id}/roles`          | Cập nhật role          |
+| `POST`   | `/{id}/reset-password` | Reset mật khẩu         |
+| `DELETE` | `/{id}`                | Xóa người dùng         |
 
 #### 📚 Vocab Admin (`/api/v1/admin/vocabs`)
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| `GET` | `/` | Danh sách từ vựng |
-| `GET` | `/{id}` | Chi tiết từ vựng |
-| `GET` | `/word/{word}` | Tìm theo từ |
-| `GET` | `/search` | Tìm kiếm từ vựng |
-| `GET` | `/cefr/{cefr}` | Lọc theo CEFR |
-| `POST` | `/` | Thêm từ vựng |
-| `POST` | `/bulk-import` | Import hàng loạt |
-| `PUT` | `/{id}` | Cập nhật từ vựng |
-| `PUT` | `/word/{word}` | Cập nhật theo từ |
-| `DELETE` | `/{id}` | Xóa từ vựng |
-| `GET` | `/export/excel` | Xuất Excel |
+| Method   | Endpoint        | Mô tả             |
+| -------- | --------------- | ----------------- |
+| `GET`    | `/`             | Danh sách từ vựng |
+| `GET`    | `/{id}`         | Chi tiết từ vựng  |
+| `GET`    | `/word/{word}`  | Tìm theo từ       |
+| `GET`    | `/search`       | Tìm kiếm từ vựng  |
+| `GET`    | `/cefr/{cefr}`  | Lọc theo CEFR     |
+| `POST`   | `/`             | Thêm từ vựng      |
+| `POST`   | `/bulk-import`  | Import hàng loạt  |
+| `PUT`    | `/{id}`         | Cập nhật từ vựng  |
+| `PUT`    | `/word/{word}`  | Cập nhật theo từ  |
+| `DELETE` | `/{id}`         | Xóa từ vựng       |
+| `GET`    | `/export/excel` | Xuất Excel        |
 
 #### 📂 Topic Admin (`/api/v1/admin/topics`)
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| `GET` | `/` | Danh sách chủ đề |
-| `POST` | `/` | Thêm chủ đề |
-| `PUT` | `/{id}` | Cập nhật chủ đề |
-| `DELETE` | `/{id}` | Xóa chủ đề |
+| Method   | Endpoint | Mô tả            |
+| -------- | -------- | ---------------- |
+| `GET`    | `/`      | Danh sách chủ đề |
+| `POST`   | `/`      | Thêm chủ đề      |
+| `PUT`    | `/{id}`  | Cập nhật chủ đề  |
+| `DELETE` | `/{id}`  | Xóa chủ đề       |
 
 #### 🏷️ Type Admin (`/api/v1/admin/types`)
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| `GET` | `/` | Danh sách loại từ |
-| `POST` | `/` | Thêm loại từ |
-| `PUT` | `/{id}` | Cập nhật loại từ |
-| `DELETE` | `/{id}` | Xóa loại từ |
+| Method   | Endpoint | Mô tả             |
+| -------- | -------- | ----------------- |
+| `GET`    | `/`      | Danh sách loại từ |
+| `POST`   | `/`      | Thêm loại từ      |
+| `PUT`    | `/{id}`  | Cập nhật loại từ  |
+| `DELETE` | `/{id}`  | Xóa loại từ       |
 
 #### 🎮 Game Admin (`/api/v1/admin/games`)
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| `GET` | `/` | Danh sách game |
-| `GET` | `/stats` | Thống kê game |
+| Method | Endpoint | Mô tả          |
+| ------ | -------- | -------------- |
+| `GET`  | `/`      | Danh sách game |
+| `GET`  | `/stats` | Thống kê game  |
 
 #### 🔔 Notification Admin (`/api/v1/admin/notifications`)
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| `POST` | `/` | Tạo thông báo |
+| Method | Endpoint     | Mô tả                |
+| ------ | ------------ | -------------------- |
+| `POST` | `/`          | Tạo thông báo        |
 | `POST` | `/broadcast` | Broadcast tới tất cả |
 
 #### 📝 Action Logs (`/api/v1/admin/action-logs`)
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| `GET` | `/` | Danh sách action logs |
-| `GET` | `/statistics` | Thống kê logs |
-| `GET` | `/export` | Export logs |
-| `DELETE` | `/cleanup` | Xóa logs cũ |
+| Method   | Endpoint      | Mô tả                 |
+| -------- | ------------- | --------------------- |
+| `GET`    | `/`           | Danh sách action logs |
+| `GET`    | `/statistics` | Thống kê logs         |
+| `GET`    | `/export`     | Export logs           |
+| `DELETE` | `/cleanup`    | Xóa logs cũ           |
 
 #### 📈 Vocab Progress Admin (`/api/v1/admin/vocab-progress`)
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| `GET` | `/` | Tiến độ học của users |
-| `GET` | `/user/{userId}` | Tiến độ theo user |
+| Method | Endpoint         | Mô tả                 |
+| ------ | ---------------- | --------------------- |
+| `GET`  | `/`              | Tiến độ học của users |
+| `GET`  | `/user/{userId}` | Tiến độ theo user     |
 
 #### 🗄️ Firebase Storage (`/api/v1/admin/storage`)
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| `POST` | `/upload` | Upload file |
-| `DELETE` | `/delete` | Xóa file |
+| Method   | Endpoint  | Mô tả       |
+| -------- | --------- | ----------- |
+| `POST`   | `/upload` | Upload file |
+| `DELETE` | `/delete` | Xóa file    |
 
 ### WebSocket Endpoints
 
-**Kết nối:** `ws://103.9.77.220:8080/ws`
+**Kết nối:** `wss://card-words.io.vn/ws`
 
 **Subscriptions:**
 
@@ -1397,7 +1423,7 @@ curl -i -N -H "Connection: Upgrade" \
   -H "Upgrade: websocket" \
   -H "Sec-WebSocket-Version: 13" \
   -H "Sec-WebSocket-Key: test" \
-  http://103.9.77.220:8080/ws
+  https://card-words.io.vn/ws
 
 # Bật debug logging
 # Thêm vào application.properties:
@@ -1418,7 +1444,7 @@ docker-compose logs card-words-ai
 docker-compose exec card-words-ai ls -la /app/models/
 
 # Test prediction endpoint
-curl http://103.9.77.220:8001/api/predict \
+curl https://card-words.io.vn/ai/predict \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"user_id": "uuid", "vocab_id": "uuid"}'
@@ -1432,10 +1458,10 @@ cd card-words-ai
 
 ```bash
 # Spring Boot actuator
-curl http://103.9.77.220:8080/actuator/health | jq
+curl https://card-words.io.vn/actuator/health | jq
 
 # AI Service health
-curl http://103.9.77.220:8001/health | jq
+curl https://card-words.io.vn/ai/health | jq
 
 # PostgreSQL
 docker-compose exec postgres pg_isready -U postgres
@@ -1451,7 +1477,7 @@ docker-compose ps
 
 ```bash
 # Spring Boot metrics
-curl http://103.9.77.220:8080/actuator/metrics | jq
+curl https://card-words.io.vn/actuator/metrics | jq
 
 # Hiệu năng Database
 docker-compose exec postgres psql -U postgres -d card_words -c '\
@@ -1654,13 +1680,22 @@ docker-compose -f docker-compose.test.yml up --abort-on-container-exit
 
 ---
 
-## 🚀 Deploy lên Production
+## 🚀 Deploy lên Production (VPS Ubuntu)
+
+### Yêu Cầu Tiên Quyết
+
+-   **VPS**: Ubuntu 20.04 LTS hoặc 22.04 LTS.
+-   **Docker**: Đã cài đặt Docker Engine và Docker Compose.
+-   **Domain**: Đã trỏ về IP của VPS (nếu dùng SSL).
 
 ### Deploy lên VPS
 
 Sau khi sửa code và push lên GitHub, deploy lên VPS rất đơn giản:
 
-#### Cách 1: SSH thủ công
+#### Cách 1: Sử dụng Script Tự Động (Khuyên dùng)
+
+Script `deploy-vps.sh` đã được tối ưu cho Ubuntu, tự động xử lý biến môi trường và Docker.
+
 ```bash
 # Push code (trên máy local)
 git push origin main
@@ -1670,10 +1705,12 @@ ssh root@<your-vps-ip>
 
 # Deploy
 cd /opt/card-words-services
-bash deploy-vps.sh
+chmod +x deploy-vps.sh
+./deploy-vps.sh
 ```
 
 #### Cách 2: Sử dụng Docker Compose Production
+
 ```bash
 # Build và deploy với production config
 docker-compose -f docker-compose.prod.yml up -d --build
@@ -1681,18 +1718,18 @@ docker-compose -f docker-compose.prod.yml up -d --build
 
 ### Tài liệu Deploy chi tiết
 
-- **Quick Reference**: `DEPLOY-QUICK-REFERENCE.md` - Các lệnh thường dùng
-- **Full Guide**: `docs/DEPLOY-GUIDE.md` - Hướng dẫn đầy đủ
-- **HTTPS Setup**: `docs/HTTPS-SETUP-GUIDE.md` - Cài đặt SSL/HTTPS
-- **Hướng dẫn tiếng Việt**: `HƯỚNG-DẪN-DEPLOY-NHANH.md`
+-   **Quick Reference**: `DEPLOY-QUICK-REFERENCE.md` - Các lệnh thường dùng
+-   **Full Guide**: `docs/DEPLOY-GUIDE.md` - Hướng dẫn đầy đủ
+-   **HTTPS Setup**: `docs/HTTPS-SETUP-GUIDE.md` - Cài đặt SSL/HTTPS
+-   **Hướng dẫn tiếng Việt**: `HƯỚNG-DẪN-DEPLOY-NHANH.md`
 
 ### Scripts Deploy có sẵn
 
-| Script | Mô tả | Vị trí |
-|--------|-------|--------|
-| `deploy-vps.sh` | Deploy đầy đủ lên VPS | Root |
-| `docker-compose.prod.yml` | Production Docker Compose | Root |
-| `docker-compose.yml` | Development Docker Compose | Root |
+| Script                    | Mô tả                      | Vị trí |
+| ------------------------- | -------------------------- | ------ |
+| `deploy-vps.sh`           | Deploy đầy đủ lên VPS      | Root   |
+| `docker-compose.prod.yml` | Production Docker Compose  | Root   |
+| `docker-compose.yml`      | Development Docker Compose | Root   |
 
 ---
 
@@ -1715,7 +1752,7 @@ Dự án này được cấp phép theo Giấy phép MIT - xem file [LICENSE](LI
 ### Tài Liệu
 
 -   **Tài liệu chính**: `docs/`
--   **Tham khảo API**: http://103.9.77.220:8080/swagger-ui.html
+-   **Tham khảo API**: https://card-words.io.vn/swagger-ui.html
 -   **Hướng dẫn WebSocket**: `docs/WEBSOCKET_EVENTS.md`
 -   **Triển khai**: `docs/docker/`
 
