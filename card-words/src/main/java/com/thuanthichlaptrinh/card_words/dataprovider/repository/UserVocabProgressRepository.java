@@ -258,6 +258,14 @@ public interface UserVocabProgressRepository extends JpaRepository<UserVocabProg
                         @Param("userId") UUID userId,
                         @Param("startDate") LocalDateTime startDate);
 
+        @Query("SELECT uvp.createdAt FROM UserVocabProgress uvp " +
+                        "WHERE uvp.user.id = :userId " +
+                        "AND uvp.createdAt >= :startDate " +
+                        "ORDER BY uvp.createdAt ASC")
+        List<LocalDateTime> findCreatedAtSince(
+                        @Param("userId") UUID userId,
+                        @Param("startDate") LocalDateTime startDate);
+
         // Get vocab count by CEFR level
         @Query("SELECT v.cefr, COUNT(uvp) " +
                         "FROM UserVocabProgress uvp " +

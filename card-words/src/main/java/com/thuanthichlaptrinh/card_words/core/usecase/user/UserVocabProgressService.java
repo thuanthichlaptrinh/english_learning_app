@@ -19,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.TextStyle;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -32,6 +34,8 @@ public class UserVocabProgressService {
     private final UserVocabProgressRepository userVocabProgressRepository;
     private final UserRepository userRepository;
     private final UserVocabProgressMapper userVocabProgressMapper;
+
+    private static final ZoneId VIETNAM_ZONE = ZoneId.of("Asia/Ho_Chi_Minh");
 
     // Get all vocabs learned by user
     @Transactional(readOnly = true)
@@ -113,7 +117,7 @@ public class UserVocabProgressService {
         LocalDate signupDate = user.getCreatedAt().toLocalDate();
         long totalDaysParticipated = Math.max(1, ChronoUnit.DAYS.between(signupDate, LocalDate.now()) + 1);
         double dailyAverage = totalTrackedVocabs == 0 ? 0.0
-            : Math.ceil((double) totalTrackedVocabs / totalDaysParticipated);
+                : Math.ceil((double) totalTrackedVocabs / totalDaysParticipated);
 
         List<UserVocabProgress> dueVocabs = userVocabProgressRepository.findDueForReview(userId, LocalDate.now());
 
@@ -167,20 +171,24 @@ public class UserVocabProgressService {
     public List<DailyVocabStatsResponse> getVocabStatsLast7Days(UUID userId) {
         log.info("Getting vocab stats for last 7 days for user: {}", userId);
 
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(VIETNAM_ZONE);
         LocalDate startDate = today.minusDays(6); // 7 ngày gần nhất bao gồm hôm nay
 
-        LocalDateTime startDateTime = startDate.atStartOfDay();
+        // Quy đổi mốc 00:00 VN về UTC để query dữ liệu đúng múi giờ lưu trữ
+        LocalDateTime startDateTimeUtc = startDate
+                .atStartOfDay(VIETNAM_ZONE)
+                .withZoneSameInstant(ZoneOffset.UTC)
+                .toLocalDateTime();
 
-        // Lấy dữ liệu từ database
-        List<Object[]> rawResults = userVocabProgressRepository.countVocabsLearnedByDateForLast7Days(userId,
-                startDateTime);
+        List<LocalDateTime> createdAtList = userVocabProgressRepository.findCreatedAtSince(userId,
+                startDateTimeUtc);
 
-        // Chuyển thành Map để dễ tra cứu (date -> count)
-        Map<LocalDate, Long> countByDate = rawResults.stream()
-                .collect(Collectors.toMap(
-                        arr -> (LocalDate) arr[0],
-                        arr -> (Long) arr[1]));
+        // Map ngày theo múi giờ VN -> số từ
+        Map<LocalDate, Long> countByDate = createdAtList.stream()
+                .map(dt -> dt.atZone(ZoneOffset.UTC)
+                        .withZoneSameInstant(VIETNAM_ZONE)
+                        .toLocalDate())
+                .collect(Collectors.groupingBy(date -> date, Collectors.counting()));
 
         // Tạo response cho đủ 7 ngày (kể cả ngày không có dữ liệu)
         List<DailyVocabStatsResponse> response = new ArrayList<>();
