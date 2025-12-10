@@ -1264,7 +1264,7 @@
             "id": 181,
             "category": "vocab",
             "question": "Ứng dụng có bao nhiêu từ vựng?",
-            "answer": "Hiện tại Card Words có hơn **3000+ từ vựng** thông dụng, bao gồm các cấp độ từ A1 đến C2. Từ vựng được chia thành nhiều chủ đề đa dạng như Kinh doanh, Công nghệ, Du lịch, Y tế, v.v. để bạn dễ dàng lựa chọn.",
+            "answer": "Hiện tại Card Words có hơn **1000+ từ vựng** thông dụng, bao gồm các cấp độ từ A1 đến C2. Từ vựng được chia thành nhiều chủ đề đa dạng như Kinh doanh, Công nghệ, Du lịch, Y tế, v.v. để bạn dễ dàng lựa chọn.",
             "keywords": ["bao nhiêu từ", "số lượng từ", "tổng số từ", "kho từ vựng", "bao nhiêu từ vựng"]
         },
         {
@@ -1287,6 +1287,41 @@
             "question": "Danh sách các chủ đề từ vựng?",
             "answer": "Card Words có hơn **20 chủ đề** phổ biến:\n- **Đời sống:** Gia đình, Mua sắm, Thể thao, Ẩm thực...\n- **Công việc:** Kinh doanh, Công nghệ, Marketing, Văn phòng...\n- **Học thuật:** Giáo dục, Khoa học, Môi trường...\nBạn có thể xem danh sách đầy đủ tại màn hình Topics.",
             "keywords": ["danh sách chủ đề", "các topic", "chủ đề nào", "list topic", "bao nhiêu chủ đề"]
+        },
+        {
+            "id": 184,
+            "category": "account",
+            "question": "Làm sao để xóa tài khoản?",
+            "answer": "Nếu bạn muốn xóa tài khoản vĩnh viễn:\n1. Vào Settings -> Account.\n2. Chọn 'Delete Account' ở dưới cùng.\n3. Nhập mật khẩu để xác nhận.\n\n**Lưu ý:** Hành động này không thể hoàn tác. Tất cả dữ liệu học tập, streak, và thành tích của bạn sẽ bị xóa vĩnh viễn.",
+            "keywords": ["xóa tài khoản", "delete account", "hủy tài khoản", "xóa nick"]
+        },
+        {
+            "id": 185,
+            "category": "content",
+            "question": "Làm sao báo cáo từ vựng sai?",
+            "answer": "Chúng tôi rất trân trọng đóng góp của bạn! Để báo lỗi:\n1. Trong màn hình chi tiết từ vựng hoặc Flashcard.\n2. Nhấn vào biểu tượng 🚩 (Report) ở góc trên.\n3. Chọn loại lỗi (Sai nghĩa, Sai chính tả, Audio lỗi...).\n4. Nhập mô tả chi tiết (nếu cần) và gửi.\nAdmin sẽ kiểm tra và sửa trong vòng 24h.",
+            "keywords": ["báo lỗi", "report", "từ sai", "lỗi từ vựng", "góp ý"]
+        },
+        {
+            "id": 186,
+            "category": "setting",
+            "question": "Ứng dụng có Dark Mode không?",
+            "answer": "Có! Card Words hỗ trợ Dark Mode để bảo vệ mắt:\n1. Vào Settings -> Appearance (Giao diện).\n2. Chọn chế độ: Light, Dark hoặc System (theo cài đặt máy).\nDark Mode giúp tiết kiệm pin và giảm mỏi mắt khi học vào ban đêm.",
+            "keywords": ["dark mode", "chế độ tối", "giao diện đen", "ban đêm", "theme"]
+        },
+        {
+            "id": 187,
+            "category": "troubleshoot",
+            "question": "Tại sao không nghe được phát âm?",
+            "answer": "Nếu bạn không nghe được âm thanh:\n1. Kiểm tra volume điện thoại (đừng để chế độ Im lặng/Silent).\n2. Đảm bảo kết nối mạng ổn định (để tải file audio).\n3. Vào Settings -> Sound -> Bật 'Auto-play Audio'.\n4. Nếu vẫn lỗi, hãy thử khởi động lại ứng dụng.",
+            "keywords": ["không nghe được", "lỗi âm thanh", "audio lỗi", "phát âm", "sound"]
+        },
+        {
+            "id": 188,
+            "category": "learning",
+            "question": "Học bao nhiêu từ một ngày là đủ?",
+            "answer": "Không có con số cố định, nhưng theo các chuyên gia:\n- **Người mới bắt đầu:** 5-10 từ/ngày.\n- **Trung bình:** 10-20 từ/ngày.\n- **Nâng cao:** 20-30 từ/ngày.\n\nQuan trọng hơn số lượng là sự **đều đặn**. Học 10 từ mỗi ngày trong 1 tháng (300 từ) hiệu quả hơn học 100 từ trong 1 ngày rồi nghỉ cả tuần.",
+            "keywords": ["bao nhiêu từ", "số lượng từ", "mục tiêu ngày", "daily goal"]
         }
     ]
 }

@@ -38,29 +38,29 @@ public class QuickQuizService {
     private final NotificationService notificationService;
     private final CEFRUpgradeService cefrUpgradeService;
 
-    // Redis services for distributed caching
+    // Các dịch vụ Redis cho bộ nhớ đệm phân tán
     private final GameSessionCacheService gameSessionCacheService;
     private final RateLimitingService rateLimitingService;
 
     private static final String GAME_NAME = "Quick Reflex Quiz";
     private static final int BASE_POINTS = 10;
     private static final int STREAK_BONUS = 5;
-    private static final int SPEED_BONUS_THRESHOLD = 1500; // 1.5 seconds
-    private static final int MIN_ANSWER_TIME = 100; // Minimum 100ms - chống gian lận
-    private static final int MAX_GAMES_PER_5_MIN = 10; // Rate limit
-    private static final int TIME_TOLERANCE_MS = 3000; // Cho phép chênh lệch 3000ms (3 giây) để tránh network latency
+    private static final int SPEED_BONUS_THRESHOLD = 1500; // 1.5 giây
+    private static final int MIN_ANSWER_TIME = 100; // Tối thiểu 100ms - chống gian lận
+    private static final int MAX_GAMES_PER_5_MIN = 10; // Giới hạn tốc độ
+    private static final int TIME_TOLERANCE_MS = 3000; // Cho phép chênh lệch 3000ms (3 giây) để tránh độ trễ mạng
 
     private List<Vocab> getRandomVocabs(QuickQuizStartRequest request) {
         List<Vocab> vocabs;
 
         String cefr = request.getCefr();
 
-        // Apply filters based on request
+        // Áp dụng bộ lọc dựa trên yêu cầu
         if (cefr != null && !cefr.trim().isEmpty()) {
-            // Only CEFR filter
+            // Chỉ lọc theo CEFR
             vocabs = vocabRepository.findByCefr(cefr.trim().toUpperCase());
         } else {
-            // No filter - get all vocabs (random topic)
+            // Không có bộ lọc - lấy tất cả từ vựng (chủ đề ngẫu nhiên)
             vocabs = vocabRepository.findAll();
         }
 
@@ -73,10 +73,10 @@ public class QuickQuizService {
                     "Không tìm thấy từ vựng" + (filterInfo.isEmpty() ? "" : " với bộ lọc:" + filterInfo));
         }
 
-        // Shuffle for randomness
+        // Trộn ngẫu nhiên
         Collections.shuffle(vocabs);
 
-        // Need totalQuestions * 4 vocabs (1 for question + 3 for wrong options)
+        // Cần totalQuestions * 4 từ vựng (1 cho câu hỏi + 3 cho các lựa chọn sai)
         return vocabs.stream()
                 .limit(request.getTotalQuestions() * 4)
                 .collect(Collectors.toList());
@@ -86,67 +86,67 @@ public class QuickQuizService {
     public QuickQuizSessionResponse startGame(QuickQuizStartRequest request, UUID userId) {
         log.info("Starting Quick Quiz game for user: {}, totalQuestions: {}", userId, request.getTotalQuestions());
 
-        // ⭐ Validate request parameters
+        // ⭐ Xác thực tham số yêu cầu
         validateQuickQuizRequest(request);
 
-        // 1. Check rate limit
+        // 1. Kiểm tra giới hạn tốc độ
         checkRateLimit(userId);
-        // 2. Load game entity
+        // 2. Tải thực thể game
         Game game = loadQuickQuizGame();
-        // 3. Get and validate vocabularies
+        // 3. Lấy và xác thực từ vựng
         List<Vocab> vocabs = getAndValidateVocabs(request);
-        // 4. Create game session
+        // 4. Tạo phiên game
         GameSession session = createGameSession(userId, game, request.getTotalQuestions());
-        // 5. Generate and cache all questions
+        // 5. Tạo và lưu cache tất cả câu hỏi
         List<QuestionData> allQuestions = generateAllQuestions(vocabs, request.getTotalQuestions());
-        // 6. Initialize session caches
+        // 6. Khởi tạo cache phiên
         initializeSessionCaches(session.getId(), allQuestions, request.getTimePerQuestion());
-        // 7. Build first question
+        // 7. Xây dựng câu hỏi đầu tiên
         QuickQuizQuestionResponse firstQuestion = buildFirstQuestion(allQuestions.get(0), request.getTimePerQuestion());
-        // 8. Build and return session response
+        // 8. Xây dựng và trả về phản hồi phiên
         return buildSessionResponse(session, request.getTimePerQuestion(), firstQuestion);
     }
 
-    // Submit an answer and get next question or final results
+    // Gửi câu trả lời và lấy câu hỏi tiếp theo hoặc kết quả cuối cùng
     @Transactional
     public QuickQuizAnswerResponse submitAnswer(QuickQuizAnswerRequest request, UUID userId) {
         log.info("Submitting answer for session: {}, question: {}", request.getSessionId(),
                 request.getQuestionNumber());
 
-        // 1. Validate and load session
+        // 1. Xác thực và tải phiên
         GameSession session = validateAndLoadSession(request.getSessionId(), userId);
 
-        // 2. Get cached questions and validate
+        // 2. Lấy câu hỏi đã cache và xác thực
         List<QuestionData> cachedQuestions = getCachedQuestions(request.getSessionId());
         validateQuestionNumber(request.getQuestionNumber(), cachedQuestions.size());
 
-        // 3. Check duplicate answer
+        // 3. Kiểm tra câu trả lời trùng lặp
         checkDuplicateAnswer(session, cachedQuestions, request.getQuestionNumber());
 
-        // 4. Get current question data
+        // 4. Lấy dữ liệu câu hỏi hiện tại
         QuestionData currentQuestionData = cachedQuestions.get(request.getQuestionNumber() - 1);
 
-        // 5. Validate answer request
+        // 5. Xác thực yêu cầu trả lời
         validateAnswerRequest(request, currentQuestionData);
 
-        // 6. Process answer and calculate score
+        // 6. Xử lý câu trả lời và tính điểm
         AnswerResult answerResult = processAnswer(request, session, currentQuestionData);
 
-        // 7. Update spaced repetition progress
+        // 7. Cập nhật tiến độ lặp lại ngắt quãng
         updateVocabProgress(userId, currentQuestionData.getMainVocab().getId(), answerResult.isCorrect());
 
-        // 8. Prepare next question or finish game
+        // 8. Chuẩn bị câu hỏi tiếp theo hoặc kết thúc game
         QuickQuizQuestionResponse nextQuestion = prepareNextQuestionOrFinish(
                 request, session, cachedQuestions, answerResult.getDetails());
 
-        // 9. Save session
+        // 9. Lưu phiên
         gameSessionRepository.save(session);
 
-        // 10. Build and return response
+        // 10. Xây dựng và trả về phản hồi
         return buildAnswerResponse(request, session, currentQuestionData, answerResult, nextQuestion);
     }
 
-    // Skip question (timeout or user chooses to skip)
+    // Bỏ qua câu hỏi (hết giờ hoặc người dùng chọn bỏ qua)
     @Transactional
     public QuickQuizAnswerResponse skipQuestion(QuickQuizAnswerRequest request, UUID userId) {
         log.info("Skipping question for session: {}, question: {}", request.getSessionId(),
@@ -165,20 +165,20 @@ public class QuickQuizService {
         // 4. Get current question data
         QuestionData currentQuestionData = cachedQuestions.get(request.getQuestionNumber() - 1);
 
-        // 5. Process as wrong answer (timeout/skip = wrong)
+        // 5. Xử lý như câu trả lời sai (hết giờ/bỏ qua = sai)
         AnswerResult answerResult = processSkippedAnswer(session, currentQuestionData, request.getTimeTaken());
 
-        // 6. Update spaced repetition progress (mark as wrong)
+        // 6. Cập nhật tiến độ lặp lại ngắt quãng (đánh dấu là sai)
         updateVocabProgress(userId, currentQuestionData.getMainVocab().getId(), false);
 
-        // 7. Prepare next question or finish game
+        // 7. Chuẩn bị câu hỏi tiếp theo hoặc kết thúc game
         QuickQuizQuestionResponse nextQuestion = prepareNextQuestionOrFinish(
                 request, session, cachedQuestions, answerResult.getDetails());
 
-        // 8. Save session
+        // 8. Lưu phiên
         gameSessionRepository.save(session);
 
-        // 9. Build and return response for skipped question
+        // 9. Xây dựng và trả về phản hồi cho câu hỏi bị bỏ qua
         return QuickQuizAnswerResponse.builder()
                 .sessionId(session.getId())
                 .questionNumber(request.getQuestionNumber())
@@ -208,7 +208,7 @@ public class QuickQuizService {
 
         List<GameSessionDetail> details = new ArrayList<>(session.getDetails());
 
-        // Build results
+        // Xây dựng kết quả
         List<QuickQuizResultDetail> results = new ArrayList<>();
         for (int i = 0; i < details.size(); i++) {
             GameSessionDetail detail = details.get(i);
@@ -249,11 +249,11 @@ public class QuickQuizService {
                 .build();
     }
 
-    // ==================== PRIVATE HELPER METHODS ====================
+    // ==================== CÁC PHƯƠNG THỨC HỖ TRỢ RIÊNG TƯ ====================
 
-    // ===== Helper methods for startGame() =====
+    // ===== Các phương thức hỗ trợ cho startGame() =====
 
-    // Validate QuickQuiz request parameters
+    // Xác thực tham số yêu cầu QuickQuiz
     private void validateQuickQuizRequest(QuickQuizStartRequest request) {
         Integer totalQuestions = request.getTotalQuestions();
         Integer timePerQuestion = request.getTimePerQuestion();
@@ -267,14 +267,14 @@ public class QuickQuizService {
         }
     }
 
-    // 1. Load Quick Quiz game entity
+    // 1. Tải thực thể game Quick Quiz
     private Game loadQuickQuizGame() {
         return gameRepository.findByName(GAME_NAME)
                 .orElseThrow(() -> new ErrorException(
                         "Không tìm thấy game 'Quick Reflex Quiz'. Vui lòng khởi tạo dữ liệu game."));
     }
 
-    // 2. Get and validate vocabularies
+    // 2. Lấy và xác thực từ vựng
     private List<Vocab> getAndValidateVocabs(QuickQuizStartRequest request) {
         List<Vocab> vocabs = getRandomVocabs(request);
         int requiredCount = request.getTotalQuestions() * 4;
@@ -287,7 +287,7 @@ public class QuickQuizService {
         return vocabs;
     }
 
-    // 3. Create game session
+    // 3. Tạo phiên game
     private GameSession createGameSession(UUID userId, Game game, int totalQuestions) {
         User user = new User();
         user.setId(userId);
@@ -308,7 +308,7 @@ public class QuickQuizService {
         return session;
     }
 
-    // 4. Generate all questions for the game
+    // 4. Tạo tất cả câu hỏi cho game
     private List<QuestionData> generateAllQuestions(List<Vocab> vocabs, int totalQuestions) {
         List<QuestionData> allQuestions = new ArrayList<>();
 
@@ -320,49 +320,50 @@ public class QuickQuizService {
         return allQuestions;
     }
 
-    // 5. Generate single question with 4 options
+    // 5. Tạo một câu hỏi với 4 lựa chọn
     private QuestionData generateSingleQuestion(List<Vocab> vocabs, int questionIndex) {
-        Vocab correctVocab = vocabs.get(questionIndex * 4); // Main vocab
-        Vocab wrongVocab1 = vocabs.get(questionIndex * 4 + 1); // Wrong option 1
-        Vocab wrongVocab2 = vocabs.get(questionIndex * 4 + 2); // Wrong option 2
-        Vocab wrongVocab3 = vocabs.get(questionIndex * 4 + 3); // Wrong option 3
+        Vocab correctVocab = vocabs.get(questionIndex * 4); // Từ vựng chính
+        Vocab wrongVocab1 = vocabs.get(questionIndex * 4 + 1); // Lựa chọn sai 1
+        Vocab wrongVocab2 = vocabs.get(questionIndex * 4 + 2); // Lựa chọn sai 2
+        Vocab wrongVocab3 = vocabs.get(questionIndex * 4 + 3); // Lựa chọn sai 3
 
         List<Vocab> optionVocabs = new ArrayList<>();
-        optionVocabs.add(correctVocab); // Correct answer
-        optionVocabs.add(wrongVocab1); // Wrong answer 1
-        optionVocabs.add(wrongVocab2); // Wrong answer 2
-        optionVocabs.add(wrongVocab3); // Wrong answer 3
+        optionVocabs.add(correctVocab); // Đáp án đúng
+        optionVocabs.add(wrongVocab1); // Đáp án sai 1
+        optionVocabs.add(wrongVocab2); // Đáp án sai 2
+        optionVocabs.add(wrongVocab3); // Đáp án sai 3
 
-        // Shuffle options to randomize position
+        // Trộn các lựa chọn để ngẫu nhiên hóa vị trí
         Collections.shuffle(optionVocabs);
 
-        // Find correct answer index after shuffle
+        // Tìm chỉ số đáp án đúng sau khi trộn
         int correctIndex = optionVocabs.indexOf(correctVocab);
 
         return new QuestionData(correctVocab, optionVocabs, correctIndex);
     }
 
-    // 6. Initialize session caches (questions, time limits, timestamps)
+    // 6. Khởi tạo cache phiên (câu hỏi, giới hạn thời gian, dấu thời gian)
     private void initializeSessionCaches(UUID sessionId, List<QuestionData> allQuestions, int timePerQuestion) {
         log.info("🚀 Initializing caches for session {}: {} questions, {} sec per question",
                 sessionId, allQuestions.size(), timePerQuestion);
 
-        // Cache questions for this session in Redis (30 min TTL)
+        // Cache câu hỏi cho phiên này trong Redis (TTL 30 phút)
         log.info("📝 Step 1: Caching questions...");
         gameSessionCacheService.cacheQuizQuestions(sessionId, allQuestions);
 
-        // Cache time limit for this session in Redis (convert seconds to milliseconds)
+        // Cache giới hạn thời gian cho phiên này trong Redis (chuyển đổi giây sang mili
+        // giây)
         log.info("⏱️ Step 2: Caching time limit...");
         gameSessionCacheService.cacheSessionTimeLimit(sessionId, timePerQuestion * 1000);
 
-        // Record start time for question 1
+        // Ghi lại thời gian bắt đầu cho câu hỏi 1
         log.info("🕐 Step 3: Caching question start time...");
         gameSessionCacheService.cacheQuestionStartTime(sessionId, 1, LocalDateTime.now());
 
         log.info("✅ All caches initialized for session {}", sessionId);
     }
 
-    // 7. Build first question response
+    // 7. Xây dựng phản hồi câu hỏi đầu tiên
     private QuickQuizQuestionResponse buildFirstQuestion(QuestionData firstQuestionData, int timePerQuestion) {
         QuickQuizQuestionResponse firstQuestion = buildQuestionResponse(
                 firstQuestionData,
@@ -371,7 +372,7 @@ public class QuickQuizService {
         return firstQuestion;
     }
 
-    // 8. Build session response
+    // 8. Xây dựng phản hồi phiên
     private QuickQuizSessionResponse buildSessionResponse(
             GameSession session,
             int timePerQuestion,
@@ -396,9 +397,9 @@ public class QuickQuizService {
                 .build();
     }
 
-    // ===== Helper methods for submitAnswer() =====
+    // ===== Các phương thức hỗ trợ cho submitAnswer() =====
 
-    // Inner class to hold answer processing result
+    // Lớp nội bộ để chứa kết quả xử lý câu trả lời
     @lombok.Data
     @lombok.AllArgsConstructor
     private static class AnswerResult {
@@ -408,7 +409,7 @@ public class QuickQuizService {
         private List<GameSessionDetail> details;
     }
 
-    // 1. Validate and load session
+    // 1. Xác thực và tải phiên
     private GameSession validateAndLoadSession(UUID sessionId, UUID userId) {
         GameSession session = gameSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new ErrorException("Không tìm thấy session game"));
@@ -424,7 +425,7 @@ public class QuickQuizService {
         return session;
     }
 
-    // 2. Get cached questions from Redis
+    // 2. Lấy câu hỏi đã cache từ Redis
     private List<QuestionData> getCachedQuestions(UUID sessionId) {
         List<QuestionData> cachedQuestions = gameSessionCacheService.getQuizQuestions(sessionId);
         if (cachedQuestions == null || cachedQuestions.isEmpty()) {
@@ -433,14 +434,14 @@ public class QuickQuizService {
         return cachedQuestions;
     }
 
-    // 3. Validate question number
+    // 3. Xác thực số câu hỏi
     private void validateQuestionNumber(int questionNumber, int totalQuestions) {
         if (questionNumber > totalQuestions) {
             throw new ErrorException("Số câu hỏi không hợp lệ");
         }
     }
 
-    // 4. Check duplicate answer
+    // 4. Kiểm tra câu trả lời trùng lặp
     private void checkDuplicateAnswer(GameSession session, List<QuestionData> cachedQuestions, int questionNumber) {
         List<GameSessionDetail> existingDetails = new ArrayList<>(session.getDetails());
         long answeredCount = existingDetails.stream()
@@ -453,9 +454,9 @@ public class QuickQuizService {
         }
     }
 
-    // 5. Validate answer request (option index + time)
+    // 5. Xác thực yêu cầu trả lời (chỉ số tùy chọn + thời gian)
     private void validateAnswerRequest(QuickQuizAnswerRequest request, QuestionData questionData) {
-        // Validate option index
+        // Xác thực chỉ số tùy chọn
         if (request.getSelectedOptionIndex() < 0 ||
                 request.getSelectedOptionIndex() >= questionData.getOptionVocabs().size()) {
             throw new ErrorException(
@@ -463,20 +464,20 @@ public class QuickQuizService {
                             ". Khoảng hợp lệ: 0-" + (questionData.getOptionVocabs().size() - 1));
         }
 
-        // Validate time taken
+        // Xác thực thời gian thực hiện
         validateTimeTaken(request);
     }
 
-    // 6. Validate time taken (min, max, server-side check)
+    // 6. Xác thực thời gian thực hiện (tối thiểu, tối đa, kiểm tra phía máy chủ)
     private void validateTimeTaken(QuickQuizAnswerRequest request) {
-        // Check minimum time
+        // Kiểm tra thời gian tối thiểu
         if (request.getTimeTaken() < MIN_ANSWER_TIME) {
             throw new ErrorException(
                     "Thời gian trả lời không hợp lệ: " + request.getTimeTaken() + "ms. Tối thiểu: " + MIN_ANSWER_TIME
                             + "ms");
         }
 
-        // Check timeout
+        // Kiểm tra hết giờ
         Integer timeLimit = gameSessionCacheService.getSessionTimeLimit(request.getSessionId());
         if (timeLimit == null) {
             timeLimit = 3000; // Default 3 seconds
@@ -488,11 +489,11 @@ public class QuickQuizService {
                             + "ms");
         }
 
-        // Validate server-side timestamp
+        // Xác thực dấu thời gian phía máy chủ
         validateServerTimestamp(request, timeLimit);
     }
 
-    // 7. Validate server-side timestamp (anti-cheat)
+    // 7. Xác thực dấu thời gian phía máy chủ (chống gian lận)
     private void validateServerTimestamp(QuickQuizAnswerRequest request, int timeLimit) {
         LocalDateTime startTime = gameSessionCacheService.getQuestionStartTime(
                 request.getSessionId(),
@@ -521,7 +522,7 @@ public class QuickQuizService {
         }
     }
 
-    // 8. Process answer and calculate score
+    // 8. Xử lý câu trả lời và tính điểm
     private AnswerResult processAnswer(QuickQuizAnswerRequest request, GameSession session,
             QuestionData questionData) {
         Vocab currentVocab = questionData.getMainVocab();
@@ -529,7 +530,7 @@ public class QuickQuizService {
 
         List<GameSessionDetail> details = new ArrayList<>(session.getDetails());
 
-        // Calculate points and streak
+        // Tính điểm và chuỗi thắng
         int pointsEarned = 0;
         int currentStreak = calculateCurrentStreak(details);
 
@@ -537,12 +538,12 @@ public class QuickQuizService {
             pointsEarned = BASE_POINTS;
             currentStreak++;
 
-            // Streak bonus
+            // Thưởng chuỗi thắng
             if (currentStreak >= 3) {
                 pointsEarned += STREAK_BONUS * (currentStreak / 3);
             }
 
-            // Speed bonus
+            // Thưởng tốc độ
             if (request.getTimeTaken() < SPEED_BONUS_THRESHOLD) {
                 pointsEarned += 5;
             }
@@ -552,7 +553,7 @@ public class QuickQuizService {
             currentStreak = 0;
         }
 
-        // Save answer detail
+        // Lưu chi tiết câu trả lời
         GameSessionDetail detail = GameSessionDetail.builder()
                 .session(session)
                 .vocab(currentVocab)
@@ -563,22 +564,22 @@ public class QuickQuizService {
         details.add(detail);
         gameSessionDetailRepository.save(detail);
 
-        // Update session score
+        // Cập nhật điểm phiên
         session.setScore(session.getScore() + pointsEarned);
 
         return new AnswerResult(isUserCorrect, pointsEarned, currentStreak, details);
     }
 
-    // Process skipped answer (timeout or user skip)
+    // Xử lý câu trả lời bị bỏ qua (hết giờ hoặc người dùng bỏ qua)
     private AnswerResult processSkippedAnswer(GameSession session, QuestionData questionData, Integer timeTaken) {
         Vocab currentVocab = questionData.getMainVocab();
         List<GameSessionDetail> details = new ArrayList<>(session.getDetails());
 
-        // Skipped = wrong answer, no points, reset streak
+        // Bỏ qua = trả lời sai, không có điểm, reset chuỗi thắng
         int pointsEarned = 0;
         int currentStreak = 0;
 
-        // Save answer detail as wrong
+        // Lưu chi tiết câu trả lời là sai
         GameSessionDetail detail = GameSessionDetail.builder()
                 .session(session)
                 .vocab(currentVocab)
@@ -589,13 +590,13 @@ public class QuickQuizService {
         details.add(detail);
         gameSessionDetailRepository.save(detail);
 
-        // No score update for skipped questions
+        // Không cập nhật điểm cho câu hỏi bị bỏ qua
         log.info("Question skipped. Session: {}, Vocab: {}", session.getId(), currentVocab.getWord());
 
         return new AnswerResult(false, pointsEarned, currentStreak, details);
     }
 
-    // 9. Prepare next question or finish game
+    // 9. Chuẩn bị câu hỏi tiếp theo hoặc kết thúc game
     private QuickQuizQuestionResponse prepareNextQuestionOrFinish(
             QuickQuizAnswerRequest request,
             GameSession session,
@@ -612,12 +613,12 @@ public class QuickQuizService {
         }
     }
 
-    // 10. Prepare next question
+    // 10. Chuẩn bị câu hỏi tiếp theo
     private QuickQuizQuestionResponse prepareNextQuestion(QuickQuizAnswerRequest request,
             List<QuestionData> cachedQuestions) {
         QuestionData nextQuestionData = cachedQuestions.get(request.getQuestionNumber());
 
-        // Record start time for next question in Redis
+        // Ghi lại thời gian bắt đầu cho câu hỏi tiếp theo trong Redis
         gameSessionCacheService.cacheQuestionStartTime(
                 request.getSessionId(),
                 request.getQuestionNumber() + 1,
@@ -634,18 +635,18 @@ public class QuickQuizService {
         return nextQuestion;
     }
 
-    // 11. Finish game and cleanup caches
+    // 11. Kết thúc game và dọn dẹp cache
     private void finishGameAndCleanup(GameSession session, List<GameSessionDetail> details) {
         finishGame(session, details);
 
-        // Record streak AFTER finishing game (outside main transaction)
+        // Ghi lại chuỗi thắng SAU KHI kết thúc game (bên ngoài transaction chính)
         recordStreakActivitySafely(session.getUser());
 
-        // Cleanup Redis caches
+        // Dọn dẹp cache Redis
         gameSessionCacheService.deleteQuizSessionCache(session.getId());
     }
 
-    // 12. Build answer response
+    // 12. Xây dựng phản hồi câu trả lời
     private QuickQuizAnswerResponse buildAnswerResponse(
             QuickQuizAnswerRequest request,
             GameSession session,
@@ -667,7 +668,7 @@ public class QuickQuizService {
                 .build();
     }
 
-    // Convert Vocab to VocabOptionResponse
+    // Chuyển đổi Vocab sang VocabOptionResponse
     private VocabOptionResponse toVocabOptionResponse(Vocab vocab) {
         return VocabOptionResponse.builder()
                 .word(vocab.getWord())
@@ -682,11 +683,11 @@ public class QuickQuizService {
                 .build();
     }
 
-    // Build QuickQuizQuestionResponse from QuestionData
+    // Xây dựng QuickQuizQuestionResponse từ QuestionData
     private QuickQuizQuestionResponse buildQuestionResponse(QuestionData questionData, int timeLimit) {
         Vocab mainVocab = questionData.getMainVocab();
 
-        // Convert option vocabs to VocabOptionResponse
+        // Chuyển đổi các từ vựng lựa chọn sang VocabOptionResponse
         List<VocabOptionResponse> optionResponses = questionData.getOptionVocabs()
                 .stream()
                 .map(this::toVocabOptionResponse)
@@ -705,12 +706,12 @@ public class QuickQuizService {
                 .audio(mainVocab.getAudio())
                 .credit(mainVocab.getCredit())
                 .options(optionResponses)
-                .correctAnswerIndex(null) // Don't send to client
+                .correctAnswerIndex(null) // Không gửi cho client
                 .timeLimit(timeLimit)
                 .build();
     }
 
-    // Rate limiting check using Redis
+    // Kiểm tra giới hạn tốc độ sử dụng Redis
     private void checkRateLimit(UUID userId) {
         RateLimitingService.RateLimitResult result = rateLimitingService.checkGameRateLimit(
                 userId,
@@ -729,7 +730,7 @@ public class QuickQuizService {
                 userId, result.getCurrentCount(), MAX_GAMES_PER_5_MIN);
     }
 
-    // Calculate current streak
+    // Tính toán chuỗi thắng hiện tại
     private int calculateCurrentStreak(List<GameSessionDetail> details) {
         int streak = 0;
         for (int i = details.size() - 1; i >= 0; i--) {
@@ -742,7 +743,7 @@ public class QuickQuizService {
         return streak;
     }
 
-    // Calculate longest streak in session
+    // Tính toán chuỗi thắng dài nhất trong phiên
     private int calculateLongestStreak(List<GameSessionDetail> details) {
         int longest = 0;
         int current = 0;
@@ -759,22 +760,22 @@ public class QuickQuizService {
         return longest;
     }
 
-    // Finish game and calculate final stats
+    // Kết thúc game và tính toán thống kê cuối cùng
     private void finishGame(GameSession session, List<GameSessionDetail> details) {
         session.setFinishedAt(LocalDateTime.now());
 
-        // Calculate duration in seconds
+        // Tính thời lượng bằng giây
         long duration = Duration.between(session.getStartedAt(), session.getFinishedAt()).getSeconds();
         session.setDuration((int) duration);
 
-        // Calculate accuracy
+        // Tính độ chính xác
         double accuracy = details.isEmpty() ? 0.0 : (session.getCorrectCount() * 100.0) / details.size();
         session.setAccuracy(accuracy);
 
         log.info("Game finished. Score: {}, Accuracy: {}%, Duration: {}s",
                 session.getScore(), String.format("%.1f", accuracy), duration);
 
-        // ✨ UPDATE LEADERBOARD after game finished
+        // ✨ CẬP NHẬT BẢNG XẾP HẠNG sau khi game kết thúc
         try {
             leaderboardService.updateUserScore(session.getUser().getId(), "quick-quiz", session.getScore());
             log.info("📊 Leaderboard updated for user: {}, score: {}", session.getUser().getId(), session.getScore());
@@ -782,7 +783,7 @@ public class QuickQuizService {
             log.error("❌ Failed to update leaderboard: {}", e.getMessage(), e);
         }
 
-        // 🎯 CHECK CEFR UPGRADE after game finished
+        // 🎯 KIỂM TRA NÂNG CẤP CEFR sau khi game kết thúc
         try {
             boolean upgraded = cefrUpgradeService.checkAndUpgradeCEFR(session.getUser().getId());
             if (upgraded) {
@@ -792,11 +793,11 @@ public class QuickQuizService {
             log.error("❌ Failed to check CEFR upgrade: {}", e.getMessage(), e);
         }
 
-        // 🔔 CREATE ACHIEVEMENT NOTIFICATIONS
+        // 🔔 TẠO THÔNG BÁO THÀNH TÍCH
         createGameAchievementNotifications(session, accuracy);
     }
 
-    // Create achievement notifications based on game performance
+    // Tạo thông báo thành tích dựa trên hiệu suất game
     private void createGameAchievementNotifications(GameSession session, double accuracy) {
         try {
             User user = session.getUser();
@@ -804,7 +805,7 @@ public class QuickQuizService {
             int correctCount = session.getCorrectCount();
             int totalQuestions = session.getTotalQuestions();
 
-            // 🏆 High Score Achievement (score >= 80)
+            // 🏆 Thành tích điểm cao (điểm >= 80)
             if (score >= 80) {
                 com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest
                         .builder()
@@ -818,7 +819,7 @@ public class QuickQuizService {
                 notificationService.createNotification(request);
             }
 
-            // 🎯 Perfect Accuracy (100%)
+            // 🎯 Độ chính xác hoàn hảo (100%)
             if (accuracy >= 100.0) {
                 com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest
                         .builder()
@@ -830,7 +831,7 @@ public class QuickQuizService {
                         .build();
                 notificationService.createNotification(request);
             }
-            // 📈 Excellent Accuracy (90-99%)
+            // 📈 Độ chính xác xuất sắc (90-99%)
             else if (accuracy >= 90.0) {
                 com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest request = com.thuanthichlaptrinh.card_words.entrypoint.dto.request.CreateNotificationRequest
                         .builder()
@@ -850,7 +851,7 @@ public class QuickQuizService {
         }
     }
 
-    // Record streak in separate method to avoid transaction issues
+    // Ghi lại chuỗi thắng trong phương thức riêng để tránh vấn đề transaction
     private void recordStreakActivitySafely(User user) {
         try {
             streakService.recordActivity(user);
@@ -860,7 +861,7 @@ public class QuickQuizService {
         }
     }
 
-    // Update user vocabulary progress (Spaced Repetition)
+    // Cập nhật tiến độ từ vựng của người dùng (Lặp lại ngắt quãng)
     private void updateVocabProgress(UUID userId, UUID vocabId, boolean isCorrect) {
         User user = new User();
         user.setId(userId);
@@ -873,8 +874,8 @@ public class QuickQuizService {
                 .orElse(UserVocabProgress.builder()
                         .user(user)
                         .vocab(vocab)
-                        .status(com.thuanthichlaptrinh.card_words.common.enums.VocabStatus.NEW) // Set NEW for first
-                                                                                                // time
+                        .status(com.thuanthichlaptrinh.card_words.common.enums.VocabStatus.NEW) // Đặt NEW cho lần đầu
+                                                                                                // tiên
                         .timesCorrect(0)
                         .timesWrong(0)
                         .efFactor(2.5)
@@ -882,14 +883,14 @@ public class QuickQuizService {
                         .repetition(0)
                         .build());
 
-        // Save current status for logging
+        // Lưu trạng thái hiện tại để ghi log
         com.thuanthichlaptrinh.card_words.common.enums.VocabStatus oldStatus = progress.getStatus();
 
         if (isCorrect) {
             progress.setTimesCorrect(progress.getTimesCorrect() + 1);
             progress.setRepetition(progress.getRepetition() + 1);
 
-            // SM-2 algorithm: increase interval
+            // Thuật toán SM-2: tăng khoảng cách
             if (progress.getRepetition() == 1) {
                 progress.setIntervalDays(1);
             } else if (progress.getRepetition() == 2) {
@@ -903,7 +904,7 @@ public class QuickQuizService {
             progress.setIntervalDays(1);
         }
 
-        // Calculate and update status using VocabStatusCalculator
+        // Tính toán và cập nhật trạng thái sử dụng VocabStatusCalculator
         com.thuanthichlaptrinh.card_words.common.enums.VocabStatus newStatus = com.thuanthichlaptrinh.card_words.common.utils.VocabStatusCalculator
                 .calculateStatus(
                         oldStatus,
@@ -911,7 +912,7 @@ public class QuickQuizService {
                         progress.getTimesWrong());
         progress.setStatus(newStatus);
 
-        // Update review dates
+        // Cập nhật ngày ôn tập
         progress.setLastReviewed(java.time.LocalDate.now());
         if (progress.getIntervalDays() != null && progress.getIntervalDays() > 0) {
             progress.setNextReviewDate(java.time.LocalDate.now().plusDays(progress.getIntervalDays()));
@@ -919,7 +920,7 @@ public class QuickQuizService {
 
         userVocabProgressRepository.save(progress);
 
-        // Log status change
+        // Ghi log thay đổi trạng thái
         if (oldStatus != newStatus) {
             log.info("Quick Quiz - Vocab status updated: userId={}, vocabId={}, {} -> {}, accuracy={}",
                     userId, vocabId, oldStatus, newStatus,
@@ -928,7 +929,7 @@ public class QuickQuizService {
         }
     }
 
-    // Build explanation for answer
+    // Xây dựng giải thích cho câu trả lời
     private String buildExplanation(Vocab vocab, int correctAnswerIndex) {
         return String.format("✓ Đáp án đúng: '%s' nghĩa là '%s'", vocab.getWord(), vocab.getMeaningVi());
     }

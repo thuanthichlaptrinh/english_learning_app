@@ -29,47 +29,59 @@ public class ChatContextService {
     public String buildContext(User user, String question) {
         StringBuilder context = new StringBuilder();
 
-        // Analyze question to determine what context to retrieve
-        boolean askingAboutVocab = containsKeywords(question, "từ", "word", "vocabulary", "nghĩa", "meaning");
-        boolean askingAboutTopic = containsKeywords(question, "topic", "chủ đề", "theme");
-        boolean askingAboutProgress = containsKeywords(question, "tiến độ", "progress", "đã học", "learned");
+        try {
+            // Analyze question to determine what context to retrieve
+            boolean askingAboutVocab = containsKeywords(question, "từ", "word", "vocabulary", "nghĩa", "meaning");
+            boolean askingAboutTopic = containsKeywords(question, "topic", "chủ đề", "theme");
+            boolean askingAboutProgress = containsKeywords(question, "tiến độ", "progress", "đã học", "learned");
 
-        if (askingAboutVocab) {
-            context.append(getVocabContext(question));
-        }
+            if (askingAboutVocab) {
+                String vocabContext = getVocabContext(question);
+                if (!vocabContext.isEmpty()) {
+                    context.append(vocabContext);
+                }
+            }
 
-        if (askingAboutTopic) {
-            context.append(getTopicContext(question));
-        }
+            if (askingAboutTopic) {
+                String topicContext = getTopicContext(question);
+                if (!topicContext.isEmpty()) {
+                    context.append(topicContext);
+                }
+            }
 
-        if (askingAboutProgress && user != null) {
-            context.append(getUserProgressContext(user));
-        }
+            if (askingAboutProgress && user != null) {
+                context.append(getUserProgressContext(user));
+            }
 
-        // If no specific context, provide general overview
-        if (context.length() == 0) {
-            context.append(getGeneralContext());
+            // If no specific context, provide general overview
+            if (context.length() == 0) {
+                context.append(getGeneralContext());
+            }
+        } catch (Exception e) {
+            log.error("Error building chat context", e);
+            // Return basic context in case of error
+            return getGeneralContext();
         }
 
         return context.toString();
     }
 
     private String getVocabContext(String question) {
-        StringBuilder context = new StringBuilder("\n### Thông tin từ vựng:\n");
-
-        // Extract potential word from question
         List<Vocab> relatedVocabs = findRelatedVocabs(question);
 
-        if (!relatedVocabs.isEmpty()) {
-            for (Vocab vocab : relatedVocabs) {
-                context.append(String.format("- %s (%s): %s\n",
-                        vocab.getWord(),
-                        vocab.getCefr(),
-                        vocab.getMeaningVi()));
+        if (relatedVocabs.isEmpty()) {
+            return "";
+        }
 
-                if (vocab.getExampleSentence() != null) {
-                    context.append(String.format("  Ví dụ: %s\n", vocab.getExampleSentence()));
-                }
+        StringBuilder context = new StringBuilder("\n### Thông tin từ vựng:\n");
+        for (Vocab vocab : relatedVocabs) {
+            context.append(String.format("- %s (%s): %s\n",
+                    vocab.getWord(),
+                    vocab.getCefr(),
+                    vocab.getMeaningVi()));
+
+            if (vocab.getExampleSentence() != null) {
+                context.append(String.format("  Ví dụ: %s\n", vocab.getExampleSentence()));
             }
         }
 
@@ -80,13 +92,14 @@ public class ChatContextService {
         StringBuilder context = new StringBuilder("\n### Thông tin chủ đề:\n");
 
         List<Topic> topics = topicRepository.findAll();
+        String normalizedQuestion = question.toLowerCase();
 
         if (!topics.isEmpty()) {
             // Đếm tổng số topic
             context.append(String.format("**Tổng số chủ đề:** %d\n\n", topics.size()));
 
             context.append("**Các chủ đề có sẵn:**\n");
-            for (Topic topic : topics.stream().limit(15).collect(Collectors.toList())) {
+            for (Topic topic : topics) {
                 // Đếm số từ thực tế trong topic từ database
                 long vocabCount = vocabRepository.countByTopicId(topic.getId());
 
@@ -94,10 +107,22 @@ public class ChatContextService {
                         topic.getName(),
                         topic.getDescription() != null ? topic.getDescription() : "Không có mô tả",
                         vocabCount));
-            }
 
-            if (topics.size() > 15) {
-                context.append(String.format("\n_Còn %d chủ đề khác..._\n", topics.size() - 15));
+                // Nếu câu hỏi chứa tên topic, lấy thêm danh sách từ vựng của topic đó
+                if (normalizedQuestion.contains(topic.getName().toLowerCase())) {
+                    List<Vocab> topicVocabs = vocabRepository.findByTopicNameIgnoreCase(topic.getName());
+                    if (!topicVocabs.isEmpty()) {
+                        context.append("  > **Danh sách từ vựng trong chủ đề này:**\n");
+                        // Limit to 20 words to avoid token limit
+                        for (Vocab v : topicVocabs.stream().limit(20).collect(Collectors.toList())) {
+                            context.append(
+                                    String.format("    + %s (%s): %s\n", v.getWord(), v.getCefr(), v.getMeaningVi()));
+                        }
+                        if (topicVocabs.size() > 20) {
+                            context.append(String.format("    + ... và %d từ khác.\n", topicVocabs.size() - 20));
+                        }
+                    }
+                }
             }
         } else {
             context.append("Chưa có chủ đề nào.\n");
@@ -157,6 +182,10 @@ public class ChatContextService {
     private List<Vocab> findRelatedVocabs(String question) {
         List<Vocab> relatedVocabs = new ArrayList<>();
 
+        if (question == null || question.trim().isEmpty()) {
+            return relatedVocabs;
+        }
+
         // Simple keyword extraction and search
         String[] words = question.toLowerCase()
                 .replaceAll("[^a-zA-Z0-9\\s]", "")
@@ -164,9 +193,11 @@ public class ChatContextService {
 
         for (String word : words) {
             if (word.length() >= 3) {
-                List<Vocab> found = vocabRepository.findByWordContainingIgnoreCase(word);
+                // Use PageRequest to limit results at database level (Top 3 matches)
+                List<Vocab> found = vocabRepository
+                        .searchByKeyword(word, org.springframework.data.domain.PageRequest.of(0, 3)).getContent();
                 if (!found.isEmpty()) {
-                    relatedVocabs.addAll(found.stream().limit(3).collect(Collectors.toList()));
+                    relatedVocabs.addAll(found);
                 }
             }
         }

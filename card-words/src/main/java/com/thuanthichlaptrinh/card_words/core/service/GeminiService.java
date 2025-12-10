@@ -56,6 +56,11 @@ public class GeminiService {
                     log.error("Gemini API error: {}", response.code());
                     String errorBody = response.body() != null ? response.body().string() : "No error body";
                     log.error("Error body: {}", errorBody);
+
+                    if (response.code() == 429) {
+                        return "Hệ thống đang quá tải (Quota Exceeded). Vui lòng thử lại sau ít phút.";
+                    }
+
                     throw new IOException("Mã phản hồi không mong đợi: " + response.code());
                 }
 
